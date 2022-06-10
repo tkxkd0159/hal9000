@@ -1,0 +1,36 @@
+name: Build bot
+
+on:
+  pull_request:
+  push:
+    branches:
+      - release
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64]
+        os: [darwin, linux]
+        include:
+          - os: darwin
+            arch: arm64
+    name: ${{ matrix.arch }} for ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+
+      - name: Build bot
+        run: |
+          go mod download
+          make build
+          

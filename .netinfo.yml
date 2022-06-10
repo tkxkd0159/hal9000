@@ -1,0 +1,5 @@
+nova:
+  val_addr: "novavaloper18hcuafd3849v4deyyazn6k32ze9msyqs2xgvjh"
+  local_addr: "nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf"
+atom:
+  local_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"

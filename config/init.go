@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func init() {
+func SetEnv() {
 	viper.SetConfigFile(".env")
 	err := viper.ReadInConfig()
 	utils.HandleErr(err)

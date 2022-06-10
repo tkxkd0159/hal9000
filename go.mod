@@ -3,7 +3,7 @@ module github.com/Carina-labs/HAL9000
 go 1.18
 
 require (
-	github.com/Carina-labs/nova v1.0.0
+	github.com/Carina-labs/nova v0.1.1-0.20220610193002-665ba9b90d3e
 	github.com/spf13/viper v1.11.0
 	google.golang.org/grpc v1.45.0
 )
@@ -33,7 +33,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
-replace (
-	github.com/Carina-labs/nova => ../nova
-	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-)
+replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1

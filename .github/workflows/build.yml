@@ -4,9 +4,11 @@ on:
   pull_request:
   push:
     branches:
-      - release
+      - main
   workflow_dispatch:
 
+env:
+  USER_NAME: vvictorl
 
 jobs:
   build:
@@ -28,9 +30,11 @@ jobs:
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
+          GOPRIVATE: github.com/Carina-labs
 
       - name: Build bot
         run: |
+          git config --global url."https://${{ env.USER_NAME }}:${{ secrets.HAL_ACT }}@github.com".insteadOf "https://github.com"
           go mod download
           make build
           

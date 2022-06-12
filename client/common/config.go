@@ -66,7 +66,7 @@ func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID stri
 	tmClient, err := client.NewClientFromNode(tmRPC)
 	if err != nil {
 		return initClientCtx, err
-	} else {
-		return initClientCtx.WithClient(tmClient), nil
 	}
+	return initClientCtx.WithClient(tmClient), nil
+
 }

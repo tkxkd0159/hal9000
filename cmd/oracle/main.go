@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
@@ -29,22 +30,29 @@ func init() {
 	wd = path.Join(cwd, "bot")
 	err = os.Mkdir(wd, 0740)
 	if os.IsExist(err) {
-		log.Println("bot directory already exist")
+		log.Println("** bot directory already exist **")
 	} else if err != nil {
 		log.Fatal(err)
 	}
 }
 
+// FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
+// make run TARGET=oracle CUSTOM_ORGS="-add=true -name='gogo'"
 func main() {
 	sViper := config.Sviper
+	keyname := flag.String("name", "nova-bot", "unique key name")
+	newacc := flag.Bool("add", false, "Start client with making new account")
+	flag.Parse()
+
 	ctx, _ := common.MakeContext(novaapp.ModuleBasics, viper.GetString("nova.local_addr"),
 		"tcp://localhost:26657", viper.GetString("nova.chain_id"), wd, keyring.BackendFile)
-	brandnew := false
-	if brandnew {
-		botInfo = common.MakeClientWithNewAcc(ctx, "nova-bot", sViper.GetString("nova_mne"), sdktypes.FullFundraiserPath, hd.Secp256k1)
+
+	if *newacc {
+		botInfo = common.MakeClientWithNewAcc(ctx, *keyname, sViper.GetString("nova_mne"), sdktypes.FullFundraiserPath, hd.Secp256k1)
 	} else {
-		botInfo = common.LoadClient(ctx, "nova-bot")
+		botInfo = common.LoadClient(ctx, *keyname)
 	}
+	// Next step after check passphrase
 	fmt.Println(botInfo.GetPubKey(), botInfo.GetName(), botInfo.GetType(), botInfo.GetAddress(), botInfo.GetAlgo())
 	fmt.Println(botInfo.GetPath())
 

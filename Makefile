@@ -1,5 +1,6 @@
 TARGET ?= oracle
 BUILD_DIR ?= $(CURDIR)/build
+CUSTOM_ORGS ?= ""
 
 .PHONY: all build clean run
 
@@ -10,7 +11,7 @@ BUILD_TARGETS := build install
 build: BUILD_ARGS=-o $(BUILD_DIR)/
 
 run:
-	@go run ./cmd/$(TARGET)
+	@go run ./cmd/$(TARGET) $(CUSTOM_ORGS)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
 	@echo ">>>>>>>>>>>> $@ <<<<<<<<<<<<"

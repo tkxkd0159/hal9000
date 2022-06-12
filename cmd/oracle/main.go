@@ -9,7 +9,6 @@ import (
 	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"sync"
 )
@@ -19,11 +18,10 @@ var wg sync.WaitGroup
 func main() {
 	sViper := config.Sviper
 	fmt.Println(sViper.Get("atom_mne"))
-
-	addr := viper.GetString("NOVA_ADDR")
+	addr := viper.GetString("net.ip.nova") + ":" + viper.GetString("net.port.grpc")
 	conn, err := grpc.Dial(
 		addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithInsecure(),
 	)
 	utils.HandleErr(err, "cannot create gRPC connection", ut.EXIT)
 
@@ -41,17 +39,10 @@ func main() {
 		api.Server{}.On()
 	}()
 
-	ch1 := make(chan string)
-	go func() {
-		defer wg.Done()
-		ch1 <- "get ch1"
-	}()
-
 	nf := common.GetNodeInfo(conn)
-	vf := common.GetValInfo(conn, config.Nviper.GetString("nova.val_addr"))
+	vf := common.GetValInfo(conn, viper.GetString("nova.val_addr"))
 
 	fmt.Println(nf.GetNodeInfo())
 	fmt.Println(vf.GetValidator().Tokens)
-	fmt.Println(<-ch1)
 	wg.Wait()
 }

@@ -6,34 +6,30 @@ import (
 	"github.com/spf13/viper"
 )
 
-var Nviper *viper.Viper
 var Sviper *viper.Viper
 
 func init() {
-	Sviper = SetEnv()
-	Nviper = SetNetInfo()
+	setChainInfo()
+	Sviper = setEnv()
 }
 
-func SetEnv() *viper.Viper {
-	viper.SetConfigFile(".env")
-	err := viper.ReadInConfig()
-	utils.HandleErr(err, "Can't read .env", types.EXIT)
+func setEnv() *viper.Viper {
+	//viper.SetConfigFile(".env")
+	//err := viper.ReadInConfig()
+	//utils.HandleErr(err, "Can't read .env", types.EXIT)
 
 	sViper := viper.New()
 	sViper.SetConfigType("yaml")
 	sViper.SetConfigFile(".secret.yml")
-	err = sViper.ReadInConfig()
+	err := sViper.ReadInConfig()
 	utils.HandleErr(err, "Can't read .secret.yml", types.EXIT)
 
 	return sViper
 }
 
-func SetNetInfo() *viper.Viper {
-	netViper := viper.New()
-	netViper.SetConfigType("yaml")
-	netViper.SetConfigFile(".netinfo.yml")
-	err := netViper.ReadInConfig()
-	utils.HandleErr(err, "Can't read .netinfo.yml", types.EXIT)
-
-	return netViper
+func setChainInfo() {
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile(".chaininfo.yml")
+	err := viper.ReadInConfig()
+	utils.HandleErr(err, "Can't read .chaininfo.yml", types.EXIT)
 }

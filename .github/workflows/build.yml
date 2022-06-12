@@ -1,4 +1,4 @@
-name: Build bot
+name: Build (XC)
 
 on:
   pull_request:

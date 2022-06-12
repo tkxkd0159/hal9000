@@ -1,3 +1,4 @@
+![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/Build+%28XC%29/badge.svg)
 # HAL9000
 The world's most complete oracle feeder
 

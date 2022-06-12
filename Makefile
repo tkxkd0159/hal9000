@@ -3,7 +3,7 @@ BUILD_DIR ?= $(CURDIR)/build
 
 .PHONY: all build clean run
 
-all: build lint
+all: lint build
 
 BUILD_TARGETS := build install
 
@@ -13,6 +13,7 @@ run:
 	@go run ./cmd/$(TARGET)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
+	@echo ">>>>>>>>>>>> $@ <<<<<<<<<<<<"
 	@go $@ -mod=readonly $(BUILD_ARGS) ./...
 
 # make BUILD_DIR=./bin
@@ -31,5 +32,5 @@ go.sum: go.mod
 .PHONY: lint
 
 lint:
+	@echo ">>>> Execute golangci-lint <<<<"
 	@golangci-lint run --out-format=tab
-

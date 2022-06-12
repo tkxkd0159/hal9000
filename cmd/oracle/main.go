@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
-	"github.com/Carina-labs/HAL9000/client"
 	"github.com/Carina-labs/HAL9000/client/common"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -15,13 +14,12 @@ import (
 	"sync"
 )
 
-func init() {
-	config.SetEnv()
-}
-
 var wg sync.WaitGroup
 
 func main() {
+	sViper := config.Sviper
+	fmt.Println(sViper.Get("atom_mne"))
+
 	addr := viper.GetString("NOVA_ADDR")
 	conn, err := grpc.Dial(
 		addr,
@@ -50,12 +48,10 @@ func main() {
 	}()
 
 	nf := common.GetNodeInfo(conn)
-	vf := common.GetValInfo(conn, client.NV.GetString("nova.val_addr"))
+	vf := common.GetValInfo(conn, config.Nviper.GetString("nova.val_addr"))
 
 	fmt.Println(nf.GetNodeInfo())
 	fmt.Println(vf.GetValidator().Tokens)
-
 	fmt.Println(<-ch1)
 	wg.Wait()
-
 }

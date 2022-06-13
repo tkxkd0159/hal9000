@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"os"
+	"io"
 )
 
 type EncodingConfig struct {
@@ -43,14 +43,14 @@ func MakeEncodingConfig(mb module.BasicManager) EncodingConfig {
 	return encCfg
 }
 
-func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string) (client.Context, error) {
+func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader) (client.Context, error) {
 	encCfg := MakeEncodingConfig(mb)
 	initClientCtx := client.Context{}.
 		WithCodec(encCfg.Marshaler).
 		WithInterfaceRegistry(encCfg.InterfaceRegistry).
 		WithTxConfig(encCfg.TxConfig).
 		WithLegacyAmino(encCfg.Amino).
-		WithInput(os.Stdin).
+		WithInput(userInput).
 		WithSignModeStr(flags.SignModeDirect).
 		WithAccountRetriever(authtypes.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastSync).

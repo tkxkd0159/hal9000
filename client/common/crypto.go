@@ -12,7 +12,7 @@ import (
 // If you want to reset keyring, delete keyring-* dir
 func MakeKeyring(ctx client.Context, backend string) keyring.Keyring {
 	kb, err := NewKeyringFromBackend(ctx, backend)
-	utils.HandleErr(err, "Cannot generate keyring instance", types.EXIT)
+	utils.CheckErr(err, "Cannot generate keyring instance", types.EXIT)
 	return kb
 }
 

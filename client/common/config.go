@@ -88,7 +88,7 @@ func AddMoreFromInfo(ctx client.Context) client.Context {
 }
 
 // gas = "auto", fee = "0unova", gasPrice = "ounova"
-func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string) tx.Factory {
+func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string, gasWeight float64) tx.Factory {
 	gasSetting, _ := flags.ParseGasSetting(gas)
 
 	initFac := tx.Factory{}.
@@ -101,7 +101,7 @@ func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string)
 		WithAccountRetriever(ctx.AccountRetriever).
 		WithGas(gasSetting.Gas).
 		WithSimulateAndExecute(gasSetting.Simulate).
-		WithGasAdjustment(flags.DefaultGasAdjustment).
+		WithGasAdjustment(flags.DefaultGasAdjustment * gasWeight).
 		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
 
 	return initFac.

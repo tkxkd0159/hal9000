@@ -50,6 +50,7 @@ func MakeEncodingConfig(mb module.BasicManager) EncodingConfig {
 func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader) (client.Context, error) {
 	encCfg := MakeEncodingConfig(mb)
 	initClientCtx := client.Context{}.
+		WithSimulation(false).
 		WithInput(userInput).
 		WithCodec(encCfg.Marshaler).
 		WithInterfaceRegistry(encCfg.InterfaceRegistry).
@@ -87,7 +88,7 @@ func AddMoreFromInfo(ctx client.Context) client.Context {
 }
 
 // gas = "auto", fee = "0unova", gasPrice = "ounova"
-func MakeTxFactory(ctx client.Context, gas string, gasPrice string, fee string, memo string) tx.Factory {
+func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string) tx.Factory {
 	gasSetting, _ := flags.ParseGasSetting(gas)
 
 	initFac := tx.Factory{}.
@@ -105,7 +106,6 @@ func MakeTxFactory(ctx client.Context, gas string, gasPrice string, fee string, 
 
 	return initFac.
 		WithGasPrices(gasPrice).
-		WithFees(fee).
 		WithMemo(memo)
 
 }

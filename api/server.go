@@ -13,5 +13,5 @@ func (Server) On() {
 	http.HandleFunc("/", getRoot)
 	http.HandleFunc("/hello", getHello)
 	err := http.ListenAndServe(":3334", nil)
-	utils.HandleErr(err, "cannot open http server", ut.EXIT)
+	utils.CheckErr(err, "cannot open http server", ut.EXIT)
 }

@@ -40,9 +40,10 @@ func init() {
 
 // FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
 func main() {
-	keyname := flag.String("name", "nova-bot", "unique key name")
+	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")
+	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	disp := flag.Bool("display", false, "show context log through stdout")
+	disp := flag.Bool("display", false, "Show context log through stdout")
 
 	userOutput := os.Stdout
 	flag.Parse()
@@ -112,7 +113,7 @@ func main() {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		api.Server{}.On("127.0.0.1:3334")
+		api.Server{}.On(*apiAddr)
 	}()
 
 	conn, err := grpc.Dial(

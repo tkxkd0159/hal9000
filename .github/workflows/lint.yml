@@ -29,4 +29,5 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.46.2
+          skip-cache: true
         if: env.GIT_DIFF

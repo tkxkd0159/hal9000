@@ -39,7 +39,6 @@ func init() {
 }
 
 // FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
-// make run TARGET=oracle CUSTOM_ORGS="-add=true -name='gogo'"
 func main() {
 	keyname := flag.String("name", "nova-bot", "unique key name")
 	newacc := flag.Bool("add", false, "Start client with making new account")

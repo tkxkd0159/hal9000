@@ -11,12 +11,12 @@ import (
 // MakeKeyring returns keystore from cosmos-sdk/crypto/keyring
 // If you want to reset keyring, delete keyring-* dir
 func MakeKeyring(ctx client.Context, backend string) keyring.Keyring {
-	kb, err := NewKeyringFromBackend(ctx, backend)
+	kb, err := newKeyringFromBackend(ctx, backend)
 	utils.CheckErr(err, "Cannot generate keyring instance", types.EXIT)
 	return kb
 }
 
-func NewKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
+func newKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
 	if ctx.GenerateOnly || ctx.Simulate {
 		return keyring.New(sdktypes.KeyringServiceName(), keyring.BackendMemory, ctx.KeyringDir, ctx.Input, ctx.KeyringOptions...)
 	}

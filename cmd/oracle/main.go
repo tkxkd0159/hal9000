@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	"github.com/Carina-labs/HAL9000/client/common/types"
+	cq "github.com/Carina-labs/HAL9000/client/common/query"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
@@ -22,35 +22,20 @@ import (
 )
 
 var (
-	wg        sync.WaitGroup
-	origStdin *os.File
+	wg sync.WaitGroup
 )
 
 var (
-	wd      string
-	ctx     client.Context
-	botInfo keyring.Info
-	sViper  *viper.Viper
+	krDir, logDir string
+	ctx           client.Context
+	botInfo       keyring.Info
+	sViper        *viper.Viper
 )
 
 func init() {
-	cwd, err := os.Getwd()
-	utils.CheckErr(err, "cannot get working directory", 0)
-	wd = path.Join(cwd, "bot")
-	err = os.Mkdir(wd, 0740)
-	if os.IsExist(err) {
-		log.Println("** bot directory already exist **")
-	} else if err != nil {
-		log.Fatal(err)
-	}
-
 	sViper = config.Sviper
-
-	config := sdktypes.GetConfig()
-	config.SetBech32PrefixForAccount(types.Bech32PrefixAccAddr, types.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(types.Bech32PrefixValAddr, types.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(types.Bech32PrefixConsAddr, types.Bech32PrefixConsPub)
-	config.Seal()
+	SetBechPrefix()
+	krDir, logDir = SetInitialDir("bot", "logs")
 }
 
 // FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
@@ -58,42 +43,78 @@ func init() {
 func main() {
 	keyname := flag.String("name", "nova-bot", "unique key name")
 	newacc := flag.Bool("add", false, "Start client with making new account")
+	disp := flag.Bool("display", false, "show context log through stdout")
+
+	userOutput := os.Stdout
 	flag.Parse()
+	if !*disp {
+		fpLog, err := os.OpenFile(path.Join(logDir, "ctxlog.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		utils.CheckErr(err, "", 0)
+		userOutput = fpLog
+	}
+	defer userOutput.Close()
+
 	novaGrpcAddr := viper.GetString("net.ip.nova") + ":" + viper.GetString("net.port.grpc")
 	novaTmAddr := "tcp://" + viper.GetString("net.ip.nova") + ":" + viper.GetString("net.port.tmrpc")
 
-	mypw := sViper.GetString("pw")
-	mypphrase := fmt.Sprintf("%s\n%s\n", mypw, mypw)
+	pp := GetPassphrase(sViper)
+
 	// set pipe to ignore stdin tty
-	rpipe, wpipe, err := utils.SetPipe(origStdin)
+	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
 
 	if *newacc {
-		ctx, _ = common.MakeContext(novaapp.ModuleBasics, viper.GetString("nova.local_addr"),
-			novaTmAddr, viper.GetString("nova.chain_id"), wd, keyring.BackendFile, os.Stdin)
-		botInfo = common.MakeClientWithNewAcc(ctx, *keyname, sViper.GetString("nova_mne"), sdktypes.FullFundraiserPath, hd.Secp256k1)
+
+		ctx = common.MakeContext(
+			novaapp.ModuleBasics,
+			viper.GetString("nova.local_addr"),
+			novaTmAddr,
+			viper.GetString("nova.chain_id"),
+			krDir,
+			keyring.BackendFile,
+			os.Stdin,
+			userOutput,
+		)
+
+		botInfo = common.MakeClientWithNewAcc(
+			ctx,
+			*keyname,
+			sViper.GetString("nova_mne"),
+			sdktypes.FullFundraiserPath,
+			hd.Secp256k1,
+		)
 		os.Exit(0)
 	} else {
-		_, err = wpipe.Write([]byte(mypphrase))
+		_, err = wpipe.Write([]byte(pp))
 		utils.CheckErr(err, "", 0)
 
-		ctx, _ = common.MakeContext(novaapp.ModuleBasics, viper.GetString("nova.local_addr"),
-			novaTmAddr, viper.GetString("nova.chain_id"), wd, keyring.BackendFile, rpipe)
+		ctx = common.MakeContext(
+			novaapp.ModuleBasics,
+			viper.GetString("nova.local_addr"),
+			novaTmAddr,
+			viper.GetString("nova.chain_id"),
+			krDir,
+			keyring.BackendFile,
+			rpipe,
+			userOutput,
+		)
 		os.Stdin = rpipe
 
-		botInfo = common.LoadClient(ctx, *keyname)
+		botInfo = common.LoadClientPubInfo(ctx, *keyname)
 	}
-
 	ctx = common.AddMoreFromInfo(ctx)
+	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
 
 	// ** Build TX
-	txf := common.MakeTxFactory(ctx, "auto", "0unova", "0unova", "")
-	coin := sdktypes.Coin{Denom: "unova", Amount: sdktypes.NewInt(333)}
-	to := sdktypes.AccAddress(viper.GetString("nova.target_addr"))
-	msg1 := common.MakeSendMsg(botInfo.GetAddress(), to, coin)
+	msg1, _ := common.MakeSendMsg(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
 	msgs := []sdktypes.Msg{msg1}
-
 	common.GenTxWithFactory(ctx, txf, false, msgs...)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		api.Server{}.On("127.0.0.1:3334")
+	}()
 
 	conn, err := grpc.Dial(
 		novaGrpcAddr,
@@ -108,17 +129,9 @@ func main() {
 		}
 	}(conn)
 
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		api.Server{}.On()
-	}()
-
-	fmt.Println("\n************ gRPC query checking ************\n")
-	nf := common.GetNodeInfo(conn)
-	vf := common.GetValInfo(conn, viper.GetString("nova.val_addr"))
-
+	fmt.Println("\n************ gRPC query checking ************")
+	nf := cq.GetNodeRes(conn)
+	vf := cq.GetValRes(conn, viper.GetString("nova.val_addr"))
 	fmt.Println(nf.GetNodeInfo())
 	fmt.Println(vf.GetValidator().Tokens)
 	wg.Wait()

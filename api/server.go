@@ -8,10 +8,10 @@ import (
 
 type Server struct{}
 
-func (Server) On() {
+func (Server) On(addr string) {
 	http.Handle("/api/", apiHandler{})
 	http.HandleFunc("/", getRoot)
 	http.HandleFunc("/hello", getHello)
-	err := http.ListenAndServe(":3334", nil)
+	err := http.ListenAndServe(addr, nil)
 	utils.CheckErr(err, "cannot open http server", ut.EXIT)
 }

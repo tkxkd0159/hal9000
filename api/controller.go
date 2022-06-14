@@ -27,7 +27,6 @@ func getHello(w http.ResponseWriter, req *http.Request) {
 type apiHandler struct{}
 
 func (apiHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	log.Println(req.URL.Path)
 	if req.URL.Path == "/api/" {
 		log.Println("got request /api/")
 		utils.SetJSONHeader(w)

@@ -36,5 +36,5 @@ jobs:
         run: |
           git config --global url."https://${{ env.USER_NAME }}:${{ secrets.HAL_ACT }}@github.com".insteadOf "https://github.com"
           go mod download
-          make build
+          make all
           

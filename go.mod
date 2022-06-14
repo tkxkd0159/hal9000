@@ -6,6 +6,7 @@ require (
 	github.com/Carina-labs/nova v0.1.1-0.20220610193002-665ba9b90d3e
 	github.com/cosmos/cosmos-sdk v0.45.4
 	github.com/spf13/viper v1.11.0
+	github.com/stretchr/testify v1.7.2
 	google.golang.org/grpc v1.45.0
 )
 
@@ -101,8 +102,6 @@ require (
 	github.com/spf13/cobra v1.4.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.7.2 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca // indirect
 	github.com/tendermint/btcd v0.1.1 // indirect

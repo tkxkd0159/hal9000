@@ -3,7 +3,7 @@ module github.com/Carina-labs/HAL9000
 go 1.18
 
 require (
-	github.com/Carina-labs/nova v0.1.1-0.20220610193002-665ba9b90d3e
+	github.com/Carina-labs/nova v0.1.1-0.20220614193512-7083a40c6431
 	github.com/cosmos/cosmos-sdk v0.45.4
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.2

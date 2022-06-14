@@ -1,16 +1,18 @@
 package common
 
 import (
+	"github.com/Carina-labs/HAL9000/client/common/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/codec/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 )
 
 type EncodingConfig struct {
-	InterfaceRegistry types.InterfaceRegistry
+	InterfaceRegistry codectypes.InterfaceRegistry
 	Marshaler         codec.Codec
 	TxConfig          client.TxConfig
 	Amino             *codec.LegacyAmino
@@ -18,7 +20,7 @@ type EncodingConfig struct {
 
 func makeEncodingConfig() EncodingConfig {
 	amino := codec.NewLegacyAmino()
-	ir := types.NewInterfaceRegistry()
+	ir := codectypes.NewInterfaceRegistry()
 	marshaler := codec.NewProtoCodec(ir)
 	txCfg := authtx.NewTxConfig(marshaler, authtx.DefaultSignModes)
 
@@ -38,4 +40,12 @@ func MakeEncodingConfig(mb module.BasicManager) EncodingConfig {
 	mb.RegisterInterfaces(encCfg.InterfaceRegistry)
 
 	return encCfg
+}
+
+func SetBechPrefix() {
+	config := sdktypes.GetConfig()
+	config.SetBech32PrefixForAccount(types.Bech32PrefixAccAddr, types.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(types.Bech32PrefixValAddr, types.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(types.Bech32PrefixConsAddr, types.Bech32PrefixConsPub)
+	config.Seal()
 }

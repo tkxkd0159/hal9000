@@ -34,7 +34,7 @@ var (
 
 func init() {
 	sViper = config.Sviper
-	SetBechPrefix()
+	common.SetBechPrefix()
 	krDir, logDir = SetInitialDir("bot", "logs")
 }
 

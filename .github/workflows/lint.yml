@@ -28,5 +28,5 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: latest
+          version: v1.46.2
         if: env.GIT_DIFF

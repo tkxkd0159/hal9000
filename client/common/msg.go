@@ -20,7 +20,8 @@ func CheckAccAddr(target any) (AccAddr, error) {
 			return nil, err
 		}
 		return addr, nil
-
+	case []byte:
+		return target, nil
 	default:
 		return nil, errors.New("cannot covert target to AccAddress")
 	}

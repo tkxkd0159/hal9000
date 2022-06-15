@@ -2,11 +2,11 @@ nova:
   chain_id: "nova"
   val_addr: "novavaloper18hcuafd3849v4deyyazn6k32ze9msyqs2xgvjh"
   target_addr: "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663"
-  local_addr: "nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf"
+  bot_addr: "nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf"
 gaia:
   chain_id: "gaia"
   val_addr: "cosmosvaloper1ma2378jplsnj3chlcgwqfx8p8g92z7dzw5kg5n"
-  local_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"
+  bot_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"
 net:
   ip:
     nova: "3.37.17.209"

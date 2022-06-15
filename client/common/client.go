@@ -36,37 +36,35 @@ func GetPrivKey(ctx client.Context, keyname string) cryptotypes.PrivKey {
 	return novaPrivRaw
 }
 
-func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader, userOutput io.Writer) client.Context {
+func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader, userOutput io.Writer, genOnly bool) client.Context {
 	encCfg := MakeEncodingConfig(mb)
 	initClientCtx := client.Context{}.
 		WithSimulation(false).
+		WithSkipConfirmation(true).
+		WithSignModeStr(flags.SignModeDirect).
+		WithAccountRetriever(authtypes.AccountRetriever{}).
+		WithBroadcastMode(flags.BroadcastSync).
 		WithFrom(from).
 		WithNodeURI(tmRPC).
 		WithChainID(chainID).
 		WithHomeDir(root).
+		WithKeyringDir(root).
+		WithInput(userInput).
+		WithOutput(userOutput).
+		WithGenerateOnly(genOnly).
 		WithCodec(encCfg.Marshaler).
 		WithInterfaceRegistry(encCfg.InterfaceRegistry).
 		WithTxConfig(encCfg.TxConfig).
-		WithLegacyAmino(encCfg.Amino).
-		WithSignModeStr(flags.SignModeDirect).
-		WithAccountRetriever(authtypes.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastSync).
-		WithKeyringDir(root).
-		WithInput(userInput).
-		WithOutput(userOutput)
+		WithLegacyAmino(encCfg.Amino)
 
 	kb := MakeKeyring(initClientCtx, backend)
-	initClientCtx = initClientCtx.WithKeyring(kb)
-
-	_ = tmRPC
-
 	tmClient, err := client.NewClientFromNode(tmRPC)
 	utils.CheckErr(err, "-> Cannot set node client", 0)
 
 	return initClientCtx.
-		WithClient(tmClient).
-		WithAccountRetriever(authtypes.AccountRetriever{}).
-		WithSkipConfirmation(true)
+		WithKeyring(kb).
+		WithClient(tmClient)
+
 }
 
 func AddMoreFromInfo(ctx client.Context) client.Context {

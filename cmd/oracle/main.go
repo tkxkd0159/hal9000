@@ -72,13 +72,14 @@ func main() {
 
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			viper.GetString("nova.local_addr"),
+			viper.GetString("nova.bot_addr"),
 			novaTmAddr,
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
 			userOutput,
+			false,
 		)
 
 		botInfo = common.MakeClientWithNewAcc(
@@ -95,13 +96,14 @@ func main() {
 
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			viper.GetString("nova.local_addr"),
+			viper.GetString("nova.bot_addr"),
 			novaTmAddr,
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
 			rpipe,
 			userOutput,
+			false,
 		)
 		os.Stdin = rpipe
 

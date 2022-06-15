@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  USER_NAME: vvictorl
+
 jobs:
   golangci:
     runs-on: ubuntu-latest
@@ -16,10 +19,7 @@ jobs:
       matrix:
         arch: [ amd64 ]
         os: [ darwin, linux ]
-        include:
-          - os: darwin
-            arch: arm64
-    name: golangci-lint ${{ matrix.arch }} for ${{ matrix.os }}
+    name: ${{ matrix.arch }} for ${{ matrix.os }}
     steps:
       - uses: actions/setup-go@v3
         with:

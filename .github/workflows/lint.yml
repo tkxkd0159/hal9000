@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  USER_NAME: vvictorl
+  USER_NAME: ${{ secrets.REPO_USER }}
 
 jobs:
   golangci:

@@ -52,7 +52,12 @@ func main() {
 		utils.CheckErr(err, "", 0)
 		userOutput = fpLog
 	}
-	defer userOutput.Close()
+	defer func(o *os.File) {
+		err := o.Close()
+		if err != nil {
+
+		}
+	}(userOutput)
 
 	novaGrpcAddr := viper.GetString("net.ip.nova") + ":" + viper.GetString("net.port.grpc")
 	novaTmAddr := "tcp://" + viper.GetString("net.ip.nova") + ":" + viper.GetString("net.port.tmrpc")
@@ -122,8 +127,8 @@ func main() {
 	)
 	utils.CheckErr(err, "cannot create gRPC connection", 0)
 
-	defer func(conn *grpc.ClientConn) {
-		err := conn.Close()
+	defer func(c *grpc.ClientConn) {
+		err := c.Close()
 		if err != nil {
 			log.Printf("unexpected gRPC disconnection: %v", err)
 		}

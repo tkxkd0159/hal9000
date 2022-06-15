@@ -11,13 +11,27 @@ permissions:
 
 jobs:
   golangci:
-    name: golangci-lint
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [ amd64 ]
+        os: [ darwin, linux ]
+        include:
+          - os: darwin
+            arch: arm64
+    name: golangci-lint ${{ matrix.arch }} for ${{ matrix.os }}
     steps:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          GOPRIVATE: github.com/Carina-labs
       - uses: actions/checkout@v3
+      - name: Set git config to pull private repo
+        run: |
+          git config --global url."https://${{ env.USER_NAME }}:${{ secrets.HAL_ACT }}@github.com".insteadOf "https://github.com"
       - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
@@ -25,9 +39,8 @@ jobs:
           FILES: |
             go.mod
             go.sum
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3
+      - uses: golangci/golangci-lint-action@v3
         with:
           version: v1.46.2
-          skip-cache: true
-        if: env.GIT_DIFF
+          args: --timeout=3m --issues-exit-code=0 ./...
+#        if: env.GIT_DIFF

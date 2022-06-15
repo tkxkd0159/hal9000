@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         arch: [ amd64 ]
-        os: [ darwin, linux ]
+        os: [ darwin, linux, windows ]
     name: ${{ matrix.arch }} for ${{ matrix.os }}
     steps:
       - uses: actions/setup-go@v3
@@ -43,4 +43,4 @@ jobs:
         with:
           version: v1.46.2
           args: --timeout=3m --issues-exit-code=0 ./...
-#        if: env.GIT_DIFF
+        if: env.GIT_DIFF

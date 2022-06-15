@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  USER_NAME: vvictorl
+  USER_NAME: ${{ secrets.REPO_USER }}
 
 jobs:
   build:

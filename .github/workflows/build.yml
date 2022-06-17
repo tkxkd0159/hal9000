@@ -1,4 +1,4 @@
-name: Build (XC)
+name: build (xc)
 
 on:
   pull_request:

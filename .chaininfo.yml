@@ -15,3 +15,5 @@ net:
     grpc: 9090
     rest: 1317
     tmrpc: 26657
+    p2p: 26656
+    prometheus: 26660

@@ -29,7 +29,7 @@ func CheckAccAddr(target any) (AccAddr, error) {
 
 // ###################  Bank #####################
 
-func MakeSendMsg(from any, to any, denoms []string, amounts []int64) (*banktypes.MsgSend, error) {
+func MakeMsgSend(from any, to any, denoms []string, amounts []int64) (*banktypes.MsgSend, error) {
 
 	from, err := CheckAccAddr(from)
 	if err != nil {

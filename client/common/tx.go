@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/utils"
+	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -14,16 +15,19 @@ import (
 // GenTxWithFactory
 // 1. Generate a TX with Msg (TxBuilder). If you set --generate-onlu, it makes unsigned tx and never broadcast
 // 2. Sign the generated transaction with the keyring's account
-// 3. Broadcast the tx using gPRC
-func GenTxWithFactory(ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) {
+// 3. Broadcast the tx to the Tendermint node using gPRC
+func GenTxWithFactory(stream ut.Fstream, ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) {
 	if onlyGen {
 		ctx = ctx.WithGenerateOnly(true)
 	}
-	err := tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
-	utils.CheckErr(err, "something went wrong while make tx", 0)
-	_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n", time.Now())))
-	utils.CheckErr(err, "cannot write log on output", 1)
 
+	err := tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
+	if err != nil {
+		utils.CheckErrWithFP(stream.Err, err, "something went wrong while make tx", 1)
+	} else {
+		_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n", time.Now())))
+		utils.CheckErr(err, "cannot write log on output", 1)
+	}
 }
 
 func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string, gasWeight float64) tx.Factory {

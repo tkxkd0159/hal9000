@@ -12,6 +12,7 @@ import (
 func SetInitialDir(krDir string, logDir string) (string, string) {
 	ckrDir, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
+
 	krDir = path.Join(ckrDir, krDir)
 	err = os.Mkdir(krDir, 0740)
 	if os.IsExist(err) {

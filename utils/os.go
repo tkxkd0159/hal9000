@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/Carina-labs/HAL9000/utils/types"
@@ -8,6 +9,10 @@ import (
 	"log"
 	"os"
 	"path"
+)
+
+var (
+	B64ToStr = base64.StdEncoding.EncodeToString
 )
 
 func CheckErr(err error, msg string, action types.Code) {

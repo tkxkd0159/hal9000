@@ -3,25 +3,24 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	cQuerier "github.com/Carina-labs/HAL9000/client/common/query"
-	novac "github.com/Carina-labs/HAL9000/client/nova"
+	"github.com/Carina-labs/HAL9000/client/nova"
+	nt "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/cmd"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 	"log"
 	"net/url"
 	"os"
 	"path"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -31,38 +30,43 @@ var (
 )
 
 var (
-	krDir, logDir string
 	ctx           client.Context
 	botInfo       keyring.Info
+	krDir, logDir string
 	sViper        *viper.Viper
 )
 
 func init() {
 	sViper = config.Sviper
 	common.SetBechPrefix()
-	krDir, logDir = cmd.SetInitialDir("/bot", "logs/oracle")
+	krDir, logDir = cmd.SetInitialDir("/bot", "logs/stake")
 }
 
-// FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
 func main() {
-
-	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")
+	//apiAddr := flag.String("api", "127.0.0.1:3335", "Set bot api address")
 	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	intv := flag.Int("interval", 5, "Oracle update interval")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
 
-	novaIP := viper.GetString("net.ip.nova")
-	novaGrpcAddr := novaIP + ":" + viper.GetString("net.port.grpc")
-	novaTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
-
-	// Open api endpoint to check bot
 	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		api.Server{}.On(*apiAddr)
-	}()
+
+	novaIP := viper.GetString("net.ip.nova")
+	rawNovaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
+	novaTmAddr := url.URL{Scheme: "ws", Host: rawNovaTmAddr}
+	u := url.URL{Scheme: "ws", Host: rawNovaTmAddr, Path: "/websocket"}
+	log.Printf("connecting to %s", u.String())
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+	defer func(c *websocket.Conn) {
+		err := c.Close()
+		if err != nil {
+			utils.CheckErr(err, "", 1)
+		}
+	}(c)
 
 	// #### Start bot logic ####
 	userOutput := os.Stdout
@@ -145,53 +149,56 @@ func main() {
 	}
 	ctx = common.AddMoreFromInfo(ctx)
 	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
+	_ = txf
+	_ = botInfo
 
-	// ** Build TX
-	go func(interval int) {
+	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
+	myp := map[string]any{"query": "tm.event='Tx'"}
+	tmSubReq := &nt.RpcReq{Jsonrpc: "2.0", Method: "subscribe", ID: "0", Params: myp}
+	utils.CheckErr(err, "cannot marshal", 0)
+	err = c.WriteJSON(tmSubReq)
+	utils.CheckErr(err, "Cannot write JSON to Websocket : ", 0)
+
+	go func() {
 		defer wg.Done()
 
-		stream := ut.Fstream{Err: fpErrNova}
-		i := 0
-		intv := time.Duration(interval)
+		fp, err := os.OpenFile(path.Join(logDir, "event.txt"), os.O_CREATE|os.O_WRONLY, 0644)
+		utils.CheckErr(err, "", 0)
+
 		for {
-			log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
-			msg1, _ := common.MakeMsgSend(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
+			var reply nt.RpcRes
+			err := c.ReadJSON(&reply)
+			evts := reply.Result.Events
+			utils.CheckErr(err, "no reply from subscription", 1)
+			time.Sleep(3 * time.Second)
 
-			msg2, err := novac.MakeMsgUpdateChainState(botInfo.GetAddress(), "uatom", 7654321, 6, 777)
-			if err != nil {
-				continue
+			evt1, _ := nova.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
+			evt2, _ := nova.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
+			evt3, _ := nova.CheckEvt(evts["nova.intertx.v1.RegisteredZone.zone_name"])
+			evt4, ok := nova.CheckEvt(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"])
+			if ok {
+
 			}
-			msgs := []sdktypes.Msg{msg1, msg2}
+			evt5, ok := nova.CheckEvt(evts["nova.gal.v1.DepositRecord.amount"])
+			if ok {
 
-			common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
-			time.Sleep(intv * time.Second)
-			i++
+			}
+
+			oracleLog := fmt.Sprintf("Operator : %s, Latest Block Height : %s\n", evt1, evt2)
+			icaLog := fmt.Sprintf("Zone name : %s, Controller Address : %s\n", evt3, evt4)
+			galLog := fmt.Sprintf("User deposit amount : %s\n", evt5)
+
+			if len(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"]) > 0 {
+				fmt.Println(reflect.TypeOf(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"][0]))
+
+			}
+			totalLog := fmt.Sprintf("%s%s%s", oracleLog, icaLog, galLog)
+			fmt.Print(totalLog)
+			_, err = fmt.Fprintf(fp, "%s\n", totalLog)
+			utils.CheckErr(err, "cannot write log to event.txt", 0)
 		}
-	}(*intv)
+	}()
 
-	conn, err := grpc.Dial(
-		novaGrpcAddr,
-		grpc.WithInsecure(),
-	)
-	utils.CheckErr(err, "cannot create gRPC connection", 0)
-
-	defer func(c *grpc.ClientConn) {
-		err := c.Close()
-		if err != nil {
-			log.Printf("unexpected gRPC disconnection: %v", err)
-		}
-	}(conn)
-
-	fmt.Println("\n************ gRPC query checking ************")
-	nf := cQuerier.GetNodeRes(conn)
-	fmt.Println(nf.GetNodeInfo())
-	nv := cQuerier.GetValInfo(conn, viper.GetString("nova.val_addr"))
-	nb := cQuerier.GetBlockByHeight(conn, 14169)
-	nbh := nb.Block.Header
-
-	st := fmt.Sprintf("Staked nova on Our validator : %s\n", nv.GetValidator().Tokens)
-	proof := fmt.Sprintf("chain ID : %s, height : %d, apphash : %s, proposer : %s \n",
-		nbh.ChainId, nbh.Height, utils.B64ToStr(nbh.AppHash), utils.B64ToStr(nbh.ProposerAddress))
-	fmt.Println(fmt.Sprintf("%s %s", st, proof))
 	wg.Wait()
+
 }

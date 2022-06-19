@@ -1,6 +1,6 @@
 ![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/build.yml/badge.svg)
 ![golangci-lint](https://github.com/Carina-labs/HAL9000/actions/workflows/lint.yml/badge.svg)
-![LoC](https://img.shields.io/badge/line%20of%20codes-744-informational)
+![LoC](https://img.shields.io/badge/line%20of%20codes-1378-informational)
 
 # HAL9000
 The world's most complete oracle feeder

@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/Carina-labs/nova v0.1.1-0.20220614193512-7083a40c6431
 	github.com/cosmos/cosmos-sdk v0.45.4
+	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.2
 	google.golang.org/grpc v1.45.0
@@ -58,7 +59,6 @@ require (
 	github.com/google/orderedcode v0.0.1 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
@@ -122,7 +122,7 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	nhooyr.io/websocket v1.8.6 // indirect
+	nhooyr.io/websocket v1.8.7 // indirect
 )
 
 replace (

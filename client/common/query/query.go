@@ -13,30 +13,58 @@ import (
 	"time"
 )
 
+// ######################### Tendermint #########################
+
 func GetNodeRes(conn *grpc.ClientConn) *types.NodeInfoRes {
 	c := tendermintv1beta1.NewServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-
 	defer cancel()
+
 	r, err := c.GetNodeInfo(ctx, &types.NodeInfoReq{})
 	utils.CheckErr(err, "Can't get Node info", utiltypes.KEEP)
 
 	return r
 }
 
-func GetValRes(conn *grpc.ClientConn, valAddr string) *types.ValInfoRes {
+func GetLatestBlock(conn *grpc.ClientConn) *tendermintv1beta1.GetLatestBlockResponse {
+	c := tendermintv1beta1.NewServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	r, err := c.GetLatestBlock(ctx, &tendermintv1beta1.GetLatestBlockRequest{})
+	utils.CheckErr(err, "", 1)
+	return r
+}
+
+func GetBlockByHeight(conn *grpc.ClientConn, height int64) *tendermintv1beta1.GetBlockByHeightResponse {
+	c := tendermintv1beta1.NewServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	r, err := c.GetBlockByHeight(ctx, &tendermintv1beta1.GetBlockByHeightRequest{Height: height})
+	utils.CheckErr(err, "", 1)
+	return r
+}
+
+// ######################### Staking #########################
+
+func GetValInfo(conn *grpc.ClientConn, valAddr string) *types.ValInfoRes {
 	c := stakingv1beta1.NewQueryClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+
 	r, err := c.Validator(ctx, &types.ValInfoReq{ValidatorAddr: valAddr})
 	utils.CheckErr(err, fmt.Sprintf("Can't get %s info", valAddr), utiltypes.KEEP)
 	return r
 }
 
+// ######################### Tx #########################
+
 func GetTx(conn *grpc.ClientConn, hash string) *txv1beta1.GetTxResponse {
 	c := txv1beta1.NewServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+
 	r, err := c.GetTx(ctx, &txv1beta1.GetTxRequest{Hash: hash})
 	utils.CheckErr(err, "", 1)
 	return r

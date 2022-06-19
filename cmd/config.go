@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ func SetInitialDir(krDir string, logDir string) (string, string) {
 	utils.CheckErr(err, "cannot get working directory", 0)
 
 	krDir = path.Join(ckrDir, krDir)
-	err = os.Mkdir(krDir, 0740)
+	err = os.MkdirAll(krDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** bot directory already exist **")
 	} else if err != nil {
@@ -22,7 +22,7 @@ func SetInitialDir(krDir string, logDir string) (string, string) {
 	}
 
 	logDir = path.Join(ckrDir, logDir)
-	err = os.Mkdir(logDir, 0740)
+	err = os.MkdirAll(logDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** log directory already exist **")
 	} else if err != nil {

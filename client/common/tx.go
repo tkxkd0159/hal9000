@@ -13,7 +13,7 @@ import (
 )
 
 // GenTxWithFactory
-// 1. Generate a TX with Msg (TxBuilder). If you set --generate-onlu, it makes unsigned tx and never broadcast
+// 1. Generate a TX with Msg (TxBuilder). If you set --generate-only, it makes unsigned tx and never broadcast
 // 2. Sign the generated transaction with the keyring's account
 // 3. Broadcast the tx to the Tendermint node using gPRC
 func GenTxWithFactory(stream ut.Fstream, ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) {

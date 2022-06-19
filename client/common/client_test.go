@@ -65,7 +65,8 @@ func TestMakeContext(t *testing.T) {
 		got = common.AddMoreFromInfo(got)
 
 		assert.NotEqual(t, tc.TxConfig, got.TxConfig)
-		assert.NotEqual(t, tc.Client, got.Client)
+		gotcli, _ := got.GetNode()
+		assert.NotEqual(t, tc.Client, gotcli)
 
 		//assert.Equal(t, tc.LegacyAmino, got.LegacyAmino)
 		assert.Equal(t, tc.HomeDir, got.HomeDir)
@@ -77,8 +78,8 @@ func TestMakeContext(t *testing.T) {
 		assert.Equal(t, tc.BroadcastMode, got.BroadcastMode)
 		assert.Equal(t, tc.SignModeStr, got.SignModeStr)
 		assert.Equal(t, tc.Simulate, got.Simulate)
-		assert.Equal(t, tc.FromAddress, got.FromAddress)
-		assert.Equal(t, tc.FromName, got.FromName)
+		assert.Equal(t, tc.FromAddress, got.GetFromAddress())
+		assert.Equal(t, tc.FromName, got.GetFromName())
 		assert.Equal(t, tc.From, got.From)
 		assert.Equal(t, tc.ChainID, got.ChainID)
 		assert.Equal(t, tc.NodeURI, got.NodeURI)

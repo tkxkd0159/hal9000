@@ -43,30 +43,33 @@ func init() {
 }
 
 func main() {
+	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	//apiAddr := flag.String("api", "127.0.0.1:3335", "Set bot api address")
 	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
+	config.SetChainInfo(*isTest)
+
+	novaIP := viper.GetString("net.ip.nova")
+	novaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
+	novaTCPTmAddr := url.URL{Scheme: "tcp", Host: novaTmAddr}
+	novaWsTmAddr := url.URL{Scheme: "ws", Host: novaTmAddr, Path: "/websocket"}
 
 	wg.Add(2)
 
-	novaIP := viper.GetString("net.ip.nova")
-	rawNovaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
-	novaTmAddr := url.URL{Scheme: "ws", Host: rawNovaTmAddr}
-	u := url.URL{Scheme: "ws", Host: rawNovaTmAddr, Path: "/websocket"}
-	log.Printf("connecting to %s", u.String())
-
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	wsc, _, err := websocket.DefaultDialer.Dial(novaWsTmAddr.String(), nil)
 	if err != nil {
 		log.Fatal("dial:", err)
+	} else {
+		log.Printf("connecting to %s", novaWsTmAddr.String())
 	}
 	defer func(c *websocket.Conn) {
-		err := c.Close()
+		err := wsc.Close()
 		if err != nil {
 			utils.CheckErr(err, "", 1)
 		}
-	}(c)
+	}(wsc)
 
 	// #### Start bot logic ####
 	userOutput := os.Stdout
@@ -110,7 +113,7 @@ func main() {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			viper.GetString("nova.bot_addr"),
-			novaTmAddr.String(),
+			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
@@ -135,7 +138,7 @@ func main() {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			viper.GetString("nova.bot_addr"),
-			novaTmAddr.String(),
+			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
@@ -154,9 +157,9 @@ func main() {
 
 	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
 	myp := map[string]any{"query": "tm.event='Tx'"}
-	tmSubReq := &nt.RpcReq{Jsonrpc: "2.0", Method: "subscribe", ID: "0", Params: myp}
+	tmSubReq := &nt.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: myp}
 	utils.CheckErr(err, "cannot marshal", 0)
-	err = c.WriteJSON(tmSubReq)
+	err = wsc.WriteJSON(tmSubReq)
 	utils.CheckErr(err, "Cannot write JSON to Websocket : ", 0)
 
 	go func() {
@@ -166,8 +169,8 @@ func main() {
 		utils.CheckErr(err, "", 0)
 
 		for {
-			var reply nt.RpcRes
-			err := c.ReadJSON(&reply)
+			var reply nt.RPCRes
+			err := wsc.ReadJSON(&reply)
 			evts := reply.Result.Events
 			utils.CheckErr(err, "no reply from subscription", 1)
 			time.Sleep(3 * time.Second)

@@ -5,16 +5,16 @@ import (
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 )
 
-type RpcReq struct {
-	Jsonrpc string         `json:"jsonrpc"`
+type RPCReq struct {
+	JSONRPC string         `json:"jsonrpc"`
 	Method  string         `json:"method"`
 	Params  map[string]any `json:"params"`
 	ID      string         `json:"id"`
 }
 
-type RpcRes struct {
+type RPCRes struct {
 	ID      string    `json:"id"`
-	JsonRPC string    `json:"jsonrpc"`
+	JSONRPC string    `json:"jsonrpc"`
 	Result  ResultRes `json:"result"`
 }
 

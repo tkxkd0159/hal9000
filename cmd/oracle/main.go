@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	cQuerier "github.com/Carina-labs/HAL9000/client/common/query"
+	"github.com/Carina-labs/HAL9000/client/common/query"
 	novac "github.com/Carina-labs/HAL9000/client/nova"
 	"github.com/Carina-labs/HAL9000/cmd"
 	"github.com/Carina-labs/HAL9000/config"
@@ -45,17 +45,18 @@ func init() {
 
 // FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
 func main() {
-
+	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")
 	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	intv := flag.Int("interval", 5, "Oracle update interval")
+	intv := flag.Int("interval", 5, "Oracle update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
+	config.SetChainInfo(*isTest)
 
 	novaIP := viper.GetString("net.ip.nova")
 	novaGrpcAddr := novaIP + ":" + viper.GetString("net.port.grpc")
-	novaTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
+	novaTCPTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
 
 	// Open api endpoint to check bot
 	wg.Add(2)
@@ -106,7 +107,7 @@ func main() {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			viper.GetString("nova.bot_addr"),
-			novaTmAddr.String(),
+			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
@@ -131,7 +132,7 @@ func main() {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			viper.GetString("nova.bot_addr"),
-			novaTmAddr.String(),
+			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
 			keyring.BackendFile,
@@ -155,10 +156,15 @@ func main() {
 		intv := time.Duration(interval)
 		for {
 			log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
-			msg1, _ := common.MakeMsgSend(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
+			msg1, err := common.MakeMsgSend(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
+			if err != nil {
+				utils.CheckErr(err, "", 0)
+				continue
+			}
 
 			msg2, err := novac.MakeMsgUpdateChainState(botInfo.GetAddress(), "uatom", 7654321, 6, 777)
 			if err != nil {
+				utils.CheckErr(err, "", 0)
 				continue
 			}
 			msgs := []sdktypes.Msg{msg1, msg2}
@@ -169,6 +175,7 @@ func main() {
 		}
 	}(*intv)
 
+	fmt.Println("\n************ gRPC query checking ************")
 	conn, err := grpc.Dial(
 		novaGrpcAddr,
 		grpc.WithInsecure(),
@@ -182,16 +189,15 @@ func main() {
 		}
 	}(conn)
 
-	fmt.Println("\n************ gRPC query checking ************")
-	nf := cQuerier.GetNodeRes(conn)
-	fmt.Println(nf.GetNodeInfo())
-	nv := cQuerier.GetValInfo(conn, viper.GetString("nova.val_addr"))
-	nb := cQuerier.GetBlockByHeight(conn, 14169)
+	cq := &query.CosmosQueryClient{ClientConn: conn}
+	fmt.Println(cq.GetNodeRes().GetNodeInfo())
+	nv := cq.GetValInfo(viper.GetString("nova.val_addr"))
+	nb := cq.GetBlockByHeight(14169)
 	nbh := nb.Block.Header
 
 	st := fmt.Sprintf("Staked nova on Our validator : %s\n", nv.GetValidator().Tokens)
 	proof := fmt.Sprintf("chain ID : %s, height : %d, apphash : %s, proposer : %s \n",
 		nbh.ChainId, nbh.Height, utils.B64ToStr(nbh.AppHash), utils.B64ToStr(nbh.ProposerAddress))
-	fmt.Println(fmt.Sprintf("%s %s", st, proof))
+	fmt.Printf("%s %s", st, proof)
 	wg.Wait()
 }

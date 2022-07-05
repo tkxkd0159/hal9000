@@ -13,10 +13,19 @@ import (
 	"time"
 )
 
+type CosmosQueryClient struct {
+	*grpc.ClientConn
+	A string
+}
+
+var (
+	_ types.CommonQuery = &CosmosQueryClient{}
+)
+
 // ######################### Tendermint #########################
 
-func GetNodeRes(conn *grpc.ClientConn) *types.NodeInfoRes {
-	c := tendermintv1beta1.NewServiceClient(conn)
+func (cqc *CosmosQueryClient) GetNodeRes() *types.NodeInfoRes {
+	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -26,8 +35,8 @@ func GetNodeRes(conn *grpc.ClientConn) *types.NodeInfoRes {
 	return r
 }
 
-func GetLatestBlock(conn *grpc.ClientConn) *tendermintv1beta1.GetLatestBlockResponse {
-	c := tendermintv1beta1.NewServiceClient(conn)
+func (cqc *CosmosQueryClient) GetLatestBlock() *tendermintv1beta1.GetLatestBlockResponse {
+	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -36,8 +45,8 @@ func GetLatestBlock(conn *grpc.ClientConn) *tendermintv1beta1.GetLatestBlockResp
 	return r
 }
 
-func GetBlockByHeight(conn *grpc.ClientConn, height int64) *tendermintv1beta1.GetBlockByHeightResponse {
-	c := tendermintv1beta1.NewServiceClient(conn)
+func (cqc *CosmosQueryClient) GetBlockByHeight(height int64) *tendermintv1beta1.GetBlockByHeightResponse {
+	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -48,8 +57,8 @@ func GetBlockByHeight(conn *grpc.ClientConn, height int64) *tendermintv1beta1.Ge
 
 // ######################### Staking #########################
 
-func GetValInfo(conn *grpc.ClientConn, valAddr string) *types.ValInfoRes {
-	c := stakingv1beta1.NewQueryClient(conn)
+func (cqc *CosmosQueryClient) GetValInfo(valAddr string) *types.ValInfoRes {
+	c := stakingv1beta1.NewQueryClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -60,8 +69,8 @@ func GetValInfo(conn *grpc.ClientConn, valAddr string) *types.ValInfoRes {
 
 // ######################### Tx #########################
 
-func GetTx(conn *grpc.ClientConn, hash string) *txv1beta1.GetTxResponse {
-	c := txv1beta1.NewServiceClient(conn)
+func (cqc *CosmosQueryClient) GetTx(hash string) *txv1beta1.GetTxResponse {
+	c := txv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 

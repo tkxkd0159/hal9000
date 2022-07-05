@@ -35,3 +35,6 @@ go.sum: go.mod
 lint:
 	@echo ">>>> Execute golangci-lint <<<<"
 	@golangci-lint run --out-format=tab
+
+loc:
+	@tokei .

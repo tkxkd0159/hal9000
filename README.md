@@ -8,6 +8,7 @@ The world's most complete oracle feeder
 # Cmd
 ```bash
 make build all
-make run TARGET=oracle CUSTOM_ORGS="-add=false -name='nova-bot' -interval=2"
+make run TARGET=oracle CUSTOM_ORGS="-add=false -name='nova-bot' -interval=2 -test=false"
+make run TARGET=stake
 GOPRIVATE=github.com/Carina-labs go get github.com/Carina-labs/nova
 ```

@@ -9,7 +9,6 @@ import (
 var Sviper *viper.Viper
 
 func init() {
-	setChainInfo()
 	Sviper = setEnv()
 }
 
@@ -27,9 +26,15 @@ func setEnv() *viper.Viper {
 	return sViper
 }
 
-func setChainInfo() {
+func SetChainInfo(isTest bool) {
 	viper.SetConfigType("yaml")
-	viper.SetConfigFile(".chaininfo.yml")
-	err := viper.ReadInConfig()
-	utils.CheckErr(err, "Can't read .chaininfo.yml", types.EXIT)
+	if isTest {
+		viper.SetConfigFile(".chaininfo.test.yml")
+		err := viper.ReadInConfig()
+		utils.CheckErr(err, "Can't read .chaininfo.test.yml", 0)
+	} else {
+		viper.SetConfigFile(".chaininfo.yml")
+		err := viper.ReadInConfig()
+		utils.CheckErr(err, "Can't read .chaininfo.yml", types.EXIT)
+	}
 }

@@ -15,11 +15,10 @@ import (
 
 type CosmosQueryClient struct {
 	*grpc.ClientConn
-	A string
 }
 
 var (
-	_ types.CommonQuery = &CosmosQueryClient{}
+	_ types.CommonQuerier = &CosmosQueryClient{}
 )
 
 // ######################### Tendermint #########################

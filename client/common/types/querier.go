@@ -5,22 +5,22 @@ import (
 	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
 )
 
-type CommonQuery interface {
-	Base
-	Tm
-	Stake
+type CommonQuerier interface {
+	baseQuerier
+	tmQuerier
+	stakeQuerier
 }
 
-type Base interface {
+type baseQuerier interface {
 	GetTx(hash string) *txv1beta1.GetTxResponse
 }
 
-type Tm interface {
+type tmQuerier interface {
 	GetNodeRes() *NodeInfoRes
 	GetBlockByHeight(height int64) *tendermintv1beta1.GetBlockByHeightResponse
 	GetLatestBlock() *tendermintv1beta1.GetLatestBlockResponse
 }
 
-type Stake interface {
+type stakeQuerier interface {
 	GetValInfo(valAddr string) *ValInfoRes
 }

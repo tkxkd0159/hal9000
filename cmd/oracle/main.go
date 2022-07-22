@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
+	commonTx "github.com/Carina-labs/HAL9000/client/common/msgs"
 	"github.com/Carina-labs/HAL9000/client/common/query"
-	novac "github.com/Carina-labs/HAL9000/client/nova"
+	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	"github.com/Carina-labs/HAL9000/cmd"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -21,7 +22,6 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"path"
 	"sync"
 	"time"
 )
@@ -31,23 +31,21 @@ var (
 )
 
 var (
-	krDir, logDir string
-	ctx           client.Context
-	botInfo       keyring.Info
-	sViper        *viper.Viper
+	ctx     client.Context
+	botInfo keyring.Info
+	sViper  *viper.Viper
 )
 
 func init() {
 	sViper = config.Sviper
 	common.SetBechPrefix()
-	krDir, logDir = cmd.SetInitialDir("/bot", "logs/oracle")
 }
 
 // FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")
-	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
+	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
 	intv := flag.Int("interval", 5, "Oracle update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
@@ -65,30 +63,10 @@ func main() {
 		api.Server{}.On(*apiAddr)
 	}()
 
-	// #### Start bot logic ####
-	userOutput := os.Stdout
-	var fpErr *os.File
-	var fpErrNova *os.File
-	if !*disp {
-		fpLog, err := os.OpenFile(path.Join(logDir, "ctxlog.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open logfp", 0)
+	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/oracle")
+	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
 
-		// 외부 라이브러리에서 fmt.Fprintf(os.stderr)로 처리하는 애들 핸들링
-		fpErr, err = os.OpenFile(path.Join(logDir, "other_err.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open otherErr", 0)
-
-		// 반환되서 처리할 수 있는 에러 핸들링
-		fpErrNova, err = os.OpenFile(path.Join(logDir, "nova_err.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open novaerr", 0)
-
-		userOutput = fpLog
-		os.Stderr = fpErr
-	} else {
-		fpErr = os.Stderr
-		fpErrNova = os.Stderr
-	}
-
-	projFps := []*os.File{userOutput, fpErr, fpErrNova}
+	projFps := []*os.File{fpLog, fpErr, fpErrNova}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
@@ -102,6 +80,8 @@ func main() {
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
 
+	// #### Start bot logic ####
+
 	if *newacc {
 
 		ctx = common.MakeContext(
@@ -112,14 +92,14 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
-			userOutput,
+			fpLog,
 			false,
 		)
 
 		botInfo = common.MakeClientWithNewAcc(
 			ctx,
 			*keyname,
-			sViper.GetString("nova_mne"),
+			sViper.GetString(*keyname),
 			sdktypes.FullFundraiserPath,
 			hd.Secp256k1,
 		)
@@ -137,7 +117,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			rpipe,
-			userOutput,
+			fpLog,
 			false,
 		)
 		os.Stdin = rpipe
@@ -156,13 +136,13 @@ func main() {
 		intv := time.Duration(interval)
 		for {
 			log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
-			msg1, err := common.MakeMsgSend(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
+
+			msg1, err := commonTx.MakeMsgSend(botInfo.GetAddress(), viper.GetString("nova.target_addr"), []string{"unova"}, []int64{777})
 			if err != nil {
 				utils.CheckErr(err, "", 0)
 				continue
 			}
-
-			msg2, err := novac.MakeMsgUpdateChainState(botInfo.GetAddress(), "uatom", 7654321, 6, 777)
+			msg2, err := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), "uatom", 7654321, 6, 777)
 			if err != nil {
 				utils.CheckErr(err, "", 0)
 				continue
@@ -192,8 +172,8 @@ func main() {
 	cq := &query.CosmosQueryClient{ClientConn: conn}
 	fmt.Println(cq.GetNodeRes().GetNodeInfo())
 	nv := cq.GetValInfo(viper.GetString("nova.val_addr"))
-	nb := cq.GetBlockByHeight(14169)
-	nbh := nb.Block.Header
+	nb := cq.GetBlockByHeight(10)
+	nbh := nb.GetBlock().Header
 
 	st := fmt.Sprintf("Staked nova on Our validator : %s\n", nv.GetValidator().Tokens)
 	proof := fmt.Sprintf("chain ID : %s, height : %d, apphash : %s, proposer : %s \n",

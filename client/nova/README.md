@@ -1,9 +1,5 @@
 # Nova
 
-## Flow list
-* 3일에 한번씩 Withdraw
-
-
 ## Msg list (Tx)
 1. oracle
     1. **MsgUpdateChainState**

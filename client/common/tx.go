@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Carina-labs/HAL9000/utils"
 	ut "github.com/Carina-labs/HAL9000/utils/types"
@@ -11,6 +12,27 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"time"
 )
+
+type (
+	AccAddr = sdktypes.AccAddress
+)
+
+func CheckAccAddr(target any) (AccAddr, error) {
+	switch target := target.(type) {
+	case AccAddr:
+		return target, nil
+	case string:
+		addr, err := sdktypes.AccAddressFromBech32(target)
+		if err != nil {
+			return nil, err
+		}
+		return addr, nil
+	case []byte:
+		return target, nil
+	default:
+		return nil, errors.New("cannot covert target to AccAddress")
+	}
+}
 
 // GenTxWithFactory
 // 1. Generate a TX with Msg (TxBuilder). If you set --generate-only, it makes unsigned tx and never broadcast

@@ -1,4 +1,4 @@
-package nova
+package msgs
 
 import (
 	"github.com/Carina-labs/HAL9000/client/common"

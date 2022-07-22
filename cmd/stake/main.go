@@ -30,16 +30,14 @@ var (
 )
 
 var (
-	ctx           client.Context
-	botInfo       keyring.Info
-	krDir, logDir string
-	sViper        *viper.Viper
+	ctx     client.Context
+	botInfo keyring.Info
+	sViper  *viper.Viper
 )
 
 func init() {
 	sViper = config.Sviper
 	common.SetBechPrefix()
-	krDir, logDir = cmd.SetInitialDir("/bot", "logs/stake")
 }
 
 func main() {
@@ -71,30 +69,10 @@ func main() {
 		}
 	}(wsc)
 
-	// #### Start bot logic ####
-	userOutput := os.Stdout
-	var fpErr *os.File
-	var fpErrNova *os.File
-	if !*disp {
-		fpLog, err := os.OpenFile(path.Join(logDir, "ctxlog.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open logfp", 0)
+	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/stake")
+	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
 
-		// 외부 라이브러리에서 fmt.Fprintf(os.stderr)로 처리하는 애들 핸들링
-		fpErr, err = os.OpenFile(path.Join(logDir, "other_err.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open otherErr", 0)
-
-		// 반환되서 처리할 수 있는 에러 핸들링
-		fpErrNova, err = os.OpenFile(path.Join(logDir, "nova_err.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "cannot open novaerr", 0)
-
-		userOutput = fpLog
-		os.Stderr = fpErr
-	} else {
-		fpErr = os.Stderr
-		fpErrNova = os.Stderr
-	}
-
-	projFps := []*os.File{userOutput, fpErr, fpErrNova}
+	projFps := []*os.File{fpLog, fpErr, fpErrNova}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
@@ -108,6 +86,8 @@ func main() {
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
 
+	// #### Start bot logic ####
+
 	if *newacc {
 
 		ctx = common.MakeContext(
@@ -118,7 +98,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
-			userOutput,
+			fpLog,
 			false,
 		)
 
@@ -143,7 +123,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			rpipe,
-			userOutput,
+			fpLog,
 			false,
 		)
 		os.Stdin = rpipe
@@ -155,8 +135,8 @@ func main() {
 	_ = txf
 	_ = botInfo
 
-	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
-	myp := map[string]any{"query": "tm.event='Tx'"}
+	myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
+	//myp := map[string]any{"query": "tm.event='Tx'"}
 	tmSubReq := &nt.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: myp}
 	utils.CheckErr(err, "cannot marshal", 0)
 	err = wsc.WriteJSON(tmSubReq)
@@ -165,7 +145,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 
-		fp, err := os.OpenFile(path.Join(logDir, "event.txt"), os.O_CREATE|os.O_WRONLY, 0644)
+		fp, err := os.OpenFile(path.Join(logDir, "event.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		utils.CheckErr(err, "", 0)
 
 		for {
@@ -190,12 +170,10 @@ func main() {
 			oracleLog := fmt.Sprintf("Operator : %s, Latest Block Height : %s\n", evt1, evt2)
 			icaLog := fmt.Sprintf("Zone name : %s, Controller Address : %s\n", evt3, evt4)
 			galLog := fmt.Sprintf("User deposit amount : %s\n", evt5)
-
 			if len(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"]) > 0 {
 				fmt.Println(reflect.TypeOf(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"][0]))
-
 			}
-			totalLog := fmt.Sprintf("%s%s%s", oracleLog, icaLog, galLog)
+			totalLog := fmt.Sprintf("%s\n%s%s%s", time.Now().UTC().String(), oracleLog, icaLog, galLog)
 			fmt.Print(totalLog)
 			_, err = fmt.Fprintf(fp, "%s\n", totalLog)
 			utils.CheckErr(err, "cannot write log to event.txt", 0)

@@ -51,6 +51,7 @@ func UndelegateAndWithdraw(host string, txf tx.Factory, chanID string, interval 
 			msg1 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
 			msgs := []sdktypes.Msg{msg1}
 			common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
+
 			time.Sleep(60 * time.Second)
 
 			msg2 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, currentTs)

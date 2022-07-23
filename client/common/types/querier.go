@@ -2,8 +2,9 @@ package types
 
 import (
 	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
-	distv1beta1 "github.com/Carina-labs/nova/api/cosmos/distribution/v1beta1"
 	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
+	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
+
 	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
 )
 

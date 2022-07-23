@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	"github.com/Carina-labs/HAL9000/client/nova"
-	nt "github.com/Carina-labs/HAL9000/client/nova/types"
+	nt "github.com/Carina-labs/HAL9000/client/common/types"
 	"github.com/Carina-labs/HAL9000/cmd"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -20,7 +20,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"reflect"
 	"sync"
 	"time"
 )
@@ -42,32 +41,27 @@ func init() {
 
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
-	//apiAddr := flag.String("api", "127.0.0.1:3335", "Set bot api address")
-	keyname := flag.String("name", "nova-bot", "Set unique key name (uid)")
+	apiAddr := flag.String("api", "127.0.0.1:3336", "Set bot api address")
+	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
+	chanID := flag.String("ch", "channel-0", "Transfer Channel ID")
+	host := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
+	intv := flag.Int("interval", 10*60, "ibc-staking update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
 	config.SetChainInfo(*isTest)
 
+	novaBotAddr := viper.GetString("nova.bot_addr")
 	novaIP := viper.GetString("net.ip.nova")
 	novaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
 	novaTCPTmAddr := url.URL{Scheme: "tcp", Host: novaTmAddr}
 	novaWsTmAddr := url.URL{Scheme: "ws", Host: novaTmAddr, Path: "/websocket"}
 
-	wg.Add(2)
-
-	wsc, _, err := websocket.DefaultDialer.Dial(novaWsTmAddr.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	} else {
-		log.Printf("connecting to %s", novaWsTmAddr.String())
-	}
-	defer func(c *websocket.Conn) {
-		err := wsc.Close()
-		if err != nil {
-			utils.CheckErr(err, "", 1)
-		}
-	}(wsc)
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		api.Server{}.On(*apiAddr)
+	}()
 
 	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/stake")
 	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
@@ -86,13 +80,11 @@ func main() {
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
 
-	// #### Start bot logic ####
-
 	if *newacc {
 
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			viper.GetString("nova.bot_addr"),
+			novaBotAddr,
 			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
@@ -105,7 +97,7 @@ func main() {
 		botInfo = common.MakeClientWithNewAcc(
 			ctx,
 			*keyname,
-			sViper.GetString("nova_mne"),
+			sViper.GetString(*keyname),
 			sdktypes.FullFundraiserPath,
 			hd.Secp256k1,
 		)
@@ -117,7 +109,7 @@ func main() {
 
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			viper.GetString("nova.bot_addr"),
+			novaBotAddr,
 			novaTCPTmAddr.String(),
 			viper.GetString("nova.chain_id"),
 			krDir,
@@ -132,11 +124,24 @@ func main() {
 	}
 	ctx = common.AddMoreFromInfo(ctx)
 	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
-	_ = txf
-	_ = botInfo
 
-	myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
-	//myp := map[string]any{"query": "tm.event='Tx'"}
+	// ###### Start target bot logic ######
+
+	wsc, _, err := websocket.DefaultDialer.Dial(novaWsTmAddr.String(), nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	} else {
+		log.Printf("connecting to %s", novaWsTmAddr.String())
+	}
+	defer func(c *websocket.Conn) {
+		err := wsc.Close()
+		if err != nil {
+			utils.CheckErr(err, "", 1)
+		}
+	}(wsc)
+
+	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
+	myp := map[string]any{"query": "tm.event='Tx'"}
 	tmSubReq := &nt.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: myp}
 	utils.CheckErr(err, "cannot marshal", 0)
 	err = wsc.WriteJSON(tmSubReq)
@@ -153,32 +158,25 @@ func main() {
 			err := wsc.ReadJSON(&reply)
 			evts := reply.Result.Events
 			utils.CheckErr(err, "no reply from subscription", 1)
-			time.Sleep(3 * time.Second)
 
-			evt1, _ := nova.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
-			evt2, _ := nova.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
-			evt3, _ := nova.CheckEvt(evts["nova.intertx.v1.RegisteredZone.zone_name"])
-			evt4, ok := nova.CheckEvt(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"])
-			if ok {
+			evt10, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.chain_id"])
+			evt11, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
+			evt12, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
+			evt13, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.app_hash"])
 
-			}
-			evt5, ok := nova.CheckEvt(evts["nova.gal.v1.DepositRecord.amount"])
-			if ok {
+			oracleLog := fmt.Sprintf("Zone : %s, Operator : %s, Latest Block Height : %s Apphash : %s\n", evt10, evt11, evt12, evt13)
 
-			}
-
-			oracleLog := fmt.Sprintf("Operator : %s, Latest Block Height : %s\n", evt1, evt2)
-			icaLog := fmt.Sprintf("Zone name : %s, Controller Address : %s\n", evt3, evt4)
-			galLog := fmt.Sprintf("User deposit amount : %s\n", evt5)
-			if len(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"]) > 0 {
-				fmt.Println(reflect.TypeOf(evts["nova.intertx.v1.RegisteredZone.ica_connection_info"][0]))
-			}
-			totalLog := fmt.Sprintf("%s\n%s%s%s", time.Now().UTC().String(), oracleLog, icaLog, galLog)
+			totalLog := fmt.Sprintf("%s\n%s", time.Now().UTC().String(), oracleLog)
 			fmt.Print(totalLog)
 			_, err = fmt.Fprintf(fp, "%s\n", totalLog)
 			utils.CheckErr(err, "cannot write log to event.txt", 0)
 		}
 	}()
+
+	go func(interval int) {
+		defer wg.Done()
+		IcaStake(*host, txf, *chanID, interval, fpErrNova)
+	}(*intv)
 
 	wg.Wait()
 

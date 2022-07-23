@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	B64ToStr = base64.StdEncoding.EncodeToString
+	ToB64Str = base64.StdEncoding.EncodeToString
 )
 
 func CheckErr(err error, msg string, action types.Code) {

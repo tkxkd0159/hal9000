@@ -45,11 +45,6 @@ func main() {
 	flag.Parse()
 	config.SetChainInfo(*isTest)
 
-	novaBotAddr := viper.GetString("nova.bot_addr")
-	novaIP := viper.GetString("net.ip.nova")
-	novaTCPTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
-
-	// Open api endpoint to check bot
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
@@ -58,22 +53,22 @@ func main() {
 
 	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/oracle")
 	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
-
 	projFps := []*os.File{fpLog, fpErr, fpErrNova}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
 			utils.CheckErr(err, "", 1)
-
 		}
 	}(projFps...)
 
 	// set pipe to ignore stdin tty
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
+	novaBotAddr := viper.GetString("nova.bot_addr")
+	novaIP := viper.GetString("net.ip.nova")
+	novaTCPTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
 
 	if *newacc {
-
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			novaBotAddr,
@@ -85,7 +80,6 @@ func main() {
 			fpLog,
 			false,
 		)
-
 		botInfo = common.MakeClientWithNewAcc(
 			ctx,
 			*keyname,
@@ -111,7 +105,6 @@ func main() {
 			false,
 		)
 		os.Stdin = rpipe
-
 		botInfo = common.LoadClientPubInfo(ctx, *keyname)
 	}
 	ctx = common.AddMoreFromInfo(ctx)

@@ -18,11 +18,6 @@ import (
 
 func UndelegateAndWithdraw(host string, txf tx.Factory, chanID string, interval int, errLogger *os.File) {
 
-	isStart := true
-	stream := ut.Fstream{Err: errLogger}
-	i := 0
-	intv := time.Duration(interval)
-
 	targetIP := viper.GetString(fmt.Sprintf("net.ip.%s", host))
 	targetGrpcAddr := targetIP + ":" + viper.GetString("net.port.grpc")
 	conn, err := grpc.Dial(
@@ -32,12 +27,14 @@ func UndelegateAndWithdraw(host string, txf tx.Factory, chanID string, interval 
 	utils.CheckErr(err, "cannot create gRPC connection", 0)
 	defer func(c *grpc.ClientConn) {
 		err = c.Close()
-		if err != nil {
-			log.Printf("unexpected gRPC disconnection: %v", err)
-		}
+		utils.CheckErr(err, "", 1)
 	}(conn)
 	cq := &query.CosmosQueryClient{ClientConn: conn}
 
+	isStart := true
+	stream := ut.Fstream{Err: errLogger}
+	i := 0
+	intv := time.Duration(interval)
 	for {
 		log.Printf("Undelegate & Withdraw Bot is ongoing for %d secs\n", int(intv)*i)
 

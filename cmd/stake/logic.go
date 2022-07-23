@@ -17,7 +17,6 @@ func IcaStake(host string, txf tx.Factory, chanID string, interval int, errLogge
 	stream := ut.Fstream{Err: errLogger}
 	i := 0
 	intv := time.Duration(interval)
-
 	for {
 		log.Printf("ICA-staking Bot is ongoing for %d secs\n", int(intv)*i)
 

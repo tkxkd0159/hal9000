@@ -32,9 +32,7 @@ func UpdateChainState(host *string, txf tx.Factory, interval int, errLogger *os.
 	utils.CheckErr(err, "cannot create gRPC connection", 0)
 	defer func(c *grpc.ClientConn) {
 		err = c.Close()
-		if err != nil {
-			log.Printf("unexpected gRPC disconnection: %v", err)
-		}
+		utils.CheckErr(err, "", 1)
 	}(conn)
 	cq := &query.CosmosQueryClient{ClientConn: conn}
 

@@ -3,7 +3,7 @@ module github.com/Carina-labs/HAL9000
 go 1.18
 
 require (
-	github.com/Carina-labs/nova v0.1.1-0.20220614193512-7083a40c6431
+	github.com/Carina-labs/nova v0.5.6
 	github.com/cosmos/cosmos-sdk v0.45.4
 	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.11.0

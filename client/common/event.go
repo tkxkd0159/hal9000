@@ -1,4 +1,4 @@
-package nova
+package common
 
 func CheckEvt(attrs []string) (any, bool) {
 	if len(attrs) == 1 {

@@ -44,7 +44,7 @@ func main() {
 	apiAddr := flag.String("api", "127.0.0.1:3336", "Set bot api address")
 	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	chanID := flag.String("ch", "channel-0", "Transfer Channel ID")
+	chanID := flag.String("ch", "channel-0", "Nova Transfer Channel ID")
 	host := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
 	intv := flag.Int("interval", 10*60, "ibc-staking update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
@@ -70,9 +70,8 @@ func main() {
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
-			if err != nil {
-				utils.CheckErr(err, "", 1)
-			}
+			utils.CheckErr(err, "", 1)
+
 		}
 	}(projFps...)
 
@@ -155,7 +154,7 @@ func main() {
 
 		for {
 			var reply nt.RPCRes
-			err := wsc.ReadJSON(&reply)
+			err = wsc.ReadJSON(&reply)
 			evts := reply.Result.Events
 			utils.CheckErr(err, "no reply from subscription", 1)
 

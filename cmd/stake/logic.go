@@ -19,7 +19,7 @@ func IcaStake(host string, txf tx.Factory, chanID string, interval int, errLogge
 	intv := time.Duration(interval)
 
 	for {
-		log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
+		log.Printf("ICA-staking Bot is ongoing for %d secs\n", int(intv)*i)
 
 		msg1 := novaTx.MakeMsgDelegate(host, botInfo.GetAddress(), "transfer", chanID)
 		msgs := []sdktypes.Msg{msg1}

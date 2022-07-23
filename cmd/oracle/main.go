@@ -63,9 +63,8 @@ func main() {
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
-			if err != nil {
-				utils.CheckErr(err, "", 1)
-			}
+			utils.CheckErr(err, "", 1)
+
 		}
 	}(projFps...)
 

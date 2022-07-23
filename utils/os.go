@@ -15,16 +15,16 @@ var (
 	ToB64Str = base64.StdEncoding.EncodeToString
 )
 
-func CheckErr(err error, msg string, action types.Code) {
+func CheckErr(err error, moreMsg string, action types.Code) {
 	switch action {
 	case types.EXIT:
 		if err != nil {
-			panic(fmt.Sprintf("%s: \n %v", msg, err))
+			panic(fmt.Sprintf("%s: \n %v", moreMsg, err))
 
 		}
 	case types.KEEP:
 		if err != nil {
-			log.Printf("%s: \n %v\n", msg, err)
+			log.Printf("%s: \n %v\n", moreMsg, err)
 		}
 	}
 }

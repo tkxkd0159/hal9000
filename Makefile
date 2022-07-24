@@ -32,9 +32,12 @@ go.sum: go.mod
 
 .PHONY: lint
 
+LintCon=PrivGolint
 lint:
-	@echo ">>>> Execute golangci-lint <<<<"
-	@golangci-lint run --out-format=tab
+	@echo "--> Running linter"
+	@if docker ps -a --format {{.Names}} | grep $(LintCon) > /dev/null; \
+	then docker start -a $(LintCon); \
+	else docker run -a stdout -a stderr -v $(CURDIR):/app -w /app --name $(LintCon) golint:v1.46.2 golangci-lint run --out-format=tab --timeout=10m; fi
 
 loc:
 	@tokei .

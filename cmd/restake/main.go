@@ -51,8 +51,8 @@ func main() {
 
 	cfg.SetChainInfo(flags.Test)
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, "logs/oracle")
-	fpLog, fpErr, fpErrNova := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
-	projFps := []*os.File{fpLog, fpErr, fpErrNova}
+	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
+	projFps := []*os.File{fdLog, fdErr, fdErrExt}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
@@ -76,7 +76,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
-			fpLog,
+			fdLog,
 			false,
 		)
 		botInfo = common.MakeClientWithNewAcc(
@@ -100,7 +100,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			rpipe,
-			fpLog,
+			fdLog,
 			false,
 		)
 		os.Stdin = rpipe
@@ -112,7 +112,7 @@ func main() {
 	// ###### Start target bot logic ######
 	go func(interval int) {
 		defer wg.Done()
-		IcaAutoStake(flags.Host, txf, interval, fpErrNova)
+		IcaAutoStake(flags.Host, txf, interval, fdErr)
 	}(flags.Period)
 
 	wg.Wait()

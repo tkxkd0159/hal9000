@@ -29,7 +29,7 @@ func CheckErr(err error, moreMsg string, action types.Code) {
 	}
 }
 
-func CheckErrWithFP(fp *os.File, err error, msg string, action types.Code) {
+func LogErrWithFd(fd *os.File, err error, msg string, action types.Code) {
 	switch action {
 	case types.EXIT:
 		if err != nil {
@@ -37,7 +37,7 @@ func CheckErrWithFP(fp *os.File, err error, msg string, action types.Code) {
 		}
 	case types.KEEP:
 		if err != nil {
-			l := log.New(fp, "ERROR (check) : ", log.Llongfile|log.LstdFlags)
+			l := log.New(fd, "ERROR (check) : ", log.Llongfile|log.LstdFlags)
 			l.Printf("%s: \n %v\n", msg, err)
 		}
 	}

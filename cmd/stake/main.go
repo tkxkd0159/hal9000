@@ -58,8 +58,8 @@ func main() {
 
 	cfg.SetChainInfo(*isTest)
 	krDir, logDir := cfg.SetInitialDir(*keyname, "logs/stake")
-	fpLog, fpErr, fpErrNova := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
-	projFps := []*os.File{fpLog, fpErr, fpErrNova}
+	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
+	projFps := []*os.File{fdLog, fdErr, fdErrExt}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
@@ -85,7 +85,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
-			fpLog,
+			fdLog,
 			false,
 		)
 		botInfo = common.MakeClientWithNewAcc(
@@ -109,7 +109,7 @@ func main() {
 			krDir,
 			keyring.BackendFile,
 			rpipe,
-			fpLog,
+			fdLog,
 			false,
 		)
 		os.Stdin = rpipe
@@ -167,7 +167,7 @@ func main() {
 
 	go func(interval int) {
 		defer wg.Done()
-		IcaStake(flags.Host, txf, flags.IBCChan.Nova.Transfer, interval, fpErrNova)
+		IcaStake(flags.Host, txf, flags.IBCChan.Nova.Transfer, interval, fdErr)
 	}(flags.Period)
 
 	wg.Wait()

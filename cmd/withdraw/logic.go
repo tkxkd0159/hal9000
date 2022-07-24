@@ -6,7 +6,6 @@ import (
 	"github.com/Carina-labs/HAL9000/client/common/query"
 	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/viper"
@@ -32,7 +31,6 @@ func UndelegateAndWithdraw(host string, txf tx.Factory, chanID string, interval 
 	cq := &query.CosmosQueryClient{ClientConn: conn}
 
 	isStart := true
-	stream := ut.Fstream{Err: errLogger}
 	i := 0
 	intv := time.Duration(interval)
 	for {
@@ -45,18 +43,18 @@ func UndelegateAndWithdraw(host string, txf tx.Factory, chanID string, interval 
 		if isStart {
 			msg1 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
 			msgs := []sdktypes.Msg{msg1}
-			common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
+			common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 			isStart = false
 		} else {
 			msg1 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
 			msgs := []sdktypes.Msg{msg1}
-			common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
+			common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 
 			time.Sleep(60 * time.Second)
 
 			msg2 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, currentTs)
 			msgs = []sdktypes.Msg{msg2}
-			common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
+			common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		}
 
 		time.Sleep(intv * time.Second)

@@ -16,13 +16,13 @@ import (
 	"time"
 )
 
-func UpdateChainState(host *string, txf tx.Factory, interval int, errLogger *os.File) {
+func UpdateChainState(host string, txf tx.Factory, interval int, errLogger *os.File) {
 	var (
-		targetIP       = viper.GetString(fmt.Sprintf("net.ip.%s", *host))
+		targetIP       = viper.GetString(fmt.Sprintf("net.ip.%s", host))
 		targetGrpcAddr = targetIP + ":" + viper.GetString("net.port.grpc")
-		targetValAddr  = viper.GetString(fmt.Sprintf("%s.val_addr", *host))
-		targetDenom    = viper.GetString(fmt.Sprintf("%s.denom", *host))
-		targetDecimal  = viper.GetUint32(fmt.Sprintf("%s.decimal", *host))
+		targetValAddr  = viper.GetString(fmt.Sprintf("%s.val_addr", host))
+		targetDenom    = viper.GetString(fmt.Sprintf("%s.denom", host))
+		targetDecimal  = viper.GetUint32(fmt.Sprintf("%s.decimal", host))
 	)
 
 	conn, err := grpc.Dial(
@@ -56,7 +56,7 @@ func UpdateChainState(host *string, txf tx.Factory, interval int, errLogger *os.
 			}
 		}
 
-		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), *host, delegatedToken, targetDenom, targetDecimal, h, apphash)
+		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, delegatedToken, targetDenom, targetDecimal, h, apphash)
 		msgs := []sdktypes.Msg{msg1}
 		common.GenTxWithFactory(stream, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)

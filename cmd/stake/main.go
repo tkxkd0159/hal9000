@@ -6,8 +6,7 @@ import (
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
 	nt "github.com/Carina-labs/HAL9000/client/common/types"
-	"github.com/Carina-labs/HAL9000/cmd"
-	"github.com/Carina-labs/HAL9000/config"
+	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -35,7 +34,7 @@ var (
 )
 
 func init() {
-	sViper = config.Sviper
+	sViper = cfg.Sviper
 	common.SetBechPrefix()
 }
 
@@ -45,26 +44,26 @@ func main() {
 	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
 	chanID := flag.String("ch", "channel-0", "Nova Transfer Channel ID")
-	host := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
+	hostchain := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
 	intv := flag.Int("interval", 10*60, "ibc-staking update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
-	config.SetChainInfo(*isTest)
+	flags := cfg.FlagOpts{Test: *isTest, New: *newacc, Disp: *disp, ExtIP: *apiAddr, Kn: *keyname, Host: *hostchain, Period: *intv, IBCChan: cfg.IBCChan{Nova: cfg.IBCPort{Transfer: *chanID}}}
 
 	wg.Add(3)
 	go func() {
 		defer wg.Done()
-		api.Server{}.On(*apiAddr)
+		api.Server{}.On(flags.ExtIP)
 	}()
 
-	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/stake")
-	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
+	cfg.SetChainInfo(*isTest)
+	krDir, logDir := cfg.SetInitialDir(*keyname, "logs/stake")
+	fpLog, fpErr, fpErrNova := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
 	projFps := []*os.File{fpLog, fpErr, fpErrNova}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
 			utils.CheckErr(err, "", 1)
-
 		}
 	}(projFps...)
 
@@ -77,7 +76,7 @@ func main() {
 	novaTCPTmAddr := url.URL{Scheme: "tcp", Host: novaTmAddr}
 	novaWsTmAddr := url.URL{Scheme: "ws", Host: novaTmAddr, Path: "/websocket"}
 
-	if *newacc {
+	if flags.New {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			novaBotAddr,
@@ -98,7 +97,7 @@ func main() {
 		)
 		os.Exit(0)
 	} else {
-		pp := cmd.GetPassphrase(sViper)
+		pp := cfg.GetPassphrase(sViper)
 		_, err = wpipe.Write([]byte(pp))
 		utils.CheckErr(err, "", 0)
 
@@ -168,8 +167,8 @@ func main() {
 
 	go func(interval int) {
 		defer wg.Done()
-		IcaStake(*host, txf, *chanID, interval, fpErrNova)
-	}(*intv)
+		IcaStake(flags.Host, txf, flags.IBCChan.Nova.Transfer, interval, fpErrNova)
+	}(flags.Period)
 
 	wg.Wait()
 

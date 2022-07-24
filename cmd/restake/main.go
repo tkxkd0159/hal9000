@@ -4,8 +4,7 @@ import (
 	"flag"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	"github.com/Carina-labs/HAL9000/cmd"
-	"github.com/Carina-labs/HAL9000/config"
+	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -29,7 +28,7 @@ var (
 )
 
 func init() {
-	sViper = config.Sviper
+	sViper = cfg.Sviper
 	common.SetBechPrefix()
 }
 
@@ -38,26 +37,26 @@ func main() {
 	apiAddr := flag.String("api", "127.0.0.1:3335", "Set bot api address")
 	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	host := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
+	hostchain := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
 	intv := flag.Int("interval", 6*60*60, "Re-stake interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()
-	config.SetChainInfo(*isTest)
+	flags := cfg.FlagOpts{Test: *isTest, New: *newacc, Disp: *disp, ExtIP: *apiAddr, Kn: *keyname, Host: *hostchain, Period: *intv}
 
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		api.Server{}.On(*apiAddr)
+		api.Server{}.On(flags.ExtIP)
 	}()
 
-	krDir, logDir := cmd.SetInitialDir(*keyname, "logs/oracle")
-	fpLog, fpErr, fpErrNova := cmd.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", disp)
+	cfg.SetChainInfo(flags.Test)
+	krDir, logDir := cfg.SetInitialDir(flags.Kn, "logs/oracle")
+	fpLog, fpErr, fpErrNova := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
 	projFps := []*os.File{fpLog, fpErr, fpErrNova}
 	defer func(fps ...*os.File) {
 		for _, fp := range fps {
 			err := fp.Close()
 			utils.CheckErr(err, "", 1)
-
 		}
 	}(projFps...)
 
@@ -68,7 +67,7 @@ func main() {
 	novaIP := viper.GetString("net.ip.nova")
 	novaTCPTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
 
-	if *newacc {
+	if flags.New {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
 			novaBotAddr,
@@ -82,14 +81,14 @@ func main() {
 		)
 		botInfo = common.MakeClientWithNewAcc(
 			ctx,
-			*keyname,
-			sViper.GetString(*keyname),
+			flags.Kn,
+			sViper.GetString(flags.Kn),
 			sdktypes.FullFundraiserPath,
 			hd.Secp256k1,
 		)
 		os.Exit(0)
 	} else {
-		pp := cmd.GetPassphrase(sViper)
+		pp := cfg.GetPassphrase(sViper)
 		_, err = wpipe.Write([]byte(pp))
 		utils.CheckErr(err, "", 0)
 
@@ -105,7 +104,7 @@ func main() {
 			false,
 		)
 		os.Stdin = rpipe
-		botInfo = common.LoadClientPubInfo(ctx, *keyname)
+		botInfo = common.LoadClientPubInfo(ctx, flags.Kn)
 	}
 	ctx = common.AddMoreFromInfo(ctx)
 	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
@@ -113,8 +112,8 @@ func main() {
 	// ###### Start target bot logic ######
 	go func(interval int) {
 		defer wg.Done()
-		IcaAutoStake(*host, txf, interval, fpErrNova)
-	}(*intv)
+		IcaAutoStake(flags.Host, txf, interval, fpErrNova)
+	}(flags.Period)
 
 	wg.Wait()
 }

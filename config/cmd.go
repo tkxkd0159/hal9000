@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"fmt"
@@ -8,6 +8,26 @@ import (
 	"os"
 	"path"
 )
+
+type IBCPort struct {
+	Transfer string
+}
+
+type IBCChan struct {
+	Nova IBCPort
+	Host IBCPort
+}
+
+type FlagOpts struct {
+	Test   bool
+	New    bool
+	Disp   bool
+	ExtIP  string
+	Kn     string
+	Host   string
+	Period int
+	IBCChan
+}
 
 func SetInitialDir(krDir string, logDir string) (string, string) {
 	ckrDir, err := os.Getwd()
@@ -38,10 +58,10 @@ func GetPassphrase(vp *viper.Viper) string {
 	return pp
 }
 
-func SetAllLogger(logDir, stdLogName, errLogName, errRedirectLogName string, isDisp *bool) (*os.File, *os.File, *os.File) {
+func SetAllLogger(logDir, stdLogName, errLogName, errRedirectLogName string, isDisp bool) (*os.File, *os.File, *os.File) {
 	var fpLog, fpErr, fpErrNova *os.File
 	var err error
-	if !*isDisp {
+	if !isDisp {
 		fpLog, err = os.OpenFile(path.Join(logDir, stdLogName), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		utils.CheckErr(err, "cannot open logfp", 0)
 

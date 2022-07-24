@@ -8,9 +8,9 @@ import (
 
 var Sviper *viper.Viper
 
-func init() {
-	Sviper = setEnv()
-}
+//func init() {
+//	Sviper = setEnv()
+//}
 
 func setEnv() *viper.Viper {
 	//viper.SetConfigFile(".env")

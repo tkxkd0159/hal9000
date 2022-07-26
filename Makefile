@@ -1,5 +1,5 @@
 TARGET ?= oracle
-BUILD_DIR ?= $(CURDIR)/build
+BUILD_DIR ?= $(CURDIR)/out
 FLAGS ?= ""
 
 .PHONY: all build clean run
@@ -14,7 +14,7 @@ run:
 	@go run ./cmd/$(TARGET) $(FLAGS)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
-	@echo ">>>>>>>>>>>> $@ <<<<<<<<<<<<"
+	@echo "--> $@ "
 	@go $@ -mod=readonly $(BUILD_ARGS) ./...
 
 # make BUILD_DIR=./bin
@@ -35,9 +35,7 @@ go.sum: go.mod
 LintCon=PrivGolint
 lint:
 	@echo "--> Running linter"
-	@if docker ps -a --format {{.Names}} | grep $(LintCon) > /dev/null; \
-	then docker start -a $(LintCon); \
-	else docker run -a stdout -a stderr -v $(CURDIR):/app -w /app --name $(LintCon) golint:v1.46.2 golangci-lint run --out-format=tab --timeout=10m; fi
+	@golangci-lint run --out-format=tab
 
 loc:
 	@tokei .

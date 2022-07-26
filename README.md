@@ -1,6 +1,6 @@
 ![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/build.yml/badge.svg)
 ![golangci-lint](https://github.com/Carina-labs/HAL9000/actions/workflows/lint.yml/badge.svg)
-![LoC](https://img.shields.io/badge/line%20of%20codes-1430-informational)
+![LoC](https://img.shields.io/badge/line%20of%20codes-1867-informational)
 
 # HAL9000
 The world's most complete oracle feeder
@@ -18,14 +18,19 @@ GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@v0.5.1
 
 # Cmd
 ```bash
-make build all
-
-# Set keyring
+# Set keyring if you need
 make run TARGET=oracle FLAGS="-display -add -name=nova_bot"
 
-# Run bot
-make run TARGET=oracle FLAGS="-name=nova_bot -host=gaia -interval=5 -test=false -display"
-make run TARGET=stake FLAGS="-interval=5 -display"
-make run TARGET=restake FLAGS="-interval=5 -display"
-make run TARGET=withdraw FLAGS="-interval=5 -display"
+# Build bot
+make all
+
+# Run bot without build (test)
+make run TARGET=oracle FLAGS="-name=nova_bot -host=gaia -interval=5 -display"
+make run TARGET=stake FLAGS="-host=gaia -interval=5 -display"
+make run TARGET=restake FLAGS="-host=gaia -ch=channel-0 -interval=5 -display"
+make run TARGET=withdraw FLAGS="-host=gaia -ch=channel-45 -interval=5 -display"
+
+# Run bot (prod)
+./out/<bot> [flags]
+
 ```

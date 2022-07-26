@@ -8,15 +8,11 @@ import (
 
 var Sviper *viper.Viper
 
-//func init() {
-//	Sviper = setEnv()
-//}
+func init() {
+	Sviper = setEnv()
+}
 
 func setEnv() *viper.Viper {
-	//viper.SetConfigFile(".env")
-	//err := viper.ReadInConfig()
-	//utils.CheckErr(err, "Can't read .env", types.EXIT)
-
 	sViper := viper.New()
 	sViper.SetConfigType("yaml")
 	sViper.SetConfigFile(".secret.yml")

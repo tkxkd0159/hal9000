@@ -44,7 +44,7 @@ func main() {
 	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
 	chanID := flag.String("ch", "channel-0", "Nova Transfer Channel ID")
-	hostchain := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
+	hostchain := flag.String("host", "gaia", "Name of host chain registered with Nova")
 	intv := flag.Int("interval", 10*60, "ibc-staking update interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")
 	flag.Parse()

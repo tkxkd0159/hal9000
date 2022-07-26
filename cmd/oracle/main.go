@@ -32,7 +32,6 @@ func init() {
 	common.SetBechPrefix()
 }
 
-// FIXME: wasmvm doesn't support AArch64. Need to set GOARCH=amd64
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")

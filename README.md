@@ -22,7 +22,7 @@ GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@v0.5.1
 make run TARGET=oracle FLAGS="-display -add -name=nova_bot"
 
 # Build bot
-make all
+make all ARCH=<arm64|amd64>
 
 # Run bot without build (test)
 make run TARGET=oracle FLAGS="-name=nova_bot -host=gaia -interval=5 -display"

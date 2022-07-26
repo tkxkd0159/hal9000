@@ -1,7 +1,7 @@
 TARGET ?= oracle
 BUILD_DIR ?= $(CURDIR)/out
 FLAGS ?= ""
-
+ARCH ?= arm64
 .PHONY: all build clean run
 
 all: lint build
@@ -11,11 +11,11 @@ BUILD_TARGETS := build install
 build: BUILD_ARGS=-o $(BUILD_DIR)/
 
 run:
-	@go run ./cmd/$(TARGET) $(FLAGS)
+	@GOARCH=$(ARCH) go run ./cmd/$(TARGET) $(FLAGS)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
 	@echo "--> $@ "
-	@go $@ -mod=readonly $(BUILD_ARGS) ./...
+	@GOARCH=$(ARCH) go $@ -mod=readonly $(BUILD_ARGS) ./...
 
 # make BUILD_DIR=./bin
 $(BUILD_DIR)/:

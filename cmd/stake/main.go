@@ -7,6 +7,8 @@ import (
 	"github.com/Carina-labs/HAL9000/client/common"
 	nt "github.com/Carina-labs/HAL9000/client/common/types"
 	cfg "github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/logic"
+	"github.com/Carina-labs/HAL9000/rpc"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -151,10 +153,10 @@ func main() {
 			evts := reply.Result.Events
 			utils.CheckErr(err, "no reply from subscription", 1)
 
-			evt10, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.chain_id"])
-			evt11, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
-			evt12, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
-			evt13, _ := common.CheckEvt(evts["nova.oracle.v1.ChainInfo.app_hash"])
+			evt10, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.chain_id"])
+			evt11, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
+			evt12, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
+			evt13, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.app_hash"])
 
 			oracleLog := fmt.Sprintf("Zone : %s, Operator : %s, Latest Block Height : %s Apphash : %s\n", evt10, evt11, evt12, evt13)
 
@@ -167,7 +169,7 @@ func main() {
 
 	go func(interval int) {
 		defer wg.Done()
-		IcaStake(flags.Host, txf, flags.IBCChan.Nova.Transfer, interval, fdErr)
+		logic.IcaStake(flags.Host, ctx, txf, botInfo, flags.IBCChan.Nova.Transfer, interval, fdErr)
 	}(flags.Period)
 
 	wg.Wait()

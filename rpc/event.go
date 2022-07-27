@@ -1,4 +1,4 @@
-package common
+package rpc
 
 func CheckEvt(attrs []string) (any, bool) {
 	if len(attrs) == 1 {

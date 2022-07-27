@@ -1,7 +1,7 @@
 TARGET ?= oracle
 BUILD_DIR ?= $(CURDIR)/out
 FLAGS ?= ""
-ARCH ?= arm64
+ARCH ?= $(shell go env GOARCH)
 .PHONY: all build clean run
 
 all: lint build

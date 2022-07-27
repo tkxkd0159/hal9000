@@ -5,6 +5,7 @@ import (
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
 	cfg "github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -114,7 +115,7 @@ func main() {
 	// ###### Start target bot logic ######
 	go func(interval int) {
 		defer wg.Done()
-		UpdateChainState(flags.Host, txf, interval, fdErr)
+		logic.UpdateChainState(flags.Host, ctx, txf, botInfo, interval, fdErr)
 	}(flags.Period)
 
 	wg.Wait()

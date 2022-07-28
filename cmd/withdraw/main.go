@@ -12,24 +12,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/spf13/viper"
-	"net/url"
 	"os"
 	"sync"
 )
 
 var (
-	wg sync.WaitGroup
-)
-
-var (
+	wg      sync.WaitGroup
 	ctx     client.Context
 	botInfo keyring.Info
-	sViper  *viper.Viper
 )
 
 func init() {
-	sViper = cfg.Sviper
 	common.SetBechPrefix()
 }
 
@@ -52,6 +45,8 @@ func main() {
 	}()
 
 	cfg.SetChainInfo(flags.Test)
+	Nova := &cfg.NovaInfo{}
+	Nova.Set(flags.Kn)
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, "logs/oracle")
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
 	projFps := []*os.File{fdLog, fdErr, fdErrExt}
@@ -65,16 +60,13 @@ func main() {
 	// set pipe to ignore stdin tty
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
-	novaBotAddr := viper.GetString("nova.bot_addr")
-	novaIP := viper.GetString("net.ip.nova")
-	novaTCPTmAddr := &url.URL{Scheme: "tcp", Host: novaIP + ":" + viper.GetString("net.port.tmrpc")}
 
 	if flags.New {
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			novaBotAddr,
-			novaTCPTmAddr.String(),
-			viper.GetString("nova.chain_id"),
+			Nova.Bot.Addr,
+			Nova.TmRPC.String(),
+			Nova.ChainID,
 			krDir,
 			keyring.BackendFile,
 			os.Stdin,
@@ -84,21 +76,21 @@ func main() {
 		botInfo = common.MakeClientWithNewAcc(
 			ctx,
 			flags.Kn,
-			sViper.GetString(flags.Kn),
+			Nova.Bot.Mnemonic(),
 			sdktypes.FullFundraiserPath,
 			hd.Secp256k1,
 		)
 		os.Exit(0)
 	} else {
-		pp := cfg.GetPassphrase(sViper)
+		pp := Nova.Bot.Passphrase()
 		_, err = wpipe.Write([]byte(pp))
 		utils.CheckErr(err, "", 0)
 
 		ctx = common.MakeContext(
 			novaapp.ModuleBasics,
-			novaBotAddr,
-			novaTCPTmAddr.String(),
-			viper.GetString("nova.chain_id"),
+			Nova.Bot.Addr,
+			Nova.TmRPC.String(),
+			Nova.ChainID,
 			krDir,
 			keyring.BackendFile,
 			rpipe,

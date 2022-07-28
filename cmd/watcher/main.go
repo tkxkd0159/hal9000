@@ -10,9 +10,7 @@ import (
 	rpctype "github.com/Carina-labs/HAL9000/rpc/types"
 	"github.com/Carina-labs/HAL9000/utils"
 	"github.com/gorilla/websocket"
-	"github.com/spf13/viper"
 	"log"
-	"net/url"
 	"sync"
 	"time"
 )
@@ -24,37 +22,33 @@ const (
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	cfg.SetChainInfo(*isTest)
-	novaIP := viper.GetString("net.ip.nova")
-	novaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
-	novaWsTmAddr := url.URL{Scheme: "ws", Host: novaTmAddr, Path: "/websocket"}
+	Nova := &cfg.NovaInfo{}
+	Nova.Set()
 
-	wsc, _, err := websocket.DefaultDialer.Dial(novaWsTmAddr.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	} else {
-		log.Printf("connecting to %s", novaWsTmAddr.String())
-	}
-	defer func(c *websocket.Conn) {
-		err := wsc.Close()
-		if err != nil {
-			utils.CheckErr(err, "", 1)
-		}
-	}(wsc)
-
-	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
-	paramSet := map[string]any{"query": "tm.event='Tx'"}
-	tmSubReq := &rpctype.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: paramSet}
-	utils.CheckErr(err, "cannot marshal", 0)
-	err = wsc.WriteJSON(tmSubReq)
-	utils.CheckErr(err, "Cannot write JSON to Websocket : ", 0)
-
-	// ###### Start target bot logic ######
 	var wg sync.WaitGroup
 	wg.Add(NumWorker)
 
 	// Deprecated
 	go func() {
 		defer wg.Done()
+		wsc, _, err := websocket.DefaultDialer.Dial(Nova.TmWsRPC.String(), nil)
+		if err != nil {
+			log.Fatal("dial:", err)
+		} else {
+			log.Printf("connecting to %s", Nova.TmWsRPC.String())
+		}
+		defer func(c *websocket.Conn) {
+			err := wsc.Close()
+			if err != nil {
+				utils.CheckErr(err, "", 1)
+			}
+		}(wsc)
+		//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
+		paramSet := map[string]any{"query": "tm.event='Tx'"}
+		tmSubReq := &rpctype.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: paramSet}
+		utils.CheckErr(err, "cannot marshal", 0)
+		err = wsc.WriteJSON(tmSubReq)
+		utils.CheckErr(err, "Cannot write JSON to Websocket : ", 0)
 
 		for {
 			var reply rpctype.RPCRes
@@ -80,11 +74,11 @@ func main() {
 	go func() {
 		defer wg.Done()
 
-		botAddr := viper.GetString("nova.bot_addr")
-		novaWsc := rpc.MakeEventWatcher(novaWsTmAddr)
+		novaWsc := rpc.MakeEventWatcher(*Nova.TmWsRPC)
 		wsErr := novaWsc.Start()
 		utils.CheckErr(wsErr, "", 0)
-		query1 := fmt.Sprintf("tm.event='Tx' AND message.sender='%s'", botAddr)
+		query1 := fmt.Sprintf("tm.event='Tx' AND message.action='%s'", "/nova.oracle.v1.MsgUpdateChainState")
+		//query1 := fmt.Sprintf("tm.event='Tx'")
 		subsErr := novaWsc.Subscribe(watchCtx, query1)
 		utils.CheckErr(subsErr, "", 0)
 
@@ -95,7 +89,7 @@ func main() {
 		for {
 			res := <-novaWsc.ResponsesCh
 			var wsRes rpctype.ResultEvent
-			err = json.Unmarshal(res.Result, &wsRes)
+			err := json.Unmarshal(res.Result, &wsRes)
 			utils.CheckErr(err, "", 0)
 			evts := wsRes.Events
 			fmt.Printf("%s\n", evts[parser.EventWithFieldName("app_hash")])

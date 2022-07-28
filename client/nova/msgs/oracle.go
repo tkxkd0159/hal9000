@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func MakeMsgUpdateChainState(operator sdktypes.AccAddress, chainID string, amount string, denom string, decimal uint32, blockHeight int64, apphash []byte) *types.MsgUpdateChainState {
+func MakeMsgUpdateChainState(operator sdktypes.AccAddress, chainID string, denom string, decimal uint32, amount string, blockHeight int64, apphash []byte) *types.MsgUpdateChainState {
 	bigAmt, ok := sdktypes.NewIntFromString(amount)
 	if !ok {
 		log.Fatalln("Bigint conversion fail")

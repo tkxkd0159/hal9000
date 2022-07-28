@@ -42,21 +42,9 @@ func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo k
 	for {
 		log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
 
-		h := cq.GetLatestBlock().GetBlock().GetHeader().GetHeight()
-		hisInfo := cq.GetHistoricalInfo(h)
-		apphash := hisInfo.GetHist().GetHeader().GetAppHash()
+		delegatedToken, height, apphash := OracleInfo(cq, targetValAddr)
 
-		var delegatedToken string
-		for _, val := range hisInfo.GetHist().GetValset() {
-			if val.GetOperatorAddress() != targetValAddr {
-				continue
-			} else {
-				delegatedToken = val.GetTokens()
-				break
-			}
-		}
-
-		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, delegatedToken, targetDenom, targetDecimal, h, apphash)
+		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, targetDenom, targetDecimal, delegatedToken, height, apphash)
 		msgs := []sdktypes.Msg{msg1}
 		common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)
@@ -88,7 +76,7 @@ func IcaAutoStake(host string, ctx client.Context, txf tx.Factory, botInfo keyri
 	for {
 		log.Printf("Re-staking Bot is ongoing for %d secs\n", int(intv)*i)
 
-		r := cq.GetRewards(targetHostAddr, targetValAddr).GetRewards()[0]
+		r := RewardsWithAddr(cq, targetHostAddr, targetValAddr)
 		msg1 := novaTx.MakeMsgIcaAutoStaking(host, targetHostAddr, botInfo.GetAddress(), r)
 		msgs := []sdktypes.Msg{msg1}
 		common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -133,9 +121,7 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 	for {
 		log.Printf("Undelegate & Withdraw Bot is ongoing for %d secs\n", int(intv)*i)
 
-		secs := cq.GetLatestBlock().GetBlock().GetHeader().GetTime().GetSeconds()
-		nanos := cq.GetLatestBlock().GetBlock().GetHeader().GetTime().GetNanos()
-		currentTs := time.Unix(secs, int64(nanos)).UTC()
+		blkTS := LatestBlockTS(cq)
 
 		if isStart {
 			msg1 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
@@ -149,7 +135,7 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 
 			time.Sleep(60 * time.Second)
 
-			msg2 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, currentTs)
+			msg2 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, blkTS)
 			msgs = []sdktypes.Msg{msg2}
 			common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		}

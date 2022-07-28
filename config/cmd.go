@@ -30,10 +30,10 @@ type FlagOpts struct {
 }
 
 func SetInitialDir(krDir string, logDir string) (string, string) {
-	ckrDir, err := os.Getwd()
+	cwd, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
 
-	krDir = path.Join(ckrDir, "/bot", krDir)
+	krDir = path.Join(cwd, "/bot", krDir)
 	err = os.MkdirAll(krDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** bot directory already exist **")
@@ -41,7 +41,7 @@ func SetInitialDir(krDir string, logDir string) (string, string) {
 		log.Fatal(err)
 	}
 
-	logDir = path.Join(ckrDir, logDir)
+	logDir = path.Join(cwd, logDir)
 	err = os.MkdirAll(logDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** log directory already exist **")

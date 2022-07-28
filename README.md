@@ -1,6 +1,6 @@
 ![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/build.yml/badge.svg)
 ![golangci-lint](https://github.com/Carina-labs/HAL9000/actions/workflows/lint.yml/badge.svg)
-![LoC](https://img.shields.io/badge/line%20of%20codes-1867-informational)
+![LoC](https://img.shields.io/badge/line%20of%20codes-3917-informational)
 
 # HAL9000
 The world's most complete oracle feeder
@@ -22,7 +22,7 @@ GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@v0.5.1
 make run TARGET=oracle FLAGS="-display -add -name=nova_bot"
 
 # Build bot
-make all ARCH=<arm64|amd64>
+make all [ARCH=<arm64|amd64>] # if you don't set ARCH, it follows GOARCH
 
 # Run bot without build (test)
 make run TARGET=oracle FLAGS="-name=nova_bot -host=gaia -interval=5 -display"

@@ -45,6 +45,7 @@ func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo k
 		delegatedToken, height, apphash := OracleInfo(cq, targetValAddr)
 
 		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, targetDenom, targetDecimal, delegatedToken, height, apphash)
+		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
 		common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)

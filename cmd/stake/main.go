@@ -2,27 +2,20 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/common"
-	nt "github.com/Carina-labs/HAL9000/client/common/types"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
-	"github.com/Carina-labs/HAL9000/rpc"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
-	"log"
 	"net/url"
 	"os"
-	"path"
 	"sync"
-	"time"
 )
 
 var (
@@ -76,7 +69,6 @@ func main() {
 	novaIP := viper.GetString("net.ip.nova")
 	novaTmAddr := novaIP + ":" + viper.GetString("net.port.tmrpc")
 	novaTCPTmAddr := url.URL{Scheme: "tcp", Host: novaTmAddr}
-	novaWsTmAddr := url.URL{Scheme: "ws", Host: novaTmAddr, Path: "/websocket"}
 
 	if flags.New {
 		ctx = common.MakeContext(
@@ -119,53 +111,6 @@ func main() {
 	}
 	ctx = common.AddMoreFromInfo(ctx)
 	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
-
-	wsc, _, err := websocket.DefaultDialer.Dial(novaWsTmAddr.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	} else {
-		log.Printf("connecting to %s", novaWsTmAddr.String())
-	}
-	defer func(c *websocket.Conn) {
-		err := wsc.Close()
-		if err != nil {
-			utils.CheckErr(err, "", 1)
-		}
-	}(wsc)
-
-	//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
-	myp := map[string]any{"query": "tm.event='Tx'"}
-	tmSubReq := &nt.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: myp}
-	utils.CheckErr(err, "cannot marshal", 0)
-	err = wsc.WriteJSON(tmSubReq)
-	utils.CheckErr(err, "Cannot write JSON to Websocket : ", 0)
-
-	// ###### Start target bot logic ######
-	go func() {
-		defer wg.Done()
-
-		fp, err := os.OpenFile(path.Join(logDir, "event.txt"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		utils.CheckErr(err, "", 0)
-
-		for {
-			var reply nt.RPCRes
-			err = wsc.ReadJSON(&reply)
-			evts := reply.Result.Events
-			utils.CheckErr(err, "no reply from subscription", 1)
-
-			evt10, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.chain_id"])
-			evt11, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
-			evt12, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.last_block_height"])
-			evt13, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.app_hash"])
-
-			oracleLog := fmt.Sprintf("Zone : %s, Operator : %s, Latest Block Height : %s Apphash : %s\n", evt10, evt11, evt12, evt13)
-
-			totalLog := fmt.Sprintf("%s\n%s", time.Now().UTC().String(), oracleLog)
-			fmt.Print(totalLog)
-			_, err = fmt.Fprintf(fp, "%s\n", totalLog)
-			utils.CheckErr(err, "cannot write log to event.txt", 0)
-		}
-	}()
 
 	go func(interval int) {
 		defer wg.Done()

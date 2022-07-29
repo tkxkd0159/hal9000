@@ -26,6 +26,10 @@ go.sum: go.mod
 	GOPRIVATE=github.com/Carina-labs go mod verify
 	GOPRIVATE=github.com/Carina-labs go mod tidy
 
+pusher: go.sum $(BUILD_DIR)/
+	@echo "--> Generate pusher for test"
+	@GOARCH=$(ARCH) go build -mod=readonly -o out/ ./test/pusher
+
 #######################################################
 ###                     Linting                     ###
 #######################################################

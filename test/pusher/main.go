@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/Carina-labs/HAL9000/client/common"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/test"
@@ -11,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+	ibctypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	"os"
 	"sync"
 )
@@ -102,7 +104,9 @@ func main() {
 	// ###### Start target bot logic ######
 	go func(interval int) {
 		defer wg.Done()
-		test.DepositGal(ctx, txf, botInfo, interval, fdErr, test.IBCInfo{ZoneID: *ZoneID, IBCChan: *IBCChan, IBCPort: "transfer"}, "unova", 1000)
+		port := "transfer"
+		DenomTrace := ibctypes.DenomTrace{BaseDenom: "uatom", Path: fmt.Sprintf("%s/%s", port, *IBCChan)}
+		test.DepositGal(ctx, txf, botInfo, interval, fdErr, test.IBCInfo{ZoneID: *ZoneID, IBCChan: *IBCChan, IBCPort: port}, DenomTrace.IBCDenom(), 1000)
 	}(flags.Period)
 
 	wg.Wait()

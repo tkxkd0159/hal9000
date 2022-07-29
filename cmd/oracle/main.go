@@ -46,7 +46,7 @@ func main() {
 
 	cfg.SetChainInfo(flags.Test)
 	Nova := &cfg.NovaInfo{}
-	Nova.Set(flags.Kn)
+	Nova.Set("bot_addr", flags.Kn)
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, "logs/oracle")
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
 	projFps := []*os.File{fdLog, fdErr, fdErrExt}

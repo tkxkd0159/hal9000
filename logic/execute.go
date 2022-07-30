@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc"
+	"log"
 	"os"
 	"reflect"
 	"time"
@@ -44,6 +45,7 @@ func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo k
 		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, Host.Decimal, delegatedToken, height, apphash)
 		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
+		log.Println("----> MsgUpdateChainState was sent")
 		base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
@@ -79,6 +81,7 @@ func IcaAutoStake(host string, ctx client.Context, txf tx.Factory, botInfo keyri
 
 		msg1 := novaTx.MakeMsgIcaAutoStaking(host, Host.HostAccount, botInfo.GetAddress(), r)
 		msgs := []sdktypes.Msg{msg1}
+		log.Println("----> MsgIcaAutoStaking was sent")
 		base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
@@ -94,6 +97,7 @@ func IcaStake(host string, ctx client.Context, txf tx.Factory, botInfo keyring.I
 
 		msg1 := novaTx.MakeMsgDelegate(host, botInfo.GetAddress(), "transfer", chanID)
 		msgs := []sdktypes.Msg{msg1}
+		log.Println("----> MsgDelegate was sent")
 		base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
@@ -128,17 +132,20 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 		if isStart {
 			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
 			msgs := []sdktypes.Msg{msg1, msg2}
+			log.Println("----> MsgUndelegate was sent")
 			base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 			isStart = false
 		} else {
 			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
 			msgs := []sdktypes.Msg{msg1, msg2}
+			log.Println("----> MsgUndelegate was sent")
 			base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 
 			time.Sleep(60 * time.Second)
 
 			msg3 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, blkTS)
 			msgs = []sdktypes.Msg{msg3}
+			log.Println("----> MsgPendingWithdraw was sent")
 			base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		}
 

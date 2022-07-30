@@ -9,13 +9,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
 type (
 	AccAddr = sdktypes.AccAddress
+)
+
+var (
+	wm sync.RWMutex
 )
 
 func CheckAccAddr(target any) (AccAddr, error) {
@@ -40,6 +46,13 @@ func CheckAccAddr(target any) (AccAddr, error) {
 // 2. Sign the generated transaction with the keyring's account
 // 3. Broadcast the tx to the Tendermint node using gPRC
 func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Get panic while generating tx")
+		}
+	}()
+	wm.Lock()
+	defer wm.Unlock()
 	if onlyGen {
 		ctx = ctx.WithGenerateOnly(true)
 	}
@@ -48,14 +61,15 @@ func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGe
 	if err != nil {
 		if strings.Contains(err.Error(), "account sequence mismatch") {
 			utils.LogErrWithFd(errFd, err, "", 1)
-			txseq := txf.Sequence()
 			for {
-				txseq++
+				txseq := txf.Sequence()
 				txf.WithSequence(txseq)
 				err = tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
-				if err == nil {
+				if !strings.Contains(err.Error(), "account sequence mismatch") {
 					break
 				}
+				utils.LogErrWithFd(errFd, err, "", 1)
+				time.Sleep(6 * time.Second)
 			}
 
 		} else {

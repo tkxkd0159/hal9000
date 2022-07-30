@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc"
-	"log"
 	"os"
+	"reflect"
 	"time"
 )
 
@@ -38,10 +38,9 @@ func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo k
 	i := 0
 	intv := time.Duration(interval)
 	for {
-		log.Printf("Bot is ongoing for %d secs\n", int(intv)*i)
+		botTickLog("Oracle", int(intv)*i)
 
 		delegatedToken, height, apphash := OracleInfo(cq, Host.Validator)
-
 		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, Host.Decimal, delegatedToken, height, apphash)
 		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
@@ -69,9 +68,15 @@ func IcaAutoStake(host string, ctx client.Context, txf tx.Factory, botInfo keyri
 	i := 0
 	intv := time.Duration(interval)
 	for {
-		log.Printf("Re-staking Bot is ongoing for %d secs\n", int(intv)*i)
+		botTickLog("Re-Staking", int(intv)*i)
 
 		r := RewardsWithAddr(cq, Host.HostAccount, Host.Validator)
+		if reflect.DeepEqual(r, sdktypes.DecCoin{}) {
+			time.Sleep(intv * time.Second)
+			i++
+			continue
+		}
+
 		msg1 := novaTx.MakeMsgIcaAutoStaking(host, Host.HostAccount, botInfo.GetAddress(), r)
 		msgs := []sdktypes.Msg{msg1}
 		common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -85,7 +90,7 @@ func IcaStake(host string, ctx client.Context, txf tx.Factory, botInfo keyring.I
 	i := 0
 	intv := time.Duration(interval)
 	for {
-		log.Printf("ICA-staking Bot is ongoing for %d secs\n", int(intv)*i)
+		botTickLog("ICA-Staking", int(intv)*i)
 
 		msg1 := novaTx.MakeMsgDelegate(host, botInfo.GetAddress(), "transfer", chanID)
 		msgs := []sdktypes.Msg{msg1}
@@ -114,7 +119,7 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 	i := 0
 	intv := time.Duration(interval)
 	for {
-		log.Printf("Undelegate & Withdraw Bot is ongoing for %d secs\n", int(intv)*i)
+		botTickLog("Undelegate & Withdraw", int(intv)*i)
 
 		blkTS := LatestBlockTS(cq)
 		delegatedToken, height, apphash := OracleInfo(cq, Host.Validator)

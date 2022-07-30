@@ -31,7 +31,7 @@ func main() {
 	apiAddr := flag.String("api", "127.0.0.1:3337", "Set bot api address")
 	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
 	newacc := flag.Bool("add", false, "Start client with making new account")
-	chanID := flag.String("ch", "channel-45", "Host Transfer Channel ID")
+	chanID := flag.String("ch", "channel-2", "Host Transfer Channel ID")
 	hostchain := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
 	intv := flag.Int("interval", 21*24*60*60, "Withdraw interval (sec)")
 	disp := flag.Bool("display", false, "Show context log through stdout")

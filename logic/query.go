@@ -3,6 +3,7 @@ package logic
 import (
 	"github.com/Carina-labs/HAL9000/client/common/query"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+	"log"
 	"time"
 )
 
@@ -31,5 +32,13 @@ func LatestBlockTS(cq *query.CosmosQueryClient) time.Time {
 }
 
 func RewardsWithAddr(cq *query.CosmosQueryClient, delegator string, validator string) sdktypes.DecCoin {
-	return cq.GetRewards(delegator, validator).GetRewards()[0]
+	var reward sdktypes.DecCoin
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("There is no reward to handle")
+			reward = sdktypes.DecCoin{}
+		}
+	}()
+	reward = cq.GetRewards(delegator, validator).GetRewards()[0]
+	return reward
 }

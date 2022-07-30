@@ -9,7 +9,7 @@ gaia:
   denom: "uatom"
   decimal: 6
   val_addr: "cosmosvaloper1ma2378jplsnj3chlcgwqfx8p8g92z7dzw5kg5n"
-  host_addr: "cosmos14cmy8gfnjv8fz5tqk6h5ejk5j3vv7t7824u36lc5z56fdyu83v3qmla7y8"
+  host_addr: "cosmos1y4tyrmmrezunwpfqfgurprpfpkg6pfdserlf3hy78h9xc3yn5nfqzh9yd9"
   bot_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"
 net:
   ip:

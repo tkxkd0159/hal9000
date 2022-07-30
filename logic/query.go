@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"github.com/Carina-labs/HAL9000/client/common/query"
+	"github.com/Carina-labs/HAL9000/client/base/query"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"log"
 	"time"

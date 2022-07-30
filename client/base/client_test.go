@@ -1,8 +1,8 @@
-package common_test
+package base_test
 
 import (
 	"bufio"
-	"github.com/Carina-labs/HAL9000/client/common"
+	"github.com/Carina-labs/HAL9000/client/base"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
@@ -17,8 +17,8 @@ func (mockio) Write(p []byte) (n int, err error) { return len(p), nil }
 func (mockio) Read(p []byte) (n int, err error)  { return len(p), nil }
 
 func TestMakeContext(t *testing.T) {
-	common.SetBechPrefix()
-	encCfg := common.MakeEncodingConfig(novaapp.ModuleBasics)
+	base.SetBechPrefix()
+	encCfg := base.MakeEncodingConfig(novaapp.ModuleBasics)
 
 	tcs := []client.Context{
 		{
@@ -46,12 +46,12 @@ func TestMakeContext(t *testing.T) {
 	for _, tc := range tcs {
 		tc.FromAddress, _ = sdktypes.AccAddressFromBech32(tc.From)
 
-		tc.Keyring = common.MakeKeyring(tc, "test")
+		tc.Keyring = base.MakeKeyring(tc, "test")
 		tmc, err := client.NewClientFromNode(tc.NodeURI)
 		assert.NoError(t, err)
 		tc.Client = tmc
 
-		got := common.MakeContext(
+		got := base.MakeContext(
 			novaapp.ModuleBasics,
 			tc.From,
 			tc.NodeURI,
@@ -62,7 +62,7 @@ func TestMakeContext(t *testing.T) {
 			mockio{},
 			true,
 		)
-		got = common.AddMoreFromInfo(got)
+		got = base.AddMoreFromInfo(got)
 
 		assert.NotEqual(t, tc.TxConfig, got.TxConfig)
 		gotcli, _ := got.GetNode()

@@ -8,14 +8,14 @@ import (
 	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
 )
 
-type CommonQuerier interface {
-	baseQuerier
+type BaseQuerier interface {
+	txQuerier
 	tmQuerier
 	stakeQuerier
 	distQuerier
 }
 
-type baseQuerier interface {
+type txQuerier interface {
 	GetTx(hash string) *txv1beta1.GetTxResponse
 }
 

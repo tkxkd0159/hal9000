@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/Carina-labs/HAL9000/client/common"
+	"github.com/Carina-labs/HAL9000/client/base"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/test"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-	common.SetBechPrefix()
+	base.SetBechPrefix()
 }
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 	utils.CheckErr(err, "", 0)
 
 	if flags.New {
-		ctx = common.MakeContext(
+		ctx = base.MakeContext(
 			novaapp.ModuleBasics,
 			Nova.Bot.Addr,
 			Nova.TmRPC.String(),
@@ -71,7 +71,7 @@ func main() {
 			false,
 		)
 
-		botInfo = common.MakeClientWithNewAcc(
+		botInfo = base.MakeClientWithNewAcc(
 			ctx,
 			flags.Kn,
 			Nova.Bot.Mnemonic(),
@@ -84,7 +84,7 @@ func main() {
 		_, err = wpipe.Write([]byte(pp))
 		utils.CheckErr(err, "", 0)
 
-		ctx = common.MakeContext(
+		ctx = base.MakeContext(
 			novaapp.ModuleBasics,
 			Nova.Bot.Addr,
 			Nova.TmRPC.String(),
@@ -96,10 +96,10 @@ func main() {
 			false,
 		)
 		os.Stdin = rpipe
-		botInfo = common.LoadClientPubInfo(ctx, flags.Kn)
+		botInfo = base.LoadClientPubInfo(ctx, flags.Kn)
 	}
-	ctx = common.AddMoreFromInfo(ctx)
-	txf := common.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
+	ctx = base.AddMoreFromInfo(ctx)
+	txf := base.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
 
 	// ###### Start target bot logic ######
 	go func(interval int) {

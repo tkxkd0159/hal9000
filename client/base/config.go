@@ -1,7 +1,7 @@
-package common
+package base
 
 import (
-	"github.com/Carina-labs/HAL9000/client/common/types"
+	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

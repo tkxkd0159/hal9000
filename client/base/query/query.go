@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"fmt"
-	"github.com/Carina-labs/HAL9000/client/common/types"
+	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/Carina-labs/HAL9000/utils"
 	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
 	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
@@ -20,7 +20,7 @@ type CosmosQueryClient struct {
 }
 
 var (
-	_ types.CommonQuerier = &CosmosQueryClient{}
+	_ types.BaseQuerier = &CosmosQueryClient{}
 )
 
 const (

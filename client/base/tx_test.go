@@ -1,7 +1,7 @@
-package common_test
+package base_test
 
 import (
-	"github.com/Carina-labs/HAL9000/client/common"
+	"github.com/Carina-labs/HAL9000/client/base"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -17,7 +17,7 @@ func TestNovaTestSuite(t *testing.T) {
 }
 
 func (s *NovaTestSuite) SetupSuite() {
-	common.SetBechPrefix()
+	base.SetBechPrefix()
 }
 
 func (s *NovaTestSuite) TestCheckAccAddr() {
@@ -39,7 +39,7 @@ func (s *NovaTestSuite) TestCheckAccAddr() {
 		},
 	}
 	for _, tc := range tcs {
-		got, err := common.CheckAccAddr(tc.input)
+		got, err := base.CheckAccAddr(tc.input)
 		assert.Equal(s.T(), tc.expected, got)
 		if got == nil {
 			assert.Errorf(s.T(), err, "cannot covert target to AccAddress")

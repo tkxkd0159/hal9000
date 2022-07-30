@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/Carina-labs/HAL9000/client/common"
+	"github.com/Carina-labs/HAL9000/client/base"
 	galtype "github.com/Carina-labs/nova/x/gal/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -26,7 +26,7 @@ func DepositGal(ctx client.Context, txf tx.Factory, botInfo keyring.Info, interv
 
 		msg1 := MakeMsgDeposit(botInfo.GetAddress(), novaInfo.ZoneID, novaInfo.IBCPort, novaInfo.IBCChan, denom, amount)
 		msgs := []sdktype.Msg{msg1}
-		common.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
+		base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
 	}

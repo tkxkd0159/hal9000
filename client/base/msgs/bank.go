@@ -1,18 +1,18 @@
 package msgs
 
 import (
-	"github.com/Carina-labs/HAL9000/client/common"
+	"github.com/Carina-labs/HAL9000/client/base"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 func MakeMsgSend(from any, to any, denoms []string, amounts []int64) (*banktypes.MsgSend, error) {
 
-	from, err := common.CheckAccAddr(from)
+	from, err := base.CheckAccAddr(from)
 	if err != nil {
 		return nil, err
 	}
-	to, err = common.CheckAccAddr(to)
+	to, err = base.CheckAccAddr(to)
 	if err != nil {
 		return nil, err
 	}

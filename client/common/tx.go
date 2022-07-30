@@ -10,6 +10,7 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -45,9 +46,23 @@ func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGe
 
 	err := tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
 	if err != nil {
-		utils.LogErrWithFd(errFd, err, "something went wrong while make tx", 1)
+		if strings.Contains(err.Error(), "account sequence mismatch") {
+			utils.LogErrWithFd(errFd, err, "", 1)
+			txseq := txf.Sequence()
+			for {
+				txseq++
+				txf.WithSequence(txseq)
+				err = tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
+				if err == nil {
+					break
+				}
+			}
+
+		} else {
+			utils.LogErrWithFd(errFd, err, "something went wrong while make tx", 1)
+		}
 	} else {
-		_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n", time.Now())))
+		_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n\n", time.Now())))
 		utils.CheckErr(err, "cannot write log on output", 1)
 	}
 }

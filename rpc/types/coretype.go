@@ -18,29 +18,50 @@ var (
 	ErrZeroOrNegativeHeight   = errors.New("height must be greater than zero")
 	ErrHeightExceedsChainHead = errors.New("height must be less than or equal to the head of the node's blockchain")
 	ErrHeightNotAvailable     = errors.New("height is not available")
-	// ErrInvalidRequest is used as a wrapper to cover more specific cases where the user has
-	// made an invalid request
-	ErrInvalidRequest = errors.New("invalid request")
+	ErrInvalidRequest         = errors.New("invalid request")
 )
+
+type NodeID string
+
+// ProtocolVersion contains the protocol versions for the software.
+type ProtocolVersion struct {
+	P2P   uint64 `json:"p2p"`
+	Block uint64 `json:"block"`
+	App   uint64 `json:"app"`
+}
+
+//-------------------------------------------------------------
+
+// NodeInfo is the basic node information exchanged
+// between two peers during the Tendermint P2P handshake.
+type NodeInfo struct {
+	ProtocolVersion ProtocolVersion `json:"protocol_version"`
+
+	// Authenticate
+	NodeID     NodeID `json:"id"`          // authenticated identifier
+	ListenAddr string `json:"listen_addr"` // accepting incoming
+
+	// Check compatibility.
+	// Channels are HexBytes so easier to read as JSON
+	Network  string         `json:"network"`  // network/chain ID
+	Version  string         `json:"version"`  // major.minor.revision
+	Channels bytes.HexBytes `json:"channels"` // channels this node knows about
+
+	// ASCIIText fields
+	Moniker string        `json:"moniker"` // arbitrary moniker
+	Other   NodeInfoOther `json:"other"`   // other application specific data
+}
+
+// NodeInfoOther is the misc. applcation specific data
+type NodeInfoOther struct {
+	TxIndex    string `json:"tx_index"`
+	RPCAddress string `json:"rpc_address"`
+}
 
 // ResultBlockchainInfo return List of block metadata
 type ResultBlockchainInfo struct {
 	LastHeight int64               `json:"last_height"`
 	BlockMetas []*tmtype.BlockMeta `json:"block_metas"`
-}
-
-type ResultGenesis struct {
-	Genesis *tmtype.GenesisDoc `json:"genesis"`
-}
-
-// ResultGenesisChunk is the output format for the chunked/paginated
-// interface. These chunks are produced by converting the genesis
-// document to JSON and then splitting the resulting payload into
-// 16 megabyte blocks and then base64 encoding each block.
-type ResultGenesisChunk struct {
-	ChunkNumber int    `json:"chunk"`
-	TotalChunks int    `json:"total"`
-	Data        string `json:"data"`
 }
 
 type ResultBlock struct {
@@ -68,20 +89,6 @@ type ResultBlockResults struct {
 	EndBlockEvents        []abci.Event              `json:"end_block_events"`
 	ValidatorUpdates      []abci.ValidatorUpdate    `json:"validator_updates"`
 	ConsensusParamUpdates *tmproto.ConsensusParams  `json:"consensus_param_updates"`
-}
-
-// NewResultCommit is a helper to initialize the ResultCommit with
-// the embedded struct
-func NewResultCommit(header *tmtype.Header, commit *tmtype.Commit,
-	canonical bool) *ResultCommit {
-
-	return &ResultCommit{
-		SignedHeader: tmtype.SignedHeader{
-			Header: header,
-			Commit: commit,
-		},
-		CanonicalCommit: canonical,
-	}
 }
 
 // SyncInfo is a info about the node's syncing state

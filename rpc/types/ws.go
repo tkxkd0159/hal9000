@@ -15,6 +15,10 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+var (
+	_ Client = &WSClient{}
+)
+
 // WSOptions for WSClient.
 type WSOptions struct {
 	MaxReconnectAttempts uint          // maximum attempts to reconnect
@@ -497,8 +501,6 @@ func (c *WSClient) readRoutine() {
 		}
 	}
 }
-
-// Predefined methods
 
 // Subscribe to a query. Note the server must have a "subscribe" route
 // defined.

@@ -92,7 +92,7 @@ func NewRPCRequest(id jsonrpcid, method string, params json.RawMessage) RPCReque
 	}
 }
 
-func (req RPCRequest) String() string {
+func (req *RPCRequest) String() string {
 	return fmt.Sprintf("RPCRequest{%s %s/%X}", req.ID, req.Method, req.Params)
 }
 
@@ -205,7 +205,7 @@ func NewRPCErrorResponse(id jsonrpcid, code int, msg string, data string) RPCRes
 	}
 }
 
-func (resp RPCResponse) String() string {
+func (resp *RPCResponse) String() string {
 	if resp.Error == nil {
 		return fmt.Sprintf("RPCResponse{%s %X}", resp.ID, resp.Result)
 	}

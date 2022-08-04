@@ -59,12 +59,12 @@ func (u *parsedURL) SetDefaultSchemeHTTP() {
 	}
 }
 
-func (u parsedURL) GetHostWithPath() string {
+func (u *parsedURL) GetHostWithPath() string {
 	// Remove protocol, userinfo and # fragment, assume opaque is empty
 	return u.Host + u.EscapedPath()
 }
 
-func (u parsedURL) GetTrimmedHostWithPath() string {
+func (u *parsedURL) GetTrimmedHostWithPath() string {
 	// if it's not an unix socket we return the normal URL
 	if !u.isUnixSocket {
 		return u.GetHostWithPath()
@@ -76,7 +76,7 @@ func (u parsedURL) GetTrimmedHostWithPath() string {
 }
 
 // GetDialAddress returns the endpoint to dial for the parsed URL
-func (u parsedURL) GetDialAddress() string {
+func (u *parsedURL) GetDialAddress() string {
 	// if it's not a unix socket we return the host, example: localhost:443
 	if !u.isUnixSocket {
 		return u.Host
@@ -85,6 +85,6 @@ func (u parsedURL) GetDialAddress() string {
 	return u.GetHostWithPath()
 }
 
-func (u parsedURL) GetTrimmedURL() string {
+func (u *parsedURL) GetTrimmedURL() string {
 	return u.Scheme + "://" + u.GetTrimmedHostWithPath()
 }

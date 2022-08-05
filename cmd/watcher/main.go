@@ -82,7 +82,7 @@ func main() {
 		subsErr := novaWsc.Subscribe(watchCtx, query1)
 		utils.CheckErr(subsErr, "", 0)
 
-		parser := rpctype.NewTypedEventParser{}
+		parser := rpctype.TypedEventParser{}
 		parser.SetProtoPkg("nova.oracle.v1")
 		parser.SetProtoMsg("ChainInfo")
 

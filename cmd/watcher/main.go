@@ -82,22 +82,20 @@ func main() {
 		subsErr := novaWsc.Subscribe(watchCtx, query1)
 		utils.CheckErr(subsErr, "", 0)
 
-		parser := rpctype.TypedEventParser{}
-		parser.SetProtoPkg("nova.oracle.v1")
-		parser.SetProtoMsg("ChainInfo")
+		parser := rpctype.NewTypedEventParser("nova.oracle.v1", "ChainInfo")
 
 		for {
 			res := <-novaWsc.ResponsesCh
 			var wsRes rpctype.ResultEvent
 			err := json.Unmarshal(res.Result, &wsRes)
 			utils.CheckErr(err, "", 0)
-			evts := wsRes.Events
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("app_hash")])
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("chain_id")])
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("coin")])
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("last_block_height")])
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("decimal")])
-			fmt.Printf("%s\n", evts[parser.EventWithFieldName("operator_address")])
+			parser.SetEvents(wsRes.Events)
+			fmt.Printf("%s\n", parser.EventWithFieldName("app_hash"))
+			fmt.Printf("%s\n", parser.EventWithFieldName("chain_id"))
+			fmt.Printf("%s\n", parser.EventWithFieldName("coin"))
+			fmt.Printf("%s\n", parser.EventWithFieldName("last_block_height"))
+			fmt.Printf("%s\n", parser.EventWithFieldName("decimal"))
+			fmt.Printf("%s\n", parser.EventWithFieldName("operator_address"))
 		}
 
 	}()

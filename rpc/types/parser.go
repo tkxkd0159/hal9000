@@ -5,9 +5,14 @@ import (
 )
 
 type TypedEventParser struct {
+	Events     TmEvents
 	protoPkg   string
 	protoMsg   string
 	protoField string
+}
+
+func (p *TypedEventParser) SetEvents(evts TmEvents) {
+	p.Events = evts
 }
 
 func (p *TypedEventParser) SetProtoPkg(protoPkgName string) {
@@ -30,12 +35,17 @@ func (p *TypedEventParser) Event() string {
 }
 
 func (p *TypedEventParser) EventWithFieldName(protoFieldName string) string {
-	return strings.Join([]string{p.protoPkg, p.protoMsg, protoFieldName}, ".")
+	evtKey := strings.Join([]string{p.protoPkg, p.protoMsg, protoFieldName}, ".")
+	if len(p.Events[evtKey]) > 0 {
+		return p.Events[evtKey][0]
+	}
+	return ""
 }
 
 func NewTypedEventParser(pkgName, msgName string, fieldName ...string) *TypedEventParser {
-	if len(fieldName) != 1 {
-		panic("You should assign only onw field")
+	if len(fieldName) > 1 {
+		panic("You should assign only one field")
+
 	}
 	if fieldName == nil {
 		return &TypedEventParser{protoPkg: pkgName, protoMsg: msgName}

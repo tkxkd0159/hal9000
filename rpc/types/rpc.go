@@ -61,7 +61,6 @@ func (req *RPCRequest) UnmarshalJSON(data []byte) error {
 		Method  string          `json:"method"`
 		Params  json.RawMessage `json:"params"` // must be map[string]interface{} or []interface{}
 	}{}
-
 	err := json.Unmarshal(data, &unsafeReq)
 	if err != nil {
 		return err
@@ -268,9 +267,12 @@ type Context struct {
 // RemoteAddr returns the remote address (usually a string "IP:port").
 // If neither HTTPReq nor WSConn is set, an empty string is returned.
 // HTTP:
-//		http.Request#RemoteAddr
+//
+//	http.Request#RemoteAddr
+//
 // WS:
-//		result of GetRemoteAddr
+//
+//	result of GetRemoteAddr
 func (ctx *Context) RemoteAddr() string {
 	if ctx.HTTPReq != nil {
 		return ctx.HTTPReq.RemoteAddr
@@ -283,10 +285,13 @@ func (ctx *Context) RemoteAddr() string {
 // Context returns the request's context.
 // The returned context is always non-nil; it defaults to the background context.
 // HTTP:
-//		The context is canceled when the client's connection closes, the request
-//		is canceled (with HTTP/2), or when the ServeHTTP method returns.
+//
+//	The context is canceled when the client's connection closes, the request
+//	is canceled (with HTTP/2), or when the ServeHTTP method returns.
+//
 // WS:
-//		The context is canceled when the client's connections closes.
+//
+//	The context is canceled when the client's connections closes.
 func (ctx *Context) Context() context.Context {
 	if ctx.HTTPReq != nil {
 		return ctx.HTTPReq.Context()

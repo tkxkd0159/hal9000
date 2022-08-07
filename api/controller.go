@@ -20,8 +20,13 @@ func getRoot(w http.ResponseWriter, req *http.Request) {
 
 func getHello(w http.ResponseWriter, req *http.Request) {
 	log.Println("got request /hello")
-	_, err := io.WriteString(w, "Hello user~")
-	utils.CheckErr(err, "error occured while write get root response", ut.KEEP)
+	utils.SetJSONHeader(w)
+	resp := make(map[string]string)
+	resp["message"] = "JSON: Hello user!"
+	resp["from"] = "bot"
+	jsonResp, err := json.Marshal(resp)
+	utils.CheckErr(err, "Error: can't JSON marshal", ut.KEEP)
+	_, _ = w.Write(jsonResp)
 }
 
 type apiHandler struct{}
@@ -29,21 +34,8 @@ type apiHandler struct{}
 func (apiHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/api/" {
 		log.Println("got request /api/")
-		utils.SetJSONHeader(w)
-		resp := make(map[string]string)
-		resp["message"] = "JSON test"
-		resp["from"] = "bot"
-		jsonResp, err := json.Marshal(resp)
-		utils.CheckErr(err, "Error: can't JSON marshal", ut.KEEP)
-		_, _ = w.Write(jsonResp)
-
-	} else if req.URL.Path == "/api/1" {
-		log.Println("got request /api/1")
-		_, err := io.WriteString(w, "This is API 1 response")
-		utils.CheckErr(err, "error occured while write response", ut.KEEP)
-	} else if req.URL.Path == "/api/2" {
-		log.Println("got request /api/2")
-		_, err := io.WriteString(w, "This is API 2 response")
+	} else if req.URL.Path == "/api/health" {
+		_, err := io.WriteString(w, BotStatus.LastCommit.String())
 		utils.CheckErr(err, "error occured while write response", ut.KEEP)
 	}
 }

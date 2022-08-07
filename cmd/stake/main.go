@@ -14,12 +14,17 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
 	wg      sync.WaitGroup
 	ctx     client.Context
 	botInfo keyring.Info
+)
+
+const (
+	NumWorker = 2
 )
 
 func init() {
@@ -38,9 +43,15 @@ func main() {
 	flag.Parse()
 	flags := cfg.FlagOpts{Test: *isTest, New: *newacc, Disp: *disp, ExtIP: *apiAddr, Kn: *keyname, Host: *hostchain, Period: *intv, IBCChan: cfg.IBCChan{Nova: cfg.IBCPort{Transfer: *chanID}}}
 
-	wg.Add(3)
+	wg.Add(NumWorker)
+	botch := make(chan time.Time)
 	go func() {
 		defer wg.Done()
+		go func() {
+			for t := range botch {
+				api.BotStatus.SetCommitTime(t)
+			}
+		}()
 		api.Server{}.On(flags.ExtIP)
 	}()
 
@@ -105,7 +116,7 @@ func main() {
 
 	go func(interval int) {
 		defer wg.Done()
-		logic.IcaStake(flags.Host, ctx, txf, botInfo, flags.IBCChan.Nova.Transfer, interval, fdErr)
+		logic.IcaStake(flags.Host, ctx, txf, botInfo, flags.IBCChan.Nova.Transfer, interval, fdErr, botch)
 	}(flags.Period)
 
 	wg.Wait()

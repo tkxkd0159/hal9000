@@ -45,10 +45,11 @@ func CheckAccAddr(target any) (AccAddr, error) {
 // 1. Generate a TX with Msg (TxBuilder). If you set --generate-only, it makes unsigned tx and never broadcast
 // 2. Sign the generated transaction with the keyring's account
 // 3. Broadcast the tx to the Tendermint node using gPRC
-func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) {
+func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGen bool, msgs ...sdktypes.Msg) (ok bool) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println("Get panic while generating tx")
+			ok = false
 		}
 	}()
 	wm.Lock()
@@ -62,8 +63,6 @@ func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGe
 		if strings.Contains(err.Error(), "account sequence mismatch") {
 			utils.LogErrWithFd(errFd, err, "", 1)
 			for {
-				txseq := txf.Sequence()
-				txf.WithSequence(txseq)
 				err = tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
 				if !strings.Contains(err.Error(), "account sequence mismatch") {
 					break
@@ -71,14 +70,20 @@ func GenTxWithFactory(errFd *os.File, ctx client.Context, txf tx.Factory, onlyGe
 				utils.LogErrWithFd(errFd, err, "", 1)
 				time.Sleep(6 * time.Second)
 			}
+			if err != nil {
+				utils.LogErrWithFd(errFd, err, "something went wrong while make tx", 1)
+				return false
+			}
+			return true
 
-		} else {
-			utils.LogErrWithFd(errFd, err, "something went wrong while make tx", 1)
 		}
-	} else {
-		_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n\n", time.Now())))
-		utils.CheckErr(err, "cannot write log on output", 1)
+		utils.LogErrWithFd(errFd, err, "something went wrong while make tx", 1)
+		return false
 	}
+	_, err = ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n\n", time.Now())))
+	utils.CheckErr(err, "cannot write log on output", 1)
+	return true
+
 }
 
 func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string, gasWeight float64) tx.Factory {

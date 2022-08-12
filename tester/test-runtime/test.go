@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	fmt.Println("test")
+	fmt.Println("tester")
 	tep := rpc.NewTypedEventParser("aaa", "sss")
 	fmt.Println(tep)
 }

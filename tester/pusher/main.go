@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Carina-labs/HAL9000/client/base"
 	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/test"
+	"github.com/Carina-labs/HAL9000/tester"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -106,7 +106,7 @@ func main() {
 		defer wg.Done()
 		port := "transfer"
 		DenomTrace := ibctypes.DenomTrace{BaseDenom: "uatom", Path: fmt.Sprintf("%s/%s", port, *IBCChan)}
-		test.DepositGal(ctx, txf, botInfo, interval, fdErr, test.IBCInfo{ZoneID: *ZoneID, IBCChan: *IBCChan, IBCPort: port}, DenomTrace.IBCDenom(), 1000)
+		tester.DepositGal(ctx, txf, botInfo, interval, fdErr, tester.IBCInfo{ZoneID: *ZoneID, IBCChan: *IBCChan, IBCPort: port}, DenomTrace.IBCDenom(), 1000)
 	}(flags.Period)
 
 	wg.Wait()

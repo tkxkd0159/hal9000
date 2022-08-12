@@ -1,4 +1,4 @@
-package test
+package tester
 
 import (
 	"github.com/Carina-labs/HAL9000/client/base"

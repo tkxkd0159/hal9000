@@ -36,7 +36,6 @@ pusher: go.sum $(BUILD_DIR)/
 
 .PHONY: lint
 
-LintCon=PrivGolint
 lint:
 	@echo "--> Running linter"
 	golangci-lint run --out-format=tab

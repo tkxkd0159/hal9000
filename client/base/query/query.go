@@ -7,6 +7,7 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
 	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
+	bankv1beta1 "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
 	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
@@ -56,6 +57,18 @@ func (cqc *CosmosQueryClient) GetBlockByHeight(height int64) *tendermintv1beta1.
 	defer cancel()
 
 	r, err := c.GetBlockByHeight(ctx, &tendermintv1beta1.GetBlockByHeightRequest{Height: height})
+	utils.CheckErr(err, "", 1)
+	return r
+}
+
+// ######################### Bank #########################
+
+func (cqc *CosmosQueryClient) GetBalance(addr string, denom string) *bankv1beta1.QueryBalanceResponse {
+	c := bankv1beta1.NewQueryClient(cqc)
+	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
+	defer cancel()
+
+	r, err := c.Balance(ctx, &bankv1beta1.QueryBalanceRequest{Address: addr, Denom: denom})
 	utils.CheckErr(err, "", 1)
 	return r
 }

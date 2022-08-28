@@ -3,6 +3,7 @@ package types
 import (
 	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
 	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
+	bankv1beta1 "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
 	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
@@ -11,8 +12,13 @@ import (
 type BaseQuerier interface {
 	txQuerier
 	tmQuerier
+	bankQuerier
 	stakeQuerier
 	distQuerier
+}
+
+type bankQuerier interface {
+	GetBalance(address string, denom string) *bankv1beta1.QueryBalanceResponse
 }
 
 type txQuerier interface {

@@ -97,13 +97,13 @@ func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string,
 		WithChainID(ctx.ChainID).
 		WithKeybase(ctx.Keyring).
 		WithAccountRetriever(ctx.AccountRetriever).
-		WithGas(gasSetting.Gas).
 		WithSimulateAndExecute(gasSetting.Simulate).
-		WithGasAdjustment(flags.DefaultGasAdjustment * gasWeight).
-		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
+		WithGas(gasSetting.Gas).
+		WithGasPrices(gasPrice).
+		WithGasAdjustment(flags.DefaultGasAdjustment * gasWeight)
 
 	return initFac.
-		WithGasPrices(gasPrice).
+		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithMemo(memo)
 
 }

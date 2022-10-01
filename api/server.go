@@ -1,6 +1,7 @@
 package api
 
 import (
+	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"net/http"
@@ -34,4 +35,14 @@ func (s Server) On(addr string) {
 	http.HandleFunc("/hello", getHello)
 	err := http.ListenAndServe(addr, nil)
 	utils.CheckErr(err, "cannot open http server", ut.EXIT)
+}
+
+func OpenMonitoringSrv(wg *sync.WaitGroup, datach <-chan time.Time, flags cfg.MonitorFlag) {
+	defer wg.Done()
+	go func() {
+		for t := range datach {
+			BotStatus.SetCommitTime(t)
+		}
+	}()
+	Server{}.On(flags.GetExtIP())
 }

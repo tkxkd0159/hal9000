@@ -37,7 +37,11 @@ type NovaInfo struct {
 	mu      sync.RWMutex
 }
 
-func (ni *NovaInfo) Set(addrTarget string, keyname ...string) {
+func NewNovaInfo() *NovaInfo {
+	return &NovaInfo{}
+}
+
+func (ni *NovaInfo) Set(addrTarget string, keyname ...string) *NovaInfo {
 	ni.mu.Lock()
 	defer ni.mu.Unlock()
 
@@ -45,25 +49,21 @@ func (ni *NovaInfo) Set(addrTarget string, keyname ...string) {
 	cid := ni.ChainID
 	ni.Bot = &BotInfo{}
 	if len(keyname) == 1 {
-		ni.Bot.mnemonic = Sviper.GetString(keyname[0])
 		ni.Bot.passphrase = GetPassphrase(Sviper)
 	}
 	ni.Bot.Addr = viper.GetString(fmt.Sprintf("%s.%s", cid, addrTarget))
 	ni.IP = viper.GetString(fmt.Sprintf("net.ip.%s", cid))
 	ni.TmRPC = &url.URL{Scheme: "tcp", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc")}
 	ni.TmWsRPC = &url.URL{Scheme: "ws", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"}
+
+	return ni
 }
 
 type BotInfo struct {
-	mnemonic   string
 	Addr       string
 	passphrase string
 }
 
 func (b BotInfo) Passphrase() string {
 	return b.passphrase
-}
-
-func (b BotInfo) Mnemonic() string {
-	return b.mnemonic
 }

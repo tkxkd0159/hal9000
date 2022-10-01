@@ -20,11 +20,11 @@ func LoadClientPubInfo(ctx client.Context, keyname string) keyring.Info {
 }
 
 func MakeClientWithNewAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
-	accInfo := CreateAcc(ctx, keyname, mnemonic, bip44path, algo)
+	accInfo := createAcc(ctx, keyname, mnemonic, bip44path, algo)
 	return accInfo
 }
 
-func CreateAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
+func createAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
 	info, err := ctx.Keyring.NewAccount(keyname, mnemonic, "", bip44path, algo)
 	utils.CheckErr(err, "Cannot create account with those arguments. Check it!", ut.EXIT)
 	return info

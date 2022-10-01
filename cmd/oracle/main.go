@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/base"
 	cfg "github.com/Carina-labs/HAL9000/config"
@@ -9,16 +8,13 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"os"
 	"sync"
 	"time"
 )
 
 var (
-	wg      sync.WaitGroup
 	ctx     client.Context
 	botInfo keyring.Info
 )
@@ -32,92 +28,49 @@ func init() {
 }
 
 func main() {
-	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
-	apiAddr := flag.String("api", "127.0.0.1:3334", "Set bot api address")
-	keyname := flag.String("name", "nova_bot", "Set unique key name (uid)")
-	newacc := flag.Bool("add", false, "Start client with making new account")
-	hostchain := flag.String("host", "gaia", "Name of the host chain from which to obtain oracle info")
-	intv := flag.Int("interval", 15*60, "Oracle update interval (sec)")
-	disp := flag.Bool("display", false, "Show context log through stdout")
-	flag.Parse()
-	flags := cfg.FlagOpts{Test: *isTest, New: *newacc, Disp: *disp, ExtIP: *apiAddr, Kn: *keyname, Host: *hostchain, Period: *intv}
+	flags := cfg.SetOracleFlags()
+	cfg.LoadChainInfo(flags.IsTest)
+	NovaInfo := cfg.NewNovaInfo().Set("bot_addr", flags.Kn)
+	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
+	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
+	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
 
+	if flags.New {
+		cfg.SetupBotKey(flags.Kn, krDir, NovaInfo)
+		os.Exit(0)
+	}
+	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)
 	botch := make(chan time.Time)
-	go func() {
-		defer wg.Done()
-		go func() {
-			for t := range botch {
-				api.BotStatus.SetCommitTime(t)
-			}
-		}()
-		api.Server{}.On(flags.ExtIP)
-	}()
-
-	cfg.SetChainInfo(flags.Test)
-	Nova := &cfg.NovaInfo{}
-	Nova.Set("bot_addr", flags.Kn)
-	krDir, logDir := cfg.SetInitialDir(flags.Kn, "logs/oracle")
-	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, "ctxlog.txt", "nova_err.txt", "other_err.txt", flags.Disp)
-	projFps := []*os.File{fdLog, fdErr, fdErrExt}
-	defer func(fps ...*os.File) {
-		for _, fp := range fps {
-			err := fp.Close()
-			utils.CheckErr(err, "", 1)
-		}
-	}(projFps...)
+	go api.OpenMonitoringSrv(wg, botch, flags)
 
 	// set pipe to ignore stdin tty
 	rpipe, wpipe, err := os.Pipe()
 	utils.CheckErr(err, "", 0)
+	os.Stdin = rpipe
+	_, err = wpipe.Write([]byte(NovaInfo.Bot.Passphrase()))
+	utils.CheckErr(err, "", 0)
 
-	if flags.New {
-		ctx = base.MakeContext(
-			novaapp.ModuleBasics,
-			Nova.Bot.Addr,
-			Nova.TmRPC.String(),
-			Nova.ChainID,
-			krDir,
-			keyring.BackendFile,
-			os.Stdin,
-			fdLog,
-			false,
-		)
+	ctx = base.MakeContext(
+		novaapp.ModuleBasics,
+		NovaInfo.Bot.Addr,
+		NovaInfo.TmRPC.String(),
+		NovaInfo.ChainID,
+		krDir,
+		keyring.BackendFile,
+		rpipe,
+		fdLog,
+		false,
+	)
 
-		botInfo = base.MakeClientWithNewAcc(
-			ctx,
-			flags.Kn,
-			Nova.Bot.Mnemonic(),
-			sdktypes.FullFundraiserPath,
-			hd.Secp256k1,
-		)
-		os.Exit(0)
-	} else {
-		pp := Nova.Bot.Passphrase()
-		_, err = wpipe.Write([]byte(pp))
-		utils.CheckErr(err, "", 0)
-
-		ctx = base.MakeContext(
-			novaapp.ModuleBasics,
-			Nova.Bot.Addr,
-			Nova.TmRPC.String(),
-			Nova.ChainID,
-			krDir,
-			keyring.BackendFile,
-			rpipe,
-			fdLog,
-			false,
-		)
-		os.Stdin = rpipe
-		botInfo = base.LoadClientPubInfo(ctx, flags.Kn)
-	}
+	botInfo = base.LoadClientPubInfo(ctx, flags.Kn)
 	ctx = base.AddMoreFromInfo(ctx)
-	txf := base.MakeTxFactory(ctx, "auto", "0unova", "", 1.1)
+	txf := base.MakeTxFactory(ctx, cfg.Gas, cfg.NovaGasPrice, "", cfg.GasWeight)
 
 	// ###### Start target bot logic ######
 	go func(interval int) {
 		defer wg.Done()
-		logic.UpdateChainState(flags.Host, ctx, txf, botInfo, interval, fdErr, botch)
+		logic.UpdateChainState(flags.HostChain, ctx, txf, botInfo, interval, fdErr, botch)
 	}(flags.Period)
 
 	wg.Wait()

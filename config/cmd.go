@@ -1,12 +1,30 @@
 package config
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/utils"
+	novaapp "github.com/Carina-labs/nova/app"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/viper"
 	"log"
 	"os"
 	"path"
+)
+
+const (
+	Gas          = "auto"
+	NovaGasPrice = "0unova"
+	GasWeight    = 1.1
+)
+
+const (
+	StdLogFile            = "ctxlog.txt"
+	LocalErrlogFile       = "nova_err.txt"
+	ExtRedirectErrlogFile = "other_err.txt"
 )
 
 type IBCPort struct {
@@ -81,4 +99,37 @@ func SetAllLogger(logDir, stdLogName, errLogName, errRedirectLogName string, isD
 	}
 
 	return fdLog, fdErr, fdErrExt
+}
+
+func InputMnemonic() (mnemonic string) {
+	fmt.Println(">>>>>>>>>>>>>> Enter mnemonic (24 words) <<<<<<<<<<<<<<")
+	s := bufio.NewScanner(os.Stdin)
+	ok := s.Scan()
+	if ok == false {
+		log.Fatalln(" * Unexpected error while setup key")
+	}
+	mnemonic = s.Text()
+	return
+}
+
+func SetupBotKey(keyname, keyloc string, info *NovaInfo) {
+	ctx := base.MakeContext(
+		novaapp.ModuleBasics,
+		info.Bot.Addr,
+		info.TmRPC.String(),
+		info.ChainID,
+		keyloc,
+		keyring.BackendFile,
+		os.Stdin,
+		os.Stdout,
+		false,
+	)
+
+	_ = base.MakeClientWithNewAcc(
+		ctx,
+		keyname,
+		InputMnemonic(),
+		sdktypes.FullFundraiserPath,
+		hd.Secp256k1,
+	)
 }

@@ -12,6 +12,13 @@ var (
 	ToB64Str = base64.StdEncoding.EncodeToString
 )
 
+func CloseFds(fds ...*os.File) {
+	for _, fd := range fds {
+		err := fd.Close()
+		CheckErr(err, "", 1)
+	}
+}
+
 func CheckErr(err error, moreMsg string, action types.Code) {
 	switch action {
 	case types.EXIT:

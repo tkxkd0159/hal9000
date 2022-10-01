@@ -22,7 +22,7 @@ func setEnv() *viper.Viper {
 	return sViper
 }
 
-func SetChainInfo(isTest bool) {
+func LoadChainInfo(isTest bool) {
 	viper.SetConfigType("yaml")
 	if isTest {
 		viper.SetConfigFile(".chaininfo.test.yml")

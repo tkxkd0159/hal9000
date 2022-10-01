@@ -6,19 +6,19 @@ import (
 	"time"
 )
 
-func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, portID string, chanID string) *types.MsgDelegate {
-	return types.NewMsgDelegate(chainID, operator, portID, chanID)
+func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, seq uint64) *types.MsgDelegate {
+	return types.NewMsgDelegate(chainID, seq, operator)
 }
 
-func MakeMsgPendingWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTs time.Time) *types.MsgPendingWithdraw {
-	return types.NewMsgPendingWithdraw(chainID, operator, portID, chanID, blockTs)
+func MakeMsgIcaWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTs time.Time, seq uint64) *types.MsgIcaWithdraw {
+	return types.NewMsgIcaWithdraw(chainID, operator, portID, chanID, blockTs, seq)
 }
 
-func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress) *types.MsgUndelegate {
-	return types.NewMsgUndelegate(chainID, operator)
+func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress, seq uint64) *types.MsgUndelegate {
+	return types.NewMsgUndelegate(chainID, seq, operator)
 }
 
-func MakeMsgDeposit(from sdktypes.AccAddress, zoneID, IBCPort, IBCChan, denom string, amount int64) *types.MsgDeposit {
+func MakeMsgDeposit(from, claimer sdktypes.AccAddress, zoneID, denom string, amount int64) *types.MsgDeposit {
 	coin := sdktypes.Coin{Denom: denom, Amount: sdktypes.NewInt(amount)}
-	return types.NewMsgDeposit(zoneID, from, coin, IBCPort, IBCChan)
+	return types.NewMsgDeposit(zoneID, from, claimer, coin)
 }

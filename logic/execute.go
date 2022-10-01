@@ -18,7 +18,8 @@ import (
 )
 
 var (
-	Host = &config.HostChainInfo{}
+	Host   = &config.HostChainInfo{}
+	tmpseq = uint64(1)
 )
 
 func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo keyring.Info, interval int, errLogger *os.File, botch chan<- time.Time) {
@@ -42,7 +43,7 @@ func UpdateChainState(host string, ctx client.Context, txf tx.Factory, botInfo k
 		botTickLog("Oracle", int(intv)*i)
 
 		delegatedToken, height, apphash := OracleInfo(cq, Host.Validator)
-		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, Host.Decimal, delegatedToken, height, apphash)
+		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, delegatedToken, height, apphash)
 		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
 		for {
@@ -85,7 +86,7 @@ func IcaAutoStake(host string, ctx client.Context, txf tx.Factory, botInfo keyri
 			continue
 		}
 
-		msg1 := novaTx.MakeMsgIcaAutoStaking(host, Host.HostAccount, botInfo.GetAddress(), r)
+		msg1 := novaTx.MakeMsgIcaAutoStaking(host, botInfo.GetAddress(), r)
 		msgs := []sdktypes.Msg{msg1}
 		for {
 			ok := base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -107,7 +108,7 @@ func IcaStake(host string, ctx client.Context, txf tx.Factory, botInfo keyring.I
 	for {
 		botTickLog("ICA-Staking", int(intv)*i)
 
-		msg1 := novaTx.MakeMsgDelegate(host, botInfo.GetAddress(), "transfer", chanID)
+		msg1 := novaTx.MakeMsgDelegate(host, botInfo.GetAddress(), tmpseq)
 		msgs := []sdktypes.Msg{msg1}
 		for {
 			ok := base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -145,10 +146,10 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 
 		blkTS := LatestBlockTS(cq)
 		delegatedToken, height, apphash := OracleInfo(cq, Host.Validator)
-		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, Host.Decimal, delegatedToken, height, apphash)
+		msg1 := novaTx.MakeMsgUpdateChainState(botInfo.GetAddress(), host, Host.Denom, delegatedToken, height, apphash)
 
 		if isStart {
-			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
+			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress(), tmpseq)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			for {
 				ok := base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -160,7 +161,7 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 			botch <- time.Now().UTC()
 			isStart = false
 		} else {
-			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress())
+			msg2 := novaTx.MakeMsgUndelegate(host, botInfo.GetAddress(), tmpseq)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			for {
 				ok := base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)
@@ -172,7 +173,7 @@ func UndelegateAndWithdraw(host string, ctx client.Context, txf tx.Factory, botI
 
 			time.Sleep(60 * time.Second)
 
-			msg3 := novaTx.MakeMsgPendingWithdraw(host, botInfo.GetAddress(), "transfer", chanID, blkTS)
+			msg3 := novaTx.MakeMsgIcaWithdraw(host, botInfo.GetAddress(), "transfer", chanID, blkTS, tmpseq)
 			msgs = []sdktypes.Msg{msg3}
 			for {
 				ok := base.GenTxWithFactory(errLogger, ctx, txf, false, msgs...)

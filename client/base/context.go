@@ -2,39 +2,12 @@ package base
 
 import (
 	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/crypto"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"io"
 )
-
-func LoadClientPubInfo(ctx client.Context, keyname string) keyring.Info {
-	accInfo, err := ctx.Keyring.Key(keyname)
-	utils.CheckErr(err, "Cannot load client with key", ut.EXIT)
-	return accInfo
-}
-
-func MakeClientWithNewAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
-	accInfo := createAcc(ctx, keyname, mnemonic, bip44path, algo)
-	return accInfo
-}
-
-func createAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
-	info, err := ctx.Keyring.NewAccount(keyname, mnemonic, "", bip44path, algo)
-	utils.CheckErr(err, "Cannot create account with those arguments. Check it!", ut.EXIT)
-	return info
-}
-
-func GetPrivKey(ctx client.Context, keyname string) cryptotypes.PrivKey {
-	privArmor, _ := ctx.Keyring.ExportPrivKeyArmor(keyname, "")
-	novaPrivRaw, _, _ := crypto.UnarmorDecryptPrivKey(privArmor, "")
-	return novaPrivRaw
-}
 
 func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader, userOutput io.Writer, genOnly bool) client.Context {
 	encCfg := MakeEncodingConfig(mb)

@@ -19,9 +19,9 @@ GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@v0.5.1
 # Cmd
 ```bash
 # Set keyring if you need
-make run TARGET=oracle FLAGS="-display -new -logloc=logs/oracle"
+make run FLAGS="-display -new -name=<keyname>"
 
-# Build bot
+# Build all bots
 make all [ARCH=<arm64|amd64>] # if you don't set ARCH, it follows GOARCH
 
 # Run bot without build (test)

@@ -101,7 +101,7 @@ func IcaAutoStake(host string, ctx client.Context, txf tx.Factory, botInfo keyri
 	}
 }
 
-func IcaStake(host string, ctx client.Context, txf tx.Factory, botInfo keyring.Info, chanID string, interval int, errLogger *os.File, botch chan<- time.Time) {
+func IcaStake(host string, ctx client.Context, txf tx.Factory, botInfo keyring.Info, interval int, errLogger *os.File, botch chan<- time.Time) {
 
 	i := 0
 	intv := time.Duration(interval)

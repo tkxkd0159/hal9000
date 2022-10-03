@@ -9,10 +9,10 @@ import (
 var Sviper *viper.Viper
 
 func init() {
-	Sviper = setEnv()
+	Sviper = setScrt()
 }
 
-func setEnv() *viper.Viper {
+func setScrt() *viper.Viper {
 	sViper := viper.New()
 	sViper.SetConfigType("yaml")
 	sViper.SetConfigFile(".secret.yml")

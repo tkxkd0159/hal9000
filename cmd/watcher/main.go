@@ -21,9 +21,8 @@ const (
 
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
-	cfg.SetChainInfo(*isTest)
-	Nova := &cfg.NovaInfo{}
-	Nova.Set("bot_addr")
+	cfg.LoadChainInfo(*isTest)
+	Nova := cfg.NewNovaInfo()
 
 	var wg sync.WaitGroup
 	wg.Add(NumWorker)

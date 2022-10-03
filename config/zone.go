@@ -7,6 +7,12 @@ import (
 	"sync"
 )
 
+// IBCInfo -> field name : IBC Port, field value : IBC Channel
+type IBCInfo struct {
+	Transfer string
+	ICA      string
+}
+
 type HostChainInfo struct {
 	GrpcAddr    string
 	Validator   string
@@ -29,7 +35,6 @@ func (hci *HostChainInfo) Set(host string) {
 }
 
 type NovaInfo struct {
-	Bot     *BotInfo
 	ChainID string
 	IP      string
 	TmRPC   *url.URL
@@ -37,33 +42,35 @@ type NovaInfo struct {
 	mu      sync.RWMutex
 }
 
-func NewNovaInfo() *NovaInfo {
-	return &NovaInfo{}
-}
-
-func (ni *NovaInfo) Set(addrTarget string, keyname ...string) *NovaInfo {
+func NewNovaInfo() (ni NovaInfo) {
 	ni.mu.Lock()
 	defer ni.mu.Unlock()
 
 	ni.ChainID = "nova"
-	cid := ni.ChainID
-	ni.Bot = &BotInfo{}
-	if len(keyname) == 1 {
-		ni.Bot.passphrase = GetPassphrase(Sviper)
-	}
-	ni.Bot.Addr = viper.GetString(fmt.Sprintf("%s.%s", cid, addrTarget))
-	ni.IP = viper.GetString(fmt.Sprintf("net.ip.%s", cid))
+	ni.IP = viper.GetString(fmt.Sprintf("net.ip.%s", ni.ChainID))
 	ni.TmRPC = &url.URL{Scheme: "tcp", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc")}
 	ni.TmWsRPC = &url.URL{Scheme: "ws", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"}
 
-	return ni
+	return
 }
 
-type BotInfo struct {
-	Addr       string
+type BotScrt struct {
+	addr       string
 	passphrase string
 }
 
-func (b BotInfo) Passphrase() string {
+func NewBotScrt(zone string, addrTarget string, keyname ...string) (bi BotScrt) {
+	if len(keyname) == 1 {
+		bi.passphrase = GetPassphrase(Sviper)
+	}
+	bi.addr = viper.GetString(fmt.Sprintf("%s.%s", zone, addrTarget))
+	return
+}
+
+func (b BotScrt) Address() string {
+	return b.addr
+}
+
+func (b BotScrt) Passphrase() string {
 	return b.passphrase
 }

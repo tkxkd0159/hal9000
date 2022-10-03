@@ -25,12 +25,12 @@ make run FLAGS="-display -new -name=<keyname>"
 make all [ARCH=<arm64|amd64>] # if you don't set ARCH, it follows GOARCH
 
 # Run bot without build (test)
-make run TARGET=oracle FLAGS="-name=nova_bot -host=gaia -interval=5 -display"
-make run TARGET=stake FLAGS="-host=gaia -interval=5 -display"
-make run TARGET=restake FLAGS="-host=gaia -ch=channel-0 -interval=5 -display"
-make run TARGET=withdraw FLAGS="-host=gaia -ch=channel-45 -interval=5 -display"
+make run TARGET=oracle FLAGS="-name=<keyname> -host=gaia -interval=5 -api=127.0.0.1:3334 -display"
+make run TARGET=stake FLAGS="-name=<keyname> -host=gaia -interval=5 -api=<addr> -display"
+make run TARGET=restake FLAGS="-name=<keyname> -host=gaia -interval=5 -api=<addr> -display"
+make run TARGET=withdraw FLAGS="-name=<keyname> -host=gaia -ch=channel-45 -interval=5 -api=<addr> -display"
 
 # Run bot (prod)
-./out/<bot> [flags]
+./out/<bot> [flags]  # use --help to show usages
 
 ```

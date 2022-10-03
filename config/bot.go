@@ -27,26 +27,6 @@ const (
 	ExtRedirectErrlogFile = "other_err.txt"
 )
 
-type IBCPort struct {
-	Transfer string
-}
-
-type IBCChan struct {
-	Nova IBCPort
-	Host IBCPort
-}
-
-type FlagOpts struct {
-	Test   bool
-	New    bool
-	Disp   bool
-	ExtIP  string
-	Kn     string
-	Host   string
-	Period int
-	IBCChan
-}
-
 func SetInitialDir(krDir string, logDir string) (string, string) {
 	cwd, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
@@ -112,10 +92,10 @@ func InputMnemonic() (mnemonic string) {
 	return
 }
 
-func SetupBotKey(keyname, keyloc string, info *NovaInfo) {
+func SetupBotKey(keyname, keyloc string, info NovaInfo, bot BotScrt) {
 	ctx := base.MakeContext(
 		novaapp.ModuleBasics,
-		info.Bot.Addr,
+		bot.Address(),
 		info.TmRPC.String(),
 		info.ChainID,
 		keyloc,

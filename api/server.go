@@ -4,6 +4,7 @@ import (
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	ut "github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"sync"
 	"time"
@@ -30,9 +31,8 @@ func init() {
 }
 
 func (s Server) On(addr string) {
-	http.Handle("/api/", apiHandler{})
-	http.HandleFunc("/", getRoot)
-	http.HandleFunc("/hello", getHello)
+	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/check/", NewChkHandler())
 	err := http.ListenAndServe(addr, nil)
 	utils.CheckErr(err, "cannot open http server", ut.EXIT)
 }

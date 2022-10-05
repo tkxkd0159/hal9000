@@ -53,7 +53,7 @@ func (s Server) On(addr string) {
 	utils.CheckErr(err, "cannot open http server", ut.EXIT)
 }
 
-func OpenMonitoringSrv(wg *sync.WaitGroup, datach <-chan time.Time, flags cfg.MonitorFlag) {
+func OpenMonitoringSrv(wg *sync.WaitGroup, datach <-chan time.Time, flags cfg.Observable) {
 	defer wg.Done()
 	relay := make(chan bool)
 	go func() {

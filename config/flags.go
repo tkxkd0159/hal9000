@@ -24,7 +24,7 @@ type BotCommon interface {
 	GetBase() BaseFlags
 }
 
-type MonitorFlag interface {
+type Observable interface {
 	GetExtIP() string
 }
 
@@ -48,16 +48,7 @@ type OracleFlags struct {
 }
 
 func (of OracleFlags) GetBase() BaseFlags {
-	return BaseFlags{
-		of.IsTest,
-		of.New,
-		of.Disp,
-		of.ExtIP,
-		of.Kn,
-		of.HostChain,
-		of.Period,
-		of.LogLocation,
-	}
+	return of.BaseFlags
 }
 
 type RestakeFlags struct {
@@ -65,16 +56,7 @@ type RestakeFlags struct {
 }
 
 func (rf RestakeFlags) GetBase() BaseFlags {
-	return BaseFlags{
-		rf.IsTest,
-		rf.New,
-		rf.Disp,
-		rf.ExtIP,
-		rf.Kn,
-		rf.HostChain,
-		rf.Period,
-		rf.LogLocation,
-	}
+	return rf.BaseFlags
 }
 
 type StakeFlags struct {
@@ -82,16 +64,7 @@ type StakeFlags struct {
 }
 
 func (sf StakeFlags) GetBase() BaseFlags {
-	return BaseFlags{
-		sf.IsTest,
-		sf.New,
-		sf.Disp,
-		sf.ExtIP,
-		sf.Kn,
-		sf.HostChain,
-		sf.Period,
-		sf.LogLocation,
-	}
+	return sf.BaseFlags
 }
 
 type WithdrawFlags struct {
@@ -100,16 +73,7 @@ type WithdrawFlags struct {
 }
 
 func (wf WithdrawFlags) GetBase() BaseFlags {
-	return BaseFlags{
-		wf.IsTest,
-		wf.New,
-		wf.Disp,
-		wf.ExtIP,
-		wf.Kn,
-		wf.HostChain,
-		wf.Period,
-		wf.LogLocation,
-	}
+	return wf.BaseFlags
 }
 
 func setBaseFlags() {

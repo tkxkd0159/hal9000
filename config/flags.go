@@ -140,7 +140,7 @@ func SetStakeFlags() StakeFlags {
 
 func SetWithdrawFlags() WithdrawFlags {
 	setBaseFlags()
-	chanID := flag.String("ch", "channel-2", "Host Transfer Channel ID")
+	chanID := flag.String("ch", "channel-225", "Host Transfer Channel ID")
 	flag.Parse()
 	return WithdrawFlags{
 		BaseFlags{

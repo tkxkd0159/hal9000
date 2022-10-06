@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/Carina-labs/HAL9000/api"
+	"github.com/Carina-labs/HAL9000/client/base/query"
+	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/cmd"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
@@ -19,7 +21,7 @@ func main() {
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	ctx, botInfo, txf := cmd.InitBaseBot(flags, krDir, fdLog)
+	ctx, krInfo, txf := cmd.SetupBotBase(flags, krDir, fdLog)
 
 	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)
@@ -28,7 +30,12 @@ func main() {
 
 	go func(interval int) {
 		defer wg.Done()
-		logic.IcaAutoStake(flags.HostChain, ctx, txf, botInfo, interval, fdErr, botch)
+		bot := novatypes.NewBot(ctx, txf, krInfo, flags.Period, fdErr, botch)
+		hostZone := cfg.NewHostChainInfo(flags.HostChain)
+		hostZone.Set()
+		cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
+		defer utils.CloseGrpc(cq.ClientConn)
+		logic.IcaAutoStake(cq, bot, hostZone)
 	}(flags.Period)
 
 	wg.Wait()

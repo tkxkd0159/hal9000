@@ -20,6 +20,15 @@ type CosmosQueryClient struct {
 	*grpc.ClientConn
 }
 
+func NewCosmosQueryClient(grpcAddr string) *CosmosQueryClient {
+	conn, err := grpc.Dial(
+		grpcAddr,
+		grpc.WithInsecure(),
+	)
+	utils.CheckErr(err, "cannot create gRPC connection", 0)
+	return &CosmosQueryClient{conn}
+}
+
 var (
 	_ types.BaseQuerier = &CosmosQueryClient{}
 )

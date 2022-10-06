@@ -14,6 +14,7 @@ type IBCInfo struct {
 }
 
 type HostChainInfo struct {
+	Name        string
 	GrpcAddr    string
 	Validator   string
 	HostAccount string
@@ -22,8 +23,13 @@ type HostChainInfo struct {
 	mu          sync.RWMutex
 }
 
-func (hci *HostChainInfo) Set(host string) {
+func NewHostChainInfo(zone string) *HostChainInfo {
+	return &HostChainInfo{Name: zone}
+}
+
+func (hci *HostChainInfo) Set() {
 	hci.mu.Lock()
+	host := hci.Name
 	defer hci.mu.Unlock()
 
 	ip := viper.GetString(fmt.Sprintf("net.ip.%s", host))

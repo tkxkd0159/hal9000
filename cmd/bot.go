@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/Carina-labs/HAL9000/client/base"
+	"github.com/Carina-labs/HAL9000/client/nova"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 	novaapp "github.com/Carina-labs/nova/app"
@@ -12,7 +13,7 @@ import (
 	"os"
 )
 
-func InitBaseBot(f cfg.BotCommon, krDir string, ctxOut io.Writer) (ctx client.Context, botInfo keyring.Info, txf tx.Factory) {
+func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer) (ctx client.Context, botInfo keyring.Info, txf tx.Factory) {
 	flags := f.GetBase()
 	base.SetBechPrefix()
 	cfg.LoadChainInfo(flags.IsTest)
@@ -20,7 +21,7 @@ func InitBaseBot(f cfg.BotCommon, krDir string, ctxOut io.Writer) (ctx client.Co
 	BotScrt := cfg.NewBotScrt(NovaInfo.ChainID, "bot_addr", flags.Kn)
 
 	if flags.New {
-		cfg.SetupBotKey(flags.Kn, krDir, NovaInfo, BotScrt)
+		nova.SetupBotKey(flags.Kn, krDir, NovaInfo, BotScrt)
 		os.Exit(0)
 	}
 

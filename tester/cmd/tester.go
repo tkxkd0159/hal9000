@@ -16,6 +16,7 @@ const (
 	NumWorker = 2
 )
 
+// TODO: add subcommand for testing
 func main() {
 	flags := cfg.SetOracleFlags()
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)

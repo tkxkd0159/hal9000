@@ -19,7 +19,7 @@ func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer) (ctx client.C
 	flags := f.GetBase()
 	base.SetBechPrefix()
 	cfg.LoadChainInfo(flags.IsTest)
-	NovaInfo := cfg.NewNovaInfo()
+	NovaInfo := cfg.NewChainNetInfo(cfg.ControlChain)
 	BotScrt := cfg.NewBotScrt(NovaInfo.ChainID, "bot_addr", flags.Kn)
 
 	if flags.New {

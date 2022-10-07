@@ -2,7 +2,7 @@ TARGET ?= oracle
 BUILD_DIR ?= $(CURDIR)/out
 FLAGS ?= ""
 ARCH ?= $(shell go env GOARCH)
-.PHONY: all build clean run
+.PHONY: all build clean run tester
 
 all: lint build
 
@@ -15,7 +15,7 @@ run:
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
 	@echo "--> $@ "
-	GOARCH=$(ARCH) go $@ -mod=readonly $(BUILD_ARGS) ./...
+	GOARCH=$(ARCH) go $@ -mod=readonly $(BUILD_ARGS) ./cmd/...
 
 # make BUILD_DIR=./bin
 $(BUILD_DIR)/:
@@ -26,9 +26,9 @@ go.sum: go.mod
 	GOPRIVATE=github.com/Carina-labs go mod verify
 	GOPRIVATE=github.com/Carina-labs go mod tidy
 
-pusher: go.sum $(BUILD_DIR)/
-	@echo "--> Generate pusher for test"
-	GOARCH=$(ARCH) go build -mod=readonly -o out/ ./test/pusher
+tester: go.sum $(BUILD_DIR)/
+	@echo "--> Generate tester for test"
+	GOARCH=$(ARCH) go build -mod=readonly -o out/ ./tester/cmd/...
 
 #######################################################
 ###                     Linting                     ###

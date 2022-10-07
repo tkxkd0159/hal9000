@@ -13,7 +13,7 @@ gaia:
   bot_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"
 net:
   ip:
-    nova: "3.37.17.209"
+    nova: "3.38.200.6"
     gaia: "3.36.104.92"
   port:
     grpc: 9090

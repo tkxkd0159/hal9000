@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	ControlChain = "nova"
 	Gas          = "auto"
 	NovaGasPrice = "0unova"
 	GasWeight    = 1.1

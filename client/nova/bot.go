@@ -24,7 +24,7 @@ var (
 	wm sync.RWMutex
 )
 
-func SetupBotKey(keyname, keyloc string, info *config.NovaInfo, bot config.BotScrt) {
+func SetupBotKey(keyname, keyloc string, info *config.ChainNetInfo, bot config.BotScrt) {
 	ctx := base.MakeContext(
 		novaapp.ModuleBasics,
 		bot.Address(),

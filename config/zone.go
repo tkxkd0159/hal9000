@@ -41,24 +41,20 @@ func (hci *HostChainInfo) Set() {
 	hci.Decimal = viper.GetUint32(fmt.Sprintf("%s.decimal", host))
 }
 
-type NovaInfo struct {
+type ChainNetInfo struct {
 	ChainID string
 	IP      string
 	TmRPC   *url.URL
 	TmWsRPC *url.URL
-	mu      sync.RWMutex
 }
 
-func NewNovaInfo() (ni *NovaInfo) {
-	ni.mu.Lock()
-	defer ni.mu.Unlock()
-
-	ni.ChainID = "nova"
-	ni.IP = viper.GetString(fmt.Sprintf("net.ip.%s", ni.ChainID))
-	ni.TmRPC = &url.URL{Scheme: "tcp", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc")}
-	ni.TmWsRPC = &url.URL{Scheme: "ws", Host: ni.IP + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"}
-
-	return
+func NewChainNetInfo(zone string) (ni *ChainNetInfo) {
+	ip := viper.GetString(fmt.Sprintf("net.ip.%s", zone))
+	return &ChainNetInfo{
+		ChainID: zone,
+		IP:      ip,
+		TmRPC:   &url.URL{Scheme: "tcp", Host: ip + ":" + viper.GetString("net.port.tmrpc")},
+		TmWsRPC: &url.URL{Scheme: "ws", Host: ip + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"}}
 }
 
 type BotScrt struct {

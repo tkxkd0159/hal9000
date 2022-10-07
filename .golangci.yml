@@ -29,3 +29,5 @@ issues:
 linters-settings:
   dogsled:
     max-blank-identifiers: 3
+  goimports:
+    local-prefixes: github.com/Carina-labs/HAL9000

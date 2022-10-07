@@ -2,13 +2,15 @@ package base
 
 import (
 	"errors"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Carina-labs/HAL9000/utils"
+	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
 func LoadClientPubInfo(ctx client.Context, keyname string) keyring.Info {

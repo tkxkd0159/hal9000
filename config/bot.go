@@ -3,11 +3,13 @@ package config
 import (
 	"bufio"
 	"fmt"
-	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"path"
+
+	"github.com/spf13/viper"
+
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 const (
@@ -80,7 +82,7 @@ func InputMnemonic() (mnemonic string) {
 	fmt.Println(">>>>>>>>>>>>>> Enter mnemonic (24 words) <<<<<<<<<<<<<<")
 	s := bufio.NewScanner(os.Stdin)
 	ok := s.Scan()
-	if ok == false {
+	if !ok {
 		log.Fatalln(" * Unexpected error while setup key")
 	}
 	mnemonic = s.Text()

@@ -1,11 +1,12 @@
 package types
 
 import (
+	"os"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"os"
-	"time"
 )
 
 type HostTransferChanID = string

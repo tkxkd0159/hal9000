@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	tmjson "github.com/tendermint/tendermint/libs/json"
 	"net"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
+
+	tmjson "github.com/tendermint/tendermint/libs/json"
 )
 
 type jsonrpcid interface {

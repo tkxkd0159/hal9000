@@ -2,27 +2,29 @@ package nova
 
 import (
 	"fmt"
-	"github.com/Carina-labs/HAL9000/client/base"
-	nova "github.com/Carina-labs/HAL9000/client/nova/types"
-	"github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	novaapp "github.com/Carina-labs/nova/app"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"log"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	novaapp "github.com/Carina-labs/nova/app"
+	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Carina-labs/HAL9000/client/base"
+	nova "github.com/Carina-labs/HAL9000/client/nova/types"
+	"github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 var (
 	wm sync.RWMutex
 )
 
-func SetupBotKey(keyname, keyloc string, info config.NovaInfo, bot config.BotScrt) {
+func SetupBotKey(keyname, keyloc string, info *config.NovaInfo, bot config.BotScrt) {
 	ctx := base.MakeContext(
 		novaapp.ModuleBasics,
 		bot.Address(),

@@ -3,17 +3,18 @@ package query
 import (
 	"context"
 	"fmt"
+	"time"
+
+	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
+	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
+	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
+	bankv1beta1 "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"google.golang.org/grpc"
+
 	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/Carina-labs/HAL9000/utils"
 	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
-	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
-	bankv1beta1 "github.com/cosmos/cosmos-sdk/x/bank/types"
-	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
-
-	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
-	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
-	"google.golang.org/grpc"
-	"time"
 )
 
 type CosmosQueryClient struct {

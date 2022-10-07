@@ -1,9 +1,10 @@
 package msgs
 
 import (
+	"time"
+
 	"github.com/Carina-labs/nova/x/gal/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"time"
 )
 
 func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, seq uint64) *types.MsgDelegate {

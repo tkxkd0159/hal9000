@@ -1,9 +1,10 @@
 package msgs
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
+	"github.com/Carina-labs/HAL9000/client/base"
 )
 
 func MakeMsgSend(from any, to any, denoms []string, amounts []int64) (*banktypes.MsgSend, error) {

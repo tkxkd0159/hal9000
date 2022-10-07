@@ -1,15 +1,17 @@
 package api
 
 import (
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	cfg "github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/utils"
+	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
 type Server struct {

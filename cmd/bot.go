@@ -1,16 +1,18 @@
 package cmd
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base"
-	"github.com/Carina-labs/HAL9000/client/nova"
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
+	"io"
+	"os"
+
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"io"
-	"os"
+
+	"github.com/Carina-labs/HAL9000/client/base"
+	"github.com/Carina-labs/HAL9000/client/nova"
+	cfg "github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer) (ctx client.Context, botInfo keyring.Info, txf tx.Factory) {

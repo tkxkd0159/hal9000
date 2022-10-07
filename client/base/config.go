@@ -1,7 +1,6 @@
 package base
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -9,6 +8,8 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
+
+	"github.com/Carina-labs/HAL9000/client/base/types"
 )
 
 type EncodingConfig struct {

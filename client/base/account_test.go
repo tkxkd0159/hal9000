@@ -2,13 +2,15 @@ package base_test
 
 import (
 	"bufio"
-	"github.com/Carina-labs/HAL9000/client/base"
+	"testing"
+
 	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/Carina-labs/HAL9000/client/base"
 )
 
 type mockio struct{}

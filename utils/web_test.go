@@ -1,11 +1,13 @@
 package utils_test
 
 import (
-	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 func TestSetJSONHeader(t *testing.T) {

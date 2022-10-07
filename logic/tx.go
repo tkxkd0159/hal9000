@@ -1,15 +1,17 @@
 package logic
 
 import (
+	"log"
+	"reflect"
+	"time"
+
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	"github.com/Carina-labs/HAL9000/client/nova"
 	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/config"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"log"
-	"reflect"
-	"time"
 )
 
 var (

@@ -2,8 +2,9 @@ package types
 
 import (
 	"errors"
-	"github.com/tendermint/tendermint/libs/log"
 	"sync"
+
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 var (

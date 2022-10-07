@@ -1,6 +1,9 @@
 package main
 
 import (
+	"sync"
+	"time"
+
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/base"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
@@ -8,8 +11,6 @@ import (
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
-	"sync"
-	"time"
 )
 
 const (

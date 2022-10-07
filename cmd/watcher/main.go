@@ -5,14 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
+	"sync"
+	"time"
+
+	"github.com/gorilla/websocket"
+
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/rpc"
 	rpctype "github.com/Carina-labs/HAL9000/rpc/types"
 	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/gorilla/websocket"
-	"log"
-	"sync"
-	"time"
 )
 
 const (

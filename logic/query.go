@@ -1,10 +1,12 @@
 package logic
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base/query"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"log"
 	"time"
+
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Carina-labs/HAL9000/client/base/query"
 )
 
 func OracleInfo(cq *query.CosmosQueryClient, validatorAddr string) (string, int64, []byte) {

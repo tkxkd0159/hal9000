@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	rpc "github.com/Carina-labs/HAL9000/rpc/types"
 )
 

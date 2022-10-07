@@ -1,12 +1,14 @@
 package base
 
 import (
-	"github.com/Carina-labs/HAL9000/utils"
+	"io"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"io"
+
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID string, root string, backend string, userInput io.Reader, userOutput io.Writer, genOnly bool) client.Context {

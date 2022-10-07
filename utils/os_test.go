@@ -2,9 +2,11 @@ package utils_test
 
 import (
 	"errors"
-	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/Carina-labs/HAL9000/utils"
 )
 
 func TestCheckErr(t *testing.T) {

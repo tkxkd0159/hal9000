@@ -1,9 +1,11 @@
 package utils
 
 import (
-	"github.com/Carina-labs/HAL9000/utils/types"
-	"google.golang.org/grpc"
 	"net/http"
+
+	"google.golang.org/grpc"
+
+	"github.com/Carina-labs/HAL9000/utils/types"
 )
 
 func SetJSONHeader(w http.ResponseWriter) {

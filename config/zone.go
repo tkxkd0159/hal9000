@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"net/url"
 	"sync"
+
+	"github.com/spf13/viper"
 )
 
 // IBCInfo -> field name : IBC Port, field value : IBC Channel
@@ -48,7 +49,7 @@ type NovaInfo struct {
 	mu      sync.RWMutex
 }
 
-func NewNovaInfo() (ni NovaInfo) {
+func NewNovaInfo() (ni *NovaInfo) {
 	ni.mu.Lock()
 	defer ni.mu.Unlock()
 

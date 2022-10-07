@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/Carina-labs/HAL9000/utils"
+	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
 type chkHandler struct{}

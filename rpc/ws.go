@@ -1,9 +1,10 @@
 package rpc
 
 import (
+	"net/url"
+
 	tmrpc "github.com/Carina-labs/HAL9000/rpc/types"
 	"github.com/Carina-labs/HAL9000/utils"
-	"net/url"
 )
 
 func MakeEventWatcher(remoteAddr url.URL) *tmrpc.WSClient {

@@ -1,11 +1,13 @@
 package base_test
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base"
+	"testing"
+
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"testing"
+
+	"github.com/Carina-labs/HAL9000/client/base"
 )
 
 type NovaTestSuite struct {

@@ -1,9 +1,11 @@
 package types_test
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base/types"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/Carina-labs/HAL9000/client/base/types"
 )
 
 func TestConvertMainPrefix(t *testing.T) {

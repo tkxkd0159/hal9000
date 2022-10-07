@@ -3,9 +3,10 @@ package utils
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/Carina-labs/HAL9000/utils/types"
 	"log"
 	"os"
+
+	"github.com/Carina-labs/HAL9000/utils/types"
 )
 
 var (

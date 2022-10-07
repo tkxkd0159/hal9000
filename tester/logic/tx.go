@@ -1,13 +1,15 @@
 package logic
 
 import (
+	"log"
+	"time"
+
+	sdktype "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/Carina-labs/HAL9000/client/nova"
 	novam "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/config"
-	sdktype "github.com/cosmos/cosmos-sdk/types"
-	"log"
-	"time"
 )
 
 func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amount int64) {

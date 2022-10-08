@@ -20,6 +20,7 @@ const (
 func main() {
 	botType := cfg.CheckBotType(os.Args[1])
 	flags := cfg.SetFlags(botType)
+	fmt.Printf("%#v", flags)
 
 	bf := flags.GetBase()
 	fmt.Printf("%#v\n", flags)

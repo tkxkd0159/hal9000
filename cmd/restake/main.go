@@ -17,9 +17,11 @@ const (
 )
 
 func main() {
-	flags := cfg.SetRestakeFlags()
-	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
-	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
+	flags := cfg.SetFlags(cfg.ActRestake)
+	bf := flags.GetBase()
+
+	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
+	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
 	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
 
@@ -28,15 +30,15 @@ func main() {
 	botch := make(chan time.Time)
 	go api.OpenMonitoringSrv(wg, botch, flags)
 
-	go func(interval int) {
+	go func() {
 		defer wg.Done()
-		bot := novatypes.NewBot(ctx, txf, krInfo, flags.Period, fdErr, botch)
-		hostZone := cfg.NewHostChainInfo(flags.HostChain)
+		bot := novatypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+		hostZone := cfg.NewHostChainInfo(bf.HostChain)
 		hostZone.Set()
 		cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
 		defer utils.CloseGrpc(cq.ClientConn)
 		logic.IcaAutoStake(cq, bot, hostZone)
-	}(flags.Period)
+	}()
 
 	wg.Wait()
 }

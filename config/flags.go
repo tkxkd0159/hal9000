@@ -81,20 +81,23 @@ func (wf WithdrawFlags) GetBase() BaseFlags {
 	return wf.BaseFlags
 }
 
-func setBaseFlags() {
-	flag.BoolVar(&isTest, "test", false, "Decide whether it's test with localnet")
-	flag.BoolVar(&isNew, "new", false, "Start client with making new account")
-	flag.BoolVar(&disp, "display", false, "Show context log through stdout")
-	flag.StringVar(&apiAddr, "api", "127.0.0.1:3334", "Set bot api address")
-	flag.StringVar(&keyname, "name", "nova_bot", "Set unique key name (uid)")
-	flag.StringVar(&hostchainName, "host", "gaia", "Name of the host chain from which to obtain oracle info")
-	flag.IntVar(&intv, "interval", 15*60, "Oracle update interval (sec)")
-	flag.StringVar(&logloc, "logloc", "logs", "Where All Logs Are Stored from project root")
+func addBaseFlags(cmd *flag.FlagSet) {
+	cmd.BoolVar(&isTest, "test", false, "Decide whether it's test with localnet")
+	cmd.BoolVar(&isNew, "new", false, "Start client with making new account")
+	cmd.BoolVar(&disp, "display", false, "Show context log through stdout")
+	cmd.StringVar(&apiAddr, "api", "127.0.0.1:3334", "Set bot api address")
+	cmd.StringVar(&keyname, "name", "nova_bot", "Set unique key name (uid)")
+	cmd.StringVar(&hostchainName, "host", "gaia", "Name of the host chain from which to obtain oracle info")
+	cmd.IntVar(&intv, "interval", 15*60, "Oracle update interval (sec)")
+	cmd.StringVar(&logloc, "logloc", "logs", "Where All Logs Are Stored from project root")
 }
 
-func SetOracleFlags() OracleFlags {
-	setBaseFlags()
-	flag.Parse()
+func SetOracleFlags(cmd *flag.FlagSet) OracleFlags {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		panic("Something went wrong while parse flags")
+	}
+
 	return OracleFlags{
 		BaseFlags{
 			IsTest:      isTest,
@@ -109,9 +112,12 @@ func SetOracleFlags() OracleFlags {
 	}
 }
 
-func SetRestakeFlags() RestakeFlags {
-	setBaseFlags()
-	flag.Parse()
+func SetRestakeFlags(cmd *flag.FlagSet) RestakeFlags {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		panic("Something went wrong while parse flags")
+	}
+
 	return RestakeFlags{
 		BaseFlags{
 			IsTest:      isTest,
@@ -126,9 +132,12 @@ func SetRestakeFlags() RestakeFlags {
 	}
 }
 
-func SetStakeFlags() StakeFlags {
-	setBaseFlags()
-	flag.Parse()
+func SetStakeFlags(cmd *flag.FlagSet) StakeFlags {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		panic("Something went wrong while parse flags")
+	}
+
 	return StakeFlags{
 		BaseFlags{
 			IsTest:      isTest,
@@ -143,10 +152,13 @@ func SetStakeFlags() StakeFlags {
 	}
 }
 
-func SetWithdrawFlags() WithdrawFlags {
-	setBaseFlags()
-	chanID := flag.String("ch", "channel-225", "Host Transfer Channel ID")
-	flag.Parse()
+func SetWithdrawFlags(cmd *flag.FlagSet) WithdrawFlags {
+	chanID := cmd.String("ch", "channel-225", "Host Transfer Channel ID")
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		panic("Something went wrong while parse flags")
+	}
+
 	return WithdrawFlags{
 		BaseFlags{
 			IsTest:      isTest,
@@ -163,30 +175,24 @@ func SetWithdrawFlags() WithdrawFlags {
 }
 
 func SetFlags(action string) (bf BotCommon) {
-	//actCmd := flag.NewFlagSet("action", flag.ExitOnError)
+	actCmd := flag.NewFlagSet(fmt.Sprintf("%s bot", action), flag.ExitOnError)
+	actCmd.Usage = func() {
+		w := actCmd.Output()
+		fmt.Fprintf(w, "  hal %s [flags]\n\nflags:\n", action)
+		actCmd.PrintDefaults()
+	}
+
+	addBaseFlags(actCmd)
+
 	switch action {
 	case ActOracle:
-		bf = SetOracleFlags()
+		bf = SetOracleFlags(actCmd)
 	case ActStake:
-		bf = SetStakeFlags()
+		bf = SetStakeFlags(actCmd)
 	case ActRestake:
-		bf = SetRestakeFlags()
+		bf = SetRestakeFlags(actCmd)
 	case ActWithdraw:
-		bf = SetWithdrawFlags()
-	}
-
-	flag.Usage = func() {
-		w := flag.CommandLine.Output()
-		fmt.Fprintf(w, "  hal %s [flags]\n\nflags:\n", action)
-		flag.PrintDefaults()
-	}
-
-	if len(os.Args) >= 3 {
-		switch os.Args[2] {
-		case "-h", "-help", "--help":
-			flag.Usage()
-			os.Exit(0)
-		}
+		bf = SetWithdrawFlags(actCmd)
 	}
 
 	return

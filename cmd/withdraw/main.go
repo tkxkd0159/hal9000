@@ -22,10 +22,11 @@ func init() {
 }
 
 func main() {
+	flags := cfg.SetFlags(cfg.ActWithdraw)
+	bf := flags.GetBase()
 
-	flags := cfg.SetWithdrawFlags()
-	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
-	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
+	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
+	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
 	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
 
@@ -35,16 +36,16 @@ func main() {
 	go api.OpenMonitoringSrv(wg, botch, flags)
 
 	// ###### Start target bot logic ######
-	go func(interval int) {
+	go func() {
 		defer wg.Done()
-		bot := novatypes.NewBot(ctx, txf, krInfo, flags.Period, fdErr, botch)
-		hostZone := cfg.NewHostChainInfo(flags.HostChain)
+		bot := novatypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+		hostZone := cfg.NewHostChainInfo(bf.HostChain)
 		hostZone.Set()
 		hostZone.WithIBCInfo(flags, cfg.ActWithdraw)
 		cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
 		defer utils.CloseGrpc(cq.ClientConn)
 		logic.UndelegateAndWithdraw(cq, bot, hostZone)
-	}(flags.Period)
+	}()
 
 	wg.Wait()
 }

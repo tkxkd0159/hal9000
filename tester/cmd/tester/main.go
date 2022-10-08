@@ -7,7 +7,6 @@ import (
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
-	"github.com/Carina-labs/HAL9000/cmd"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -23,7 +22,7 @@ func main() {
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	ctx, krInfo, txf := cmd.SetupBotBase(flags, krDir, fdLog)
+	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
 
 	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)

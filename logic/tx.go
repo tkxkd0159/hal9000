@@ -19,7 +19,6 @@ var (
 )
 
 func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
-
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
@@ -43,7 +42,6 @@ func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *confi
 }
 
 func IcaAutoStake(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
-
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
@@ -72,7 +70,6 @@ func IcaAutoStake(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.Ho
 }
 
 func IcaStake(b *novatypes.Bot, host *config.HostChainInfo) {
-
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
@@ -93,8 +90,7 @@ func IcaStake(b *novatypes.Bot, host *config.HostChainInfo) {
 	}
 }
 
-func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo, id novatypes.HostTransferChanID) {
-
+func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
 	isStart := true
 	i := 0
 	intv := time.Duration(b.Interval)
@@ -130,7 +126,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 
 			time.Sleep(60 * time.Second)
 
-			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", id, blkTS, tmpseq)
+			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, tmpseq)
 			msgs = []sdktypes.Msg{msg3}
 			for {
 				ok := nova.GenTxByBot(b, false, msgs...)

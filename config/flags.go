@@ -1,6 +1,10 @@
 package config
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+	"os"
+)
 
 var (
 	isTest        bool
@@ -22,6 +26,7 @@ var (
 
 type BotCommon interface {
 	GetBase() BaseFlags
+	Observable
 }
 
 type Observable interface {
@@ -155,4 +160,34 @@ func SetWithdrawFlags() WithdrawFlags {
 		},
 		IBCInfo{Transfer: *chanID},
 	}
+}
+
+func SetFlags(action string) (bf BotCommon) {
+	//actCmd := flag.NewFlagSet("action", flag.ExitOnError)
+	switch action {
+	case ActOracle:
+		bf = SetOracleFlags()
+	case ActStake:
+		bf = SetStakeFlags()
+	case ActRestake:
+		bf = SetRestakeFlags()
+	case ActWithdraw:
+		bf = SetWithdrawFlags()
+	}
+
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintf(w, "  hal %s [flags]\n\nflags:\n", action)
+		flag.PrintDefaults()
+	}
+
+	if len(os.Args) >= 3 {
+		switch os.Args[2] {
+		case "-h", "-help", "--help":
+			flag.Usage()
+			os.Exit(0)
+		}
+	}
+
+	return
 }

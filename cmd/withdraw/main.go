@@ -8,7 +8,6 @@ import (
 	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
-	"github.com/Carina-labs/HAL9000/cmd"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -28,7 +27,7 @@ func main() {
 	krDir, logDir := cfg.SetInitialDir(flags.Kn, flags.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, flags.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	ctx, krInfo, txf := cmd.SetupBotBase(flags, krDir, fdLog)
+	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
 
 	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)
@@ -41,9 +40,10 @@ func main() {
 		bot := novatypes.NewBot(ctx, txf, krInfo, flags.Period, fdErr, botch)
 		hostZone := cfg.NewHostChainInfo(flags.HostChain)
 		hostZone.Set()
+		hostZone.WithIBCInfo(flags, cfg.ActWithdraw)
 		cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
 		defer utils.CloseGrpc(cq.ClientConn)
-		logic.UndelegateAndWithdraw(cq, bot, hostZone, flags.HostIBC.Transfer)
+		logic.UndelegateAndWithdraw(cq, bot, hostZone)
 	}(flags.Period)
 
 	wg.Wait()

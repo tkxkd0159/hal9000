@@ -21,7 +21,8 @@ type HostChainInfo struct {
 	HostAccount string
 	Denom       string
 	Decimal     uint32
-	mu          sync.RWMutex
+	IBCInfo
+	mu sync.RWMutex
 }
 
 func NewHostChainInfo(zone string) *HostChainInfo {
@@ -39,6 +40,13 @@ func (hci *HostChainInfo) Set() {
 	hci.HostAccount = viper.GetString(fmt.Sprintf("%s.host_addr", host))
 	hci.Denom = viper.GetString(fmt.Sprintf("%s.denom", host))
 	hci.Decimal = viper.GetUint32(fmt.Sprintf("%s.decimal", host))
+}
+
+func (hci *HostChainInfo) WithIBCInfo(bc BotCommon, botTypes string) {
+	switch botTypes {
+	case ActWithdraw:
+		hci.IBCInfo = bc.(WithdrawFlags).HostIBC
+	}
 }
 
 type ChainNetInfo struct {

@@ -3,13 +3,28 @@ package config
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
 
+	novaapp "github.com/Carina-labs/nova/app"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/viper"
 
+	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/utils"
+)
+
+const (
+	ActOracle   = "oracle"
+	ActStake    = "stake"
+	ActRestake  = "restake"
+	ActWithdraw = "withdraw"
 )
 
 const (
@@ -88,4 +103,77 @@ func InputMnemonic() (mnemonic string) {
 	}
 	mnemonic = s.Text()
 	return
+}
+
+func CheckBotType(botType string) string {
+	switch botType {
+	case ActOracle, ActStake, ActRestake, ActWithdraw:
+		return botType
+	default:
+		fmt.Printf("This bot type is not supported. \n\n")
+		fmt.Println("Command:")
+		fmt.Printf("  hal [action] [flags]\n\n")
+		fmt.Println(" [action] : oracle / stake / restake / withdraw")
+		fmt.Println(" Use (-h|--help) if you want to see flag usage after set action")
+		os.Exit(1)
+	}
+	return ""
+}
+
+func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer) (ctx client.Context, botInfo keyring.Info, txf tx.Factory) {
+	flags := f.GetBase()
+	base.SetBechPrefix()
+	LoadChainInfo(flags.IsTest)
+	NovaInfo := NewChainNetInfo(ControlChain)
+	BotScrt := NewBotScrt(NovaInfo.ChainID, "bot_addr", flags.Kn)
+
+	if flags.New {
+		SetupBotKey(flags.Kn, krDir, NovaInfo, BotScrt)
+		os.Exit(0)
+	}
+
+	rpipe, wpipe, err := os.Pipe()
+	utils.CheckErr(err, "", 0)
+	os.Stdin = rpipe
+	_, err = wpipe.Write([]byte(BotScrt.Passphrase()))
+	utils.CheckErr(err, "", 0)
+
+	ctx = base.MakeContext(
+		novaapp.ModuleBasics,
+		BotScrt.Address(),
+		NovaInfo.TmRPC.String(),
+		NovaInfo.ChainID,
+		krDir,
+		keyring.BackendFile,
+		rpipe,
+		ctxOut,
+		false,
+	)
+
+	botInfo = base.LoadClientPubInfo(ctx, flags.Kn)
+	ctx = base.AddMoreFromInfo(ctx)
+	txf = base.MakeTxFactory(ctx, Gas, NovaGasPrice, "", GasWeight)
+	return
+}
+
+func SetupBotKey(keyname, keyloc string, info *ChainNetInfo, bot BotScrt) {
+	ctx := base.MakeContext(
+		novaapp.ModuleBasics,
+		bot.Address(),
+		info.TmRPC.String(),
+		info.ChainID,
+		keyloc,
+		keyring.BackendFile,
+		os.Stdin,
+		os.Stdout,
+		false,
+	)
+
+	_ = base.MakeClientWithNewAcc(
+		ctx,
+		keyname,
+		InputMnemonic(),
+		sdktypes.FullFundraiserPath,
+		hd.Secp256k1,
+	)
 }

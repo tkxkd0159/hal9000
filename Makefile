@@ -1,4 +1,5 @@
-TARGET ?= oracle
+TARGET ?= hal
+ACTION ?= oracle
 BUILD_DIR ?= $(CURDIR)/out
 FLAGS ?= ""
 ARCH ?= $(shell go env GOARCH)
@@ -11,7 +12,7 @@ BUILD_TARGETS := build install
 build: BUILD_ARGS=-o $(BUILD_DIR)/
 
 run:
-	GOARCH=$(ARCH) go run ./cmd/$(TARGET) $(FLAGS)
+	GOARCH=$(ARCH) go run ./cmd/$(TARGET) $(ACTION) $(FLAGS)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
 	@echo "--> $@ "

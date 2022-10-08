@@ -44,7 +44,7 @@ func SetInitialDir(krDir string, logDir string) (string, string) {
 	cwd, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
 
-	krDir = path.Join(cwd, "/bot", krDir)
+	krDir = path.Join(cwd, "/keyring", krDir)
 	err = os.MkdirAll(krDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** bot directory already exist **")
@@ -129,6 +129,7 @@ func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer) (ctx client.Conte
 
 	if flags.New {
 		SetupBotKey(flags.Kn, krDir, NovaInfo, BotScrt)
+		log.Println("🎉 Your keyring has been successfully set.")
 		os.Exit(0)
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -20,14 +20,12 @@ const (
 func main() {
 	botType := cfg.CheckBotType(os.Args[1])
 	flags := cfg.SetFlags(botType)
-	fmt.Printf("%#v", flags)
-
 	bf := flags.GetBase()
-	fmt.Printf("%#v\n", flags)
 	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
 	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
+	log.SetOutput(ctx.Output)
 
 	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)

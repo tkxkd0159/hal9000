@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"log"
 	"reflect"
 	"time"
 
@@ -34,7 +33,7 @@ func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *confi
 				break
 			}
 		}
-		log.Println("----> MsgUpdateChainState was sent")
+		botMsgLog(msgs)
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
@@ -62,7 +61,7 @@ func IcaAutoStake(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.Ho
 				break
 			}
 		}
-		log.Println("----> MsgIcaAutoStaking was sent")
+		botMsgLog(msgs)
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
@@ -83,7 +82,7 @@ func IcaStake(b *novatypes.Bot, host *config.HostChainInfo) {
 				break
 			}
 		}
-		log.Println("----> MsgDelegate was sent")
+		botMsgLog(msgs)
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
@@ -110,7 +109,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 					break
 				}
 			}
-			log.Println("----> MsgUndelegate was sent")
+			botMsgLog(msgs)
 			b.APIch <- time.Now().UTC()
 			isStart = false
 		} else {
@@ -122,7 +121,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 					break
 				}
 			}
-			log.Println("----> MsgUndelegate was sent")
+			botMsgLog(msgs)
 
 			time.Sleep(60 * time.Second)
 
@@ -134,7 +133,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 					break
 				}
 			}
-			log.Println("----> MsgPendingWithdraw was sent")
+			botMsgLog(msgs)
 			b.APIch <- time.Now().UTC()
 		}
 

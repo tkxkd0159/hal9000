@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"fmt"
+
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/config"
@@ -8,6 +10,7 @@ import (
 )
 
 func RouteBotAction(botType string, b *novatypes.Bot, hci *config.HostChainInfo) {
+	fmt.Printf("\n 🤖 %s bot has started working... 🤖 \n", botType)
 	switch botType {
 	case config.ActOracle:
 		cq := query.NewCosmosQueryClient(hci.GrpcAddr)

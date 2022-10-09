@@ -24,7 +24,7 @@ func main() {
 	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	ctx, krInfo, txf := cfg.SetupBotBase(flags, krDir, fdLog)
+	ctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, "bot_addr")
 	log.SetOutput(ctx.Output)
 
 	wg := new(sync.WaitGroup)
@@ -38,7 +38,7 @@ func main() {
 	hostZone.WithIBCInfo(flags, botType)
 	go func() {
 		defer wg.Done()
-		logic.RouteBotAction(botType, bot, hostZone)
+		logic.RouteBotAction(botType, bot, cni, hostZone)
 	}()
 
 	wg.Wait()

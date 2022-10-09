@@ -2,15 +2,14 @@ nova:
   chain_id: "nova"
   val_addr: "novavaloper18hcuafd3849v4deyyazn6k32ze9msyqs2xgvjh"
   bot_addr: "nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf"
-  to_addr: "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663"
-  fake_bot_addr: "nova18hcuafd3849v4deyyazn6k32ze9msyqsr6q42f"
+  client_addr: "nova1ma2378jplsnj3chlcgwqfx8p8g92z7dzxdvxmd"
 gaia:
   chain_id: "gaia"
   denom: "uatom"
   decimal: 6
   val_addr: "cosmosvaloper1ma2378jplsnj3chlcgwqfx8p8g92z7dzw5kg5n"
-  host_addr: "cosmos1fvg3ld0wvudm95jc0eycc7kvqdamey8ejlljhrrlsj398jvmj24s5vv044"
-  bot_addr: "cosmos1spcw85a6qm98uhagecfspvt2r5px2jzkdcy9mt"
+  host_addr: "cosmos1mn52fx79ckzam60qa4ctgt5meyrk09xc6y6j8adqz3wynww7mczqhj6wur"
+  client_addr: "cosmos1ma2378jplsnj3chlcgwqfx8p8g92z7dztqzacq"
 net:
   ip:
     nova: "3.38.200.6"

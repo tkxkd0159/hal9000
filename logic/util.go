@@ -12,6 +12,6 @@ func botTickLog(botType string, elapsedSecs int) {
 
 func botMsgLog(msgs []sdktypes.Msg) {
 	for _, msg := range msgs {
-		log.Printf(" 🔥%s was sent 📦\n %s", sdktypes.MsgTypeURL(msg), msg.String())
+		log.Printf(" 🔥 %s was sent 📦\n %s", sdktypes.MsgTypeURL(msg), msg.String())
 	}
 }

@@ -9,7 +9,8 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
-func RouteBotAction(botType string, b *basetypes.Bot, hci *config.HostChainInfo) {
+func RouteBotAction(botType string, b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.HostChainInfo) {
+	_ = cni
 	fmt.Printf("\n 🤖 %s bot has started working... 🤖 \n", botType)
 	switch botType {
 	case config.ActOracle:

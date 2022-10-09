@@ -20,26 +20,6 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
-const (
-	ActOracle   = "oracle"
-	ActStake    = "stake"
-	ActRestake  = "restake"
-	ActWithdraw = "withdraw"
-)
-
-const (
-	ControlChain = "nova"
-	Gas          = "auto"
-	NovaGasPrice = "0unova"
-	GasWeight    = 1.1
-)
-
-const (
-	StdLogFile            = "ctxlog.txt"
-	LocalErrlogFile       = "nova_err.txt"
-	ExtRedirectErrlogFile = "other_err.txt"
-)
-
 func SetInitialDir(krDir string, logDir string) (string, string) {
 	cwd, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
@@ -120,15 +100,15 @@ func CheckBotType(botType string) string {
 	return ""
 }
 
-func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer) (ctx client.Context, botInfo keyring.Info, txf tx.Factory) {
+func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer, zone string, target string) (ctx client.Context, botInfo keyring.Info, txf tx.Factory, cni *ChainNetInfo) {
 	flags := f.GetBase()
 	base.SetBechPrefix()
 	LoadChainInfo(flags.IsTest)
-	NovaInfo := NewChainNetInfo(ControlChain)
-	BotScrt := NewBotScrt(NovaInfo.ChainID, "bot_addr", flags.Kn)
+	cni = NewChainNetInfo(zone)
+	BotScrt := NewBotScrt(cni.ChainID, target, flags.Kn)
 
 	if flags.New {
-		SetupBotKey(flags.Kn, krDir, NovaInfo, BotScrt)
+		SetupBotKey(flags.Kn, krDir, cni, BotScrt)
 		log.Println("🎉 Your keyring has been successfully set.")
 		os.Exit(0)
 	}
@@ -142,8 +122,8 @@ func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer) (ctx client.Conte
 	ctx = base.MakeContext(
 		novaapp.ModuleBasics,
 		BotScrt.Address(),
-		NovaInfo.TmRPC.String(),
-		NovaInfo.ChainID,
+		cni.TmRPC.String(),
+		cni.ChainID,
 		krDir,
 		keyring.BackendFile,
 		rpipe,

@@ -7,7 +7,7 @@ import (
 	"github.com/Carina-labs/HAL9000/api"
 	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/client/base/query"
-	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
+	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -38,7 +38,7 @@ func main() {
 	// ###### Start target bot logic ######
 	go func() {
 		defer wg.Done()
-		bot := novatypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+		bot := basetypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
 		hostZone := cfg.NewHostChainInfo(bf.HostChain)
 		hostZone.Set()
 		hostZone.WithIBCInfo(flags, cfg.ActWithdraw)

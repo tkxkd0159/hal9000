@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/Carina-labs/HAL9000/client/base/query"
-	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
+	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
-func RouteBotAction(botType string, b *novatypes.Bot, hci *config.HostChainInfo) {
+func RouteBotAction(botType string, b *basetypes.Bot, hci *config.HostChainInfo) {
 	fmt.Printf("\n 🤖 %s bot has started working... 🤖 \n", botType)
 	switch botType {
 	case config.ActOracle:

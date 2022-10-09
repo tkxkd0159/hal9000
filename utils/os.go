@@ -38,12 +38,12 @@ func LogErrWithFd(fd *os.File, err error, msg string, action types.Code) {
 	switch action {
 	case types.EXIT:
 		if err != nil {
-			panic(fmt.Sprintf("%s: \n %v", msg, err))
+			panic(fmt.Sprintf("\n %s: \n %v", msg, err))
 		}
 	case types.KEEP:
 		if err != nil {
 			l := log.New(fd, "ERROR (check) : ", log.Llongfile|log.LstdFlags)
-			l.Printf("%s: \n %v\n", msg, err)
+			l.Printf("\n %s: %v\n", msg, err)
 		}
 	}
 }

@@ -6,10 +6,10 @@ import (
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/client/base/query"
-	"github.com/Carina-labs/HAL9000/client/nova"
+	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
 	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
-	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/config"
 )
 
@@ -28,7 +28,7 @@ func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *confi
 		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
 		for {
-			ok := nova.GenTxByBot(b, false, msgs...)
+			ok := base.GenTxByBot(b, false, msgs...)
 			if ok {
 				break
 			}
@@ -56,7 +56,7 @@ func IcaAutoStake(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.Ho
 		msg1 := novaTx.MakeMsgIcaAutoStaking(host.Name, b.KrInfo.GetAddress(), r)
 		msgs := []sdktypes.Msg{msg1}
 		for {
-			ok := nova.GenTxByBot(b, false, msgs...)
+			ok := base.GenTxByBot(b, false, msgs...)
 			if ok {
 				break
 			}
@@ -77,7 +77,7 @@ func IcaStake(b *novatypes.Bot, host *config.HostChainInfo) {
 		msg1 := novaTx.MakeMsgDelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
 		msgs := []sdktypes.Msg{msg1}
 		for {
-			ok := nova.GenTxByBot(b, false, msgs...)
+			ok := base.GenTxByBot(b, false, msgs...)
 			if ok {
 				break
 			}
@@ -104,7 +104,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			for {
-				ok := nova.GenTxByBot(b, false, msgs...)
+				ok := base.GenTxByBot(b, false, msgs...)
 				if ok {
 					break
 				}
@@ -116,7 +116,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			for {
-				ok := nova.GenTxByBot(b, false, msgs...)
+				ok := base.GenTxByBot(b, false, msgs...)
 				if ok {
 					break
 				}
@@ -128,7 +128,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *
 			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, tmpseq)
 			msgs = []sdktypes.Msg{msg3}
 			for {
-				ok := nova.GenTxByBot(b, false, msgs...)
+				ok := base.GenTxByBot(b, false, msgs...)
 				if ok {
 					break
 				}

@@ -6,9 +6,9 @@ import (
 
 	sdktype "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/client/nova"
+	"github.com/Carina-labs/HAL9000/client/base"
+	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
 	novam "github.com/Carina-labs/HAL9000/client/nova/msgs"
-	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/config"
 )
 
@@ -21,7 +21,7 @@ func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amou
 
 		msg1 := novam.MakeMsgDeposit(b.KrInfo.GetAddress(), b.KrInfo.GetAddress(), host.Name, denom, amount)
 		msgs := []sdktype.Msg{msg1}
-		nova.GenTxByBot(b, false, msgs...)
+		base.GenTxByBot(b, false, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
 	}

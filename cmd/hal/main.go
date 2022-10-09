@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Carina-labs/HAL9000/api"
-	novatypes "github.com/Carina-labs/HAL9000/client/nova/types"
+	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -32,7 +32,7 @@ func main() {
 	botch := make(chan time.Time)
 	go api.OpenMonitoringSrv(wg, botch, flags)
 
-	bot := novatypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+	bot := basetypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
 	hostZone := cfg.NewHostChainInfo(bf.HostChain)
 	hostZone.Set()
 	hostZone.WithIBCInfo(flags, botType)

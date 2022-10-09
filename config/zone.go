@@ -52,6 +52,7 @@ func (hci *HostChainInfo) WithIBCInfo(bc BotCommon, botTypes string) {
 type ChainNetInfo struct {
 	ChainID string
 	IP      string
+	GRPC    *url.URL
 	TmRPC   *url.URL
 	TmWsRPC *url.URL
 }
@@ -61,8 +62,10 @@ func NewChainNetInfo(zone string) (ni *ChainNetInfo) {
 	return &ChainNetInfo{
 		ChainID: zone,
 		IP:      ip,
+		GRPC:    &url.URL{Scheme: "tcp", Host: ip + ":" + viper.GetString("net.port.grpc")},
 		TmRPC:   &url.URL{Scheme: "tcp", Host: ip + ":" + viper.GetString("net.port.tmrpc")},
-		TmWsRPC: &url.URL{Scheme: "ws", Host: ip + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"}}
+		TmWsRPC: &url.URL{Scheme: "ws", Host: ip + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"},
+	}
 }
 
 type BotScrt struct {

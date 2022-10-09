@@ -1,18 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"sync"
 	"time"
 
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/Carina-labs/HAL9000/api"
-	"github.com/Carina-labs/HAL9000/client/base"
-	"github.com/Carina-labs/HAL9000/client/base/query"
 	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
-	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
+	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
 	"github.com/Carina-labs/HAL9000/utils"
@@ -37,20 +34,25 @@ func main() {
 	botch := make(chan time.Time)
 	go api.OpenMonitoringSrv(wg, botch, flags)
 
-	bot := basetypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+	_ = basetypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
 	hostZone := cfg.NewHostChainInfo(bf.HostChain)
 	hostZone.Set()
 	hostZone.WithIBCInfo(flags, botType)
 
-	cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
-	defer utils.CloseGrpc(cq.ClientConn)
-	delegatedToken, height, apphash := logic.OracleInfo(cq, hostZone.Validator)
+	nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
+	defer utils.CloseGrpc(nq.ClientConn)
+	tmp := logic.FetchBotSeq(nq, cfg.ActWithdraw, "gaia")
+	fmt.Println(tmp, tmp[cfg.ActWithdraw], tmp[cfg.ActUndelegate])
 
-	bot.Txf = bot.Txf.WithSequence(320)
-	msg1 := novaTx.MakeMsgUpdateChainState(bot.KrInfo.GetAddress(), hostZone.Name, hostZone.Denom, delegatedToken, height, apphash)
-	msgs := []sdktypes.Msg{msg1}
-	_ = base.GenTxByBot(bot, false, msgs...)
-	_ = cni
+	//cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
+	//defer utils.CloseGrpc(cq.ClientConn)
+	//delegatedToken, height, apphash := logic.OracleInfo(cq, hostZone.Validator)
+	//
+	//bot.Txf = bot.Txf.WithSequence(320)
+	//msg1 := novaTx.MakeMsgUpdateChainState(bot.KrInfo.GetAddress(), hostZone.Name, hostZone.Denom, delegatedToken, height, apphash)
+	//msgs := []sdktypes.Msg{msg1}
+	//_ = base.GenTxByBot(bot, false, msgs...)
+	//_ = cni
 
 	wg.Wait()
 }

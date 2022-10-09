@@ -26,7 +26,7 @@ func NewCosmosQueryClient(grpcAddr string) *CosmosQueryClient {
 		grpcAddr,
 		grpc.WithInsecure(),
 	)
-	utils.CheckErr(err, "cannot create gRPC connection", 0)
+	utils.CheckErr(err, "cannot create gRPC connection", utiltypes.EXIT)
 	return &CosmosQueryClient{conn}
 }
 
@@ -113,7 +113,7 @@ func (cqc *CosmosQueryClient) GetTx(hash string) *txv1beta1.GetTxResponse {
 	defer cancel()
 
 	r, err := c.GetTx(ctx, &txv1beta1.GetTxRequest{Hash: hash})
-	utils.CheckErr(err, "", 1)
+	utils.CheckErr(err, "", utiltypes.KEEP)
 	return r
 }
 

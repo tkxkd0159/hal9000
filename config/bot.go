@@ -100,6 +100,21 @@ func CheckBotType(botType string) string {
 	return ""
 }
 
+func CheckTesterType(botType string) string {
+	switch botType {
+	case ActOracle, ActStake, ActRestake, ActWithdraw:
+		return botType
+	default:
+		fmt.Printf(" 🤮 This bot type is not supported. \n\n")
+		fmt.Println("Command:")
+		fmt.Printf("  hal [action] [flags]\n\n")
+		fmt.Println(" [action] : oracle / stake / restake / withdraw")
+		fmt.Println(" Use (-h|--help) if you want to see flag usage after set action")
+		os.Exit(1)
+	}
+	return ""
+}
+
 func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer, zone string, target string) (ctx client.Context, botInfo keyring.Info, txf tx.Factory, cni *ChainNetInfo) {
 	flags := f.GetBase()
 	base.SetBechPrefix()

@@ -1,10 +1,15 @@
 package config
 
 const (
-	ActOracle   = "oracle"
-	ActStake    = "stake"
-	ActRestake  = "restake"
-	ActWithdraw = "withdraw"
+	ActOracle     = "oracle"
+	ActStake      = "stake"
+	ActRestake    = "restake"
+	ActWithdraw   = "withdraw"
+	ActUndelegate = "undelegate"
+
+	ActPusher = "push"
+	ActMinter = "mint"
+	ActTaker  = "take"
 )
 
 const (

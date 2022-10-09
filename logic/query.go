@@ -7,6 +7,8 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Carina-labs/HAL9000/client/base/query"
+	nquery "github.com/Carina-labs/HAL9000/client/nova/query"
+	"github.com/Carina-labs/HAL9000/config"
 )
 
 func OracleInfo(cq *query.CosmosQueryClient, validatorAddr string) (string, int64, []byte) {
@@ -43,4 +45,20 @@ func RewardsWithAddr(cq *query.CosmosQueryClient, delegator string, validator st
 	}()
 	reward = cq.GetRewards(delegator, validator).GetRewards()[0]
 	return reward
+}
+
+func FetchBotSeq(nq *nquery.NovaQueryClient, action string, zoneid string) (seqmap map[string]uint64) {
+	seqmap = make(map[string]uint64)
+	switch action {
+	case config.ActStake:
+		seqmap[config.ActStake] = nq.CurrentDelegateVersion(zoneid).GetVersion()
+	case config.ActRestake:
+		seqmap[config.ActRestake] = nq.CurrentAutoStakingVersion(zoneid).GetVersion()
+	case config.ActWithdraw:
+		seqmap[config.ActWithdraw] = nq.CurrentWithdrawVersion(zoneid).GetVersion()
+		seqmap[config.ActUndelegate] = nq.CurrentUndelegateVersion(zoneid).GetVersion()
+	default:
+		panic("there is no sequence on this action")
+	}
+	return
 }

@@ -110,7 +110,7 @@ func CheckBotType(botType string) string {
 	case ActOracle, ActStake, ActRestake, ActWithdraw:
 		return botType
 	default:
-		fmt.Printf("This bot type is not supported. \n\n")
+		fmt.Printf(" 🤮 This bot type is not supported. \n\n")
 		fmt.Println("Command:")
 		fmt.Printf("  hal [action] [flags]\n\n")
 		fmt.Println(" [action] : oracle / stake / restake / withdraw")

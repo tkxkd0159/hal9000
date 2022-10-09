@@ -15,7 +15,7 @@ The world's most complete oracle feeder
 GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@<tag>
 ```
 
-## Bot types
+## Bot action types
 * **oracle** : Update host's base token price every 15 minutes.
 * **stake** : Delegate the tokens sent by the user to the host chain via IBC to the a4x validator through the controller account every 10 mintues.
 * **restake** : Automatically re-stake the host account's rewards through IBC. The amount to be re-deposited is inquired from the distribution module of the host chain every 6 hours.

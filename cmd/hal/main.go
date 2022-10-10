@@ -24,15 +24,14 @@ func main() {
 	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
 	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	ctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, "bot_addr")
-	log.SetOutput(ctx.Output)
+	botctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, "bot_addr")
+	log.SetOutput(botctx.Output)
 
 	wg := new(sync.WaitGroup)
 	wg.Add(NumWorker)
 	botch := make(chan time.Time)
 	go api.OpenMonitoringSrv(wg, botch, flags)
-
-	bot := basetypes.NewBot(ctx, txf, krInfo, bf.Period, fdErr, botch)
+	bot := basetypes.NewBot(botctx, txf, krInfo, bf.Period, fdErr, botch)
 	hostZone := cfg.NewHostChainInfo(bf.HostChain)
 	hostZone.Set()
 	hostZone.WithIBCInfo(flags, botType)

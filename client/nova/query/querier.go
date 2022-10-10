@@ -10,7 +10,14 @@ import (
 
 	"github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/utils"
-	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
+)
+
+const (
+	ctxTimeout = time.Second * 10
+)
+
+var (
+	_ types.NovaQuerier = &NovaQueryClient{}
 )
 
 type NovaQueryClient struct {
@@ -26,48 +33,50 @@ func NewNovaQueryClient(grpcAddr string) *NovaQueryClient {
 	return &NovaQueryClient{conn}
 }
 
-var (
-	_ types.NovaQuerier = &NovaQueryClient{}
-)
-
-const (
-	ctxTimeout = time.Second * 5
-)
-
-func (nqc *NovaQueryClient) CurrentDelegateVersion(zoneid string) *galtypes.QueryCurrentDelegateVersionResponse {
+func (nqc *NovaQueryClient) CurrentDelegateVersion(zoneid string) (*galtypes.QueryCurrentDelegateVersionResponse, error) {
 	c := galtypes.NewQueryClient(nqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.DelegateCurrentVersion(ctx, &galtypes.QueryCurrentDelegateVersion{ZoneId: zoneid})
-	utils.CheckErr(err, "", utiltypes.KEEP)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
-func (nqc *NovaQueryClient) CurrentUndelegateVersion(zoneid string) *galtypes.QueryCurrentUndelegateVersionResponse {
+
+func (nqc *NovaQueryClient) CurrentUndelegateVersion(zoneid string) (*galtypes.QueryCurrentUndelegateVersionResponse, error) {
 	c := galtypes.NewQueryClient(nqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.UndelegateCurrentVersion(ctx, &galtypes.QueryCurrentUndelegateVersion{ZoneId: zoneid})
-	utils.CheckErr(err, "", utiltypes.KEEP)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
-func (nqc *NovaQueryClient) CurrentWithdrawVersion(zoneid string) *galtypes.QueryCurrentWithdrawVersionResponse {
+
+func (nqc *NovaQueryClient) CurrentWithdrawVersion(zoneid string) (*galtypes.QueryCurrentWithdrawVersionResponse, error) {
 	c := galtypes.NewQueryClient(nqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.WithdrawCurrentVersion(ctx, &galtypes.QueryCurrentWithdrawVersion{ZoneId: zoneid})
-	utils.CheckErr(err, "", utiltypes.KEEP)
-	return r
-
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
-func (nqc *NovaQueryClient) CurrentAutoStakingVersion(zoneid string) *icatypes.QueryCurrentAutoStakingVersionResponse {
+
+func (nqc *NovaQueryClient) CurrentAutoStakingVersion(zoneid string) (*icatypes.QueryCurrentAutoStakingVersionResponse, error) {
 	c := icatypes.NewQueryClient(nqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.AutoStakingCurrentVersion(ctx, &icatypes.QueryCurrentAutoStakingVersion{ZoneId: zoneid})
-	utils.CheckErr(err, "", utiltypes.KEEP)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }

@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
@@ -15,6 +14,14 @@ import (
 	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/Carina-labs/HAL9000/utils"
 	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
+)
+
+const (
+	ctxTimeout = time.Second * 10
+)
+
+var (
+	_ types.BaseQuerier = &CosmosQueryClient{}
 )
 
 type CosmosQueryClient struct {
@@ -30,99 +37,119 @@ func NewCosmosQueryClient(grpcAddr string) *CosmosQueryClient {
 	return &CosmosQueryClient{conn}
 }
 
-var (
-	_ types.BaseQuerier = &CosmosQueryClient{}
-)
-
-const (
-	ctxTimeout = time.Second * 5
-)
-
 // ######################### Tendermint #########################
 
-func (cqc *CosmosQueryClient) GetNodeRes() *tendermintv1beta1.GetNodeInfoResponse {
+func (cqc *CosmosQueryClient) GetNodeRes() (*tendermintv1beta1.GetNodeInfoResponse, error) {
 	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.GetNodeInfo(ctx, &tendermintv1beta1.GetNodeInfoRequest{})
-	utils.CheckErr(err, "Can't get Node info", utiltypes.KEEP)
+	if err != nil {
+		return nil, err
+	}
 
-	return r
+	return r, nil
 }
 
-func (cqc *CosmosQueryClient) GetLatestBlock() *tendermintv1beta1.GetLatestBlockResponse {
+func (cqc *CosmosQueryClient) GetLatestBlock() (*tendermintv1beta1.GetLatestBlockResponse, error) {
 	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.GetLatestBlock(ctx, &tendermintv1beta1.GetLatestBlockRequest{})
-	utils.CheckErr(err, "", 1)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
-func (cqc *CosmosQueryClient) GetBlockByHeight(height int64) *tendermintv1beta1.GetBlockByHeightResponse {
+func (cqc *CosmosQueryClient) GetBlockByHeight(height int64) (*tendermintv1beta1.GetBlockByHeightResponse, error) {
 	c := tendermintv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.GetBlockByHeight(ctx, &tendermintv1beta1.GetBlockByHeightRequest{Height: height})
-	utils.CheckErr(err, "", 1)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 // ######################### Bank #########################
 
-func (cqc *CosmosQueryClient) GetBalance(addr string, denom string) *bankv1beta1.QueryBalanceResponse {
+func (cqc *CosmosQueryClient) GetBalance(addr string, denom string) (*bankv1beta1.QueryBalanceResponse, error) {
 	c := bankv1beta1.NewQueryClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.Balance(ctx, &bankv1beta1.QueryBalanceRequest{Address: addr, Denom: denom})
-	utils.CheckErr(err, "", 1)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 // ######################### Staking #########################
 
-func (cqc *CosmosQueryClient) GetValInfo(valAddr string) *stakingv1beta1.QueryValidatorResponse {
+func (cqc *CosmosQueryClient) GetValInfo(valAddr string) (*stakingv1beta1.QueryValidatorResponse, error) {
 	c := stakingv1beta1.NewQueryClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.Validator(ctx, &stakingv1beta1.QueryValidatorRequest{ValidatorAddr: valAddr})
-	utils.CheckErr(err, fmt.Sprintf("Can't get %s info", valAddr), utiltypes.KEEP)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
-func (cqc *CosmosQueryClient) GetHistoricalInfo(height int64) *stakingv1beta1.QueryHistoricalInfoResponse {
+func (cqc *CosmosQueryClient) GetHistoricalInfo(height int64) (*stakingv1beta1.QueryHistoricalInfoResponse, error) {
 	c := stakingv1beta1.NewQueryClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.HistoricalInfo(ctx, &stakingv1beta1.QueryHistoricalInfoRequest{Height: height})
-	utils.CheckErr(err, "", 1)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func (cqc *CosmosQueryClient) GetDelegation(valAddr, delAddr string) (*stakingv1beta1.QueryDelegationResponse, error) {
+	c := stakingv1beta1.NewQueryClient(cqc)
+	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
+	defer cancel()
+
+	r, err := c.Delegation(ctx, &stakingv1beta1.QueryDelegationRequest{DelegatorAddr: delAddr, ValidatorAddr: valAddr})
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 // ######################### Tx #########################
 
-func (cqc *CosmosQueryClient) GetTx(hash string) *txv1beta1.GetTxResponse {
+func (cqc *CosmosQueryClient) GetTx(hash string) (*txv1beta1.GetTxResponse, error) {
 	c := txv1beta1.NewServiceClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.GetTx(ctx, &txv1beta1.GetTxRequest{Hash: hash})
-	utils.CheckErr(err, "", utiltypes.KEEP)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
-func (cqc *CosmosQueryClient) GetRewards(delegator string, validator string) *distv1beta1.QueryDelegationRewardsResponse {
+func (cqc *CosmosQueryClient) GetRewards(delegator string, validator string) (*distv1beta1.QueryDelegationRewardsResponse, error) {
 	c := distv1beta1.NewQueryClient(cqc)
 	ctx, cancel := context.WithTimeout(context.Background(), ctxTimeout)
 	defer cancel()
 
 	r, err := c.DelegationRewards(ctx, &distv1beta1.QueryDelegationRewardsRequest{DelegatorAddress: delegator, ValidatorAddress: validator})
-	utils.CheckErr(err, "", 1)
-	return r
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }

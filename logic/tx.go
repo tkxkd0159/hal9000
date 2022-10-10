@@ -2,6 +2,7 @@ package logic
 
 import (
 	"reflect"
+	"sync"
 	"time"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
@@ -10,130 +11,150 @@ import (
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
 	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
+	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
 	"github.com/Carina-labs/HAL9000/config"
 )
 
-var (
-	tmpseq = uint64(1)
-)
+func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Msg, opts ...IBCConfirm) {
+	if opts != nil {
+		ibc := opts[0]
+	LOOP1:
+		for {
+			var done bool
+			txok := base.GenTxByBot(b, SeqRecoverDelay, msgs...)
+			switch txok {
+			case base.NEXT:
+				break LOOP1
+			case base.NONE:
+				time.Sleep(time.Second * IBCDelay)
+				done = isIBCDone(ibc.seq, FetchBotSeq(ibc.nq, ibc.action, host.Name))
+			case base.CRITICAL:
+				done = false
+			}
+			if done {
+				botMsgLog(msgs)
+				break
+			}
+		}
+	} else {
+	LOOP2:
+		for {
+			var done bool
+			txok := base.GenTxByBot(b, SeqRecoverDelay, msgs...)
+			switch txok {
+			case base.NEXT:
+				break LOOP2
+			case base.NONE:
+				done = true
+			case base.CRITICAL:
+				done = false
+			}
+			if done {
+				botMsgLog(msgs)
+				break
+			}
+		}
+	}
+}
 
 func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
-		botTickLog("Oracle", int(intv)*i)
+		botTickLog("Oracle", int(intv)*i, b.Interval)
 
-		delegatedToken, height, apphash := OracleInfo(cq, host.Validator)
+		delegatedToken, height, apphash := OracleInfo(cq, host.Validator, host.HostAccount)
 		msg1 := novaTx.MakeMsgUpdateChainState(b.KrInfo.GetAddress(), host.Name, host.Denom, delegatedToken, height, apphash)
 		//msg2, _ := commonTx.MakeMsgSend(botInfo.GetAddress(), "nova1z36nmc2efth7wy3dcnjsw2tu83qn5mxyydu663", []string{"unova"}, []int64{1000})
 		msgs := []sdktypes.Msg{msg1}
-		for {
-			ok := base.GenTxByBot(b, false, msgs...)
-			if ok {
-				break
-			}
-		}
-		botMsgLog(msgs)
+		mustExecTx(b, host, msgs)
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
 	}
 }
 
-func IcaAutoStake(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
+func IcaAutoStake(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
-		botTickLog("Re-Staking", int(intv)*i)
+		botTickLog("Re-Staking", int(intv)*i, b.Interval)
 
-		r := RewardsWithAddr(cq, host.HostAccount, host.Validator)
-		if reflect.DeepEqual(r, sdktypes.DecCoin{}) {
+		hostReward := RewardsWithAddr(cq, host.HostAccount, host.Validator)
+		if reflect.DeepEqual(hostReward, sdktypes.DecCoin{}) {
 			time.Sleep(intv * time.Second)
 			i++
 			continue
 		}
 
-		msg1 := novaTx.MakeMsgIcaAutoStaking(host.Name, b.KrInfo.GetAddress(), r)
+		targetSeq := FetchBotSeq(nq, config.ActAutoStake, host.Name)
+		msg1 := novaTx.MakeMsgIcaAutoStaking(host.Name, b.KrInfo.GetAddress(), hostReward, targetSeq)
 		msgs := []sdktypes.Msg{msg1}
-		for {
-			ok := base.GenTxByBot(b, false, msgs...)
-			if ok {
-				break
-			}
-		}
-		botMsgLog(msgs)
+		mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActAutoStake, targetSeq})
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
 	}
 }
 
-func IcaStake(b *novatypes.Bot, host *config.HostChainInfo) {
+func IcaStake(nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
-		botTickLog("ICA-Staking", int(intv)*i)
+		botTickLog("ICA-Staking", int(intv)*i, b.Interval)
 
-		msg1 := novaTx.MakeMsgDelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
+		targetSeq := FetchBotSeq(nq, config.ActStake, host.Name)
+		msg1 := novaTx.MakeMsgDelegate(host.Name, b.KrInfo.GetAddress(), targetSeq)
 		msgs := []sdktypes.Msg{msg1}
-		for {
-			ok := base.GenTxByBot(b, false, msgs...)
-			if ok {
-				break
-			}
-		}
-		botMsgLog(msgs)
+		mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActStake, targetSeq})
+
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
 	}
 }
 
-func UndelegateAndWithdraw(cq *query.CosmosQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
+func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
 	isStart := true
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
-		botTickLog("Undelegate & Withdraw", int(intv)*i)
+		botTickLog("Undelegate & Withdraw", int(intv)*i, b.Interval)
 
-		blkTS := LatestBlockTS(cq)
-		delegatedToken, height, apphash := OracleInfo(cq, host.Validator)
+		delegatedToken, height, apphash := OracleInfo(cq, host.Validator, host.HostAccount)
 		msg1 := novaTx.MakeMsgUpdateChainState(b.KrInfo.GetAddress(), host.Name, host.Denom, delegatedToken, height, apphash)
 
 		if isStart {
-			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
+			undelSeq := FetchBotSeq(nq, config.ActUndelegate, host.Name)
+			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq)
 			msgs := []sdktypes.Msg{msg1, msg2}
-			for {
-				ok := base.GenTxByBot(b, false, msgs...)
-				if ok {
-					break
-				}
-			}
-			botMsgLog(msgs)
+			mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActUndelegate, undelSeq})
 			b.APIch <- time.Now().UTC()
 			isStart = false
 		} else {
-			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), tmpseq)
-			msgs := []sdktypes.Msg{msg1, msg2}
-			for {
-				ok := base.GenTxByBot(b, false, msgs...)
-				if ok {
-					break
-				}
-			}
-			botMsgLog(msgs)
+			var wg sync.WaitGroup
+			wg.Add(2)
 
-			time.Sleep(60 * time.Second)
+			go func() {
+				wg.Done()
 
-			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, tmpseq)
-			msgs = []sdktypes.Msg{msg3}
-			for {
-				ok := base.GenTxByBot(b, false, msgs...)
-				if ok {
-					break
-				}
-			}
-			botMsgLog(msgs)
+				undelSeq := FetchBotSeq(nq, config.ActUndelegate, host.Name)
+				msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq)
+				msgs := []sdktypes.Msg{msg1, msg2}
+				mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActUndelegate, undelSeq})
+			}()
+
+			go func() {
+				wg.Done()
+
+				wdSeq := FetchBotSeq(nq, config.ActWithdraw, host.Name)
+				blkTS := LatestBlockTS(cq)
+				msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, wdSeq)
+				msgs := []sdktypes.Msg{msg3}
+				mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActWithdraw, wdSeq})
+			}()
+
+			wg.Wait()
 			b.APIch <- time.Now().UTC()
 		}
 

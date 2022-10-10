@@ -15,7 +15,7 @@ run:
 	GOARCH=$(ARCH) go run ./cmd/$(TARGET) $(ACTION) $(FLAGS)
 
 $(BUILD_TARGETS): go.sum $(BUILD_DIR)/
-	@echo "--> $@ "
+	@echo " 🛠 $@ "
 	GOARCH=$(ARCH) go $@ -mod=readonly $(BUILD_ARGS) ./cmd/...
 
 # make BUILD_DIR=./bin
@@ -38,7 +38,7 @@ tester: go.sum $(BUILD_DIR)/
 .PHONY: lint
 
 lint:
-	@echo "--> Running linter"
+	@echo " 👻 Running linter"
 	golangci-lint run --out-format=tab
 
 loc:

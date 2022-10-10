@@ -60,5 +60,6 @@ make run ACTION=withdraw FLAGS="-name=<keyname> -host=gaia -ch=<ch_id> -interval
 
 # Run bot (prod)
 ./out/hal <action> [flags]  # use --help to show usages
+                            # e.g. ./out/hal oracle -display -host=gaia -interval=60 -api=127.0.0.1:3334 -logloc=logs/oracle
 
 ```

@@ -41,8 +41,8 @@ func main() {
 
 	nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
 	defer utils.CloseGrpc(nq.ClientConn)
-	tmp := logic.FetchBotSeq(nq, cfg.ActWithdraw, "gaia")
-	fmt.Println(tmp, tmp[cfg.ActWithdraw], tmp[cfg.ActUndelegate])
+	tmpseq := logic.FetchBotSeq(nq, cfg.ActWithdraw, "gaia")
+	fmt.Println(tmpseq)
 
 	//cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
 	//defer utils.CloseGrpc(cq.ClientConn)

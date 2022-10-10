@@ -11,11 +11,11 @@ type NovaQuerier interface {
 }
 
 type galQuerier interface {
-	CurrentDelegateVersion(zoneid string) *galtypes.QueryCurrentDelegateVersionResponse
-	CurrentUndelegateVersion(zoneid string) *galtypes.QueryCurrentUndelegateVersionResponse
-	CurrentWithdrawVersion(zoneid string) *galtypes.QueryCurrentWithdrawVersionResponse
+	CurrentDelegateVersion(zoneid string) (*galtypes.QueryCurrentDelegateVersionResponse, error)
+	CurrentUndelegateVersion(zoneid string) (*galtypes.QueryCurrentUndelegateVersionResponse, error)
+	CurrentWithdrawVersion(zoneid string) (*galtypes.QueryCurrentWithdrawVersionResponse, error)
 }
 
 type icaQuerier interface {
-	CurrentAutoStakingVersion(zoneid string) *icatypes.QueryCurrentAutoStakingVersionResponse
+	CurrentAutoStakingVersion(zoneid string) (*icatypes.QueryCurrentAutoStakingVersionResponse, error)
 }

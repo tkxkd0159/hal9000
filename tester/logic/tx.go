@@ -10,6 +10,7 @@ import (
 	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
 	novam "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	"github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/logic"
 )
 
 func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amount int64) {
@@ -21,7 +22,7 @@ func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amou
 
 		msg1 := novam.MakeMsgDeposit(b.KrInfo.GetAddress(), b.KrInfo.GetAddress(), host.Name, denom, amount)
 		msgs := []sdktype.Msg{msg1}
-		base.GenTxByBot(b, false, msgs...)
+		base.GenTxByBot(b, logic.SeqRecoverDelay, msgs...)
 		time.Sleep(intv * time.Second)
 		i++
 	}

@@ -3,7 +3,7 @@ package config
 const (
 	ActOracle     = "oracle"
 	ActStake      = "stake"
-	ActRestake    = "restake"
+	ActAutoStake  = "restake"
 	ActWithdraw   = "withdraw"
 	ActUndelegate = "undelegate"
 

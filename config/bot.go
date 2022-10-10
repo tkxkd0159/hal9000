@@ -87,7 +87,7 @@ func InputMnemonic() (mnemonic string) {
 
 func CheckBotType(botType string) string {
 	switch botType {
-	case ActOracle, ActStake, ActRestake, ActWithdraw:
+	case ActOracle, ActStake, ActAutoStake, ActWithdraw:
 		return botType
 	default:
 		fmt.Printf(" 🤮 This bot type is not supported. \n\n")
@@ -102,7 +102,7 @@ func CheckBotType(botType string) string {
 
 func CheckTesterType(botType string) string {
 	switch botType {
-	case ActOracle, ActStake, ActRestake, ActWithdraw:
+	case ActOracle, ActStake, ActAutoStake, ActWithdraw:
 		return botType
 	default:
 		fmt.Printf(" 🤮 This bot type is not supported. \n\n")

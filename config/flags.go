@@ -189,7 +189,7 @@ func SetFlags(action string) (bf BotCommon) {
 		bf = SetOracleFlags(actCmd)
 	case ActStake:
 		bf = SetStakeFlags(actCmd)
-	case ActRestake:
+	case ActAutoStake:
 		bf = SetRestakeFlags(actCmd)
 	case ActWithdraw:
 		bf = SetWithdrawFlags(actCmd)

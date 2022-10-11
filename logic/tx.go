@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"log"
+	"os"
 	"reflect"
 	"sync"
 	"time"
@@ -21,7 +23,8 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 	LOOP1:
 		for {
 			var done bool
-			switch base.GenTxByBot(b, msgs...) {
+			txErr := base.GenTxByBot(b, msgs...)
+			switch txErr {
 			case base.NEXT:
 				break LOOP1
 			case base.NONE:
@@ -30,9 +33,14 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 			case base.CRITICAL:
 				done = false
 			}
+
 			if done {
 				botMsgLog(msgs)
 				break
+			} else if txErr == base.NONE {
+				// TODO: Need to implement a system that can resolve this issue more effectively than simply showing the log
+				log.Printf(" 🚫 Caution : IBC Ack did not arrive normally during the set ibc timeout period ❗\n 🚫 Check the relayer status manually right now ❗\n️")
+				os.Exit(1)
 			}
 		}
 	} else {
@@ -113,7 +121,6 @@ func IcaStake(nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChai
 }
 
 func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChainInfo) {
-	isStart := true
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {
@@ -122,38 +129,30 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClien
 		delegatedToken, height, apphash := OracleInfo(cq, host.Validator, host.HostAccount)
 		msg1 := novaTx.MakeMsgUpdateChainState(b.KrInfo.GetAddress(), host.Name, host.Denom, delegatedToken, height, apphash)
 
-		if isStart {
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+			wg.Done()
+
 			undelSeq := FetchBotSeq(nq, config.ActUndelegate, host.Name)
 			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActUndelegate, undelSeq})
-			b.APIch <- time.Now().UTC()
-			isStart = false
-		} else {
-			var wg sync.WaitGroup
-			wg.Add(2)
+		}()
 
-			go func() {
-				wg.Done()
+		go func() {
+			wg.Done()
 
-				undelSeq := FetchBotSeq(nq, config.ActUndelegate, host.Name)
-				msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq)
-				msgs := []sdktypes.Msg{msg1, msg2}
-				mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActUndelegate, undelSeq})
-			}()
+			wdSeq := FetchBotSeq(nq, config.ActWithdraw, host.Name)
+			blkTS := LatestBlockTS(cq)
+			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, wdSeq)
+			msgs := []sdktypes.Msg{msg3}
+			mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActWithdraw, wdSeq})
+		}()
 
-			go func() {
-				wg.Done()
+		wg.Wait()
 
-				wdSeq := FetchBotSeq(nq, config.ActWithdraw, host.Name)
-				blkTS := LatestBlockTS(cq)
-				msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, wdSeq)
-				msgs := []sdktypes.Msg{msg3}
-				mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActWithdraw, wdSeq})
-			}()
-
-			wg.Wait()
-		}
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++

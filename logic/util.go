@@ -10,7 +10,7 @@ import (
 )
 
 func botTickLog(botType string, elapsedSecs int, period int) {
-	log.Printf("🔁 %s Bot is ongoing for %d secs (run every %d secs) 🔁\n\n", botType, elapsedSecs, period)
+	log.Printf("\n\n 🔁 %s Bot is ongoing for %d secs (run every %d secs) 🔁 \n\n", botType, elapsedSecs, period)
 }
 
 func botMsgLog(msgs []sdktypes.Msg) {

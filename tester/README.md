@@ -43,7 +43,7 @@ novad tx gal claim gaia $nclient
 # 5. Delegate ibc asset on host chain by bot
 
 # 6. Undelegate asset from nova's validator on specific zone (enter the ibc undelegation queue)
-novad tx gal pending-undelegate gaia $nclient $nclient 1000snuatom
+novad tx gal pending-undelegate gaia $nclient $nclient 10000000000000snuatom
 
 # 7. Undelegate ibc asset on host chain by bot
 # 8. Withdraw ibc asset on host chain by bot (ibc-transfer from host chain to Nova)

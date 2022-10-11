@@ -6,7 +6,7 @@ import (
 
 const (
 	ReQueryDelay = time.Second * 1
-	IBCDelay     = time.Second * 30
+	IBCDelay     = time.Second * 30 // This value must be set higher than the ibc timeout.
 )
 
 const (

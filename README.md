@@ -1,6 +1,6 @@
 ![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/build.yml/badge.svg)
 ![golangci-lint](https://github.com/Carina-labs/HAL9000/actions/workflows/lint.yml/badge.svg)
-![LoC](https://img.shields.io/badge/line%20of%20codes-2721-informational)
+![LoC](https://img.shields.io/badge/line%20of%20codes-3094-informational)
 
 <!-- TOC -->
 * [HAL9000](#hal9000)
@@ -10,7 +10,7 @@
 <!-- TOC -->
 
 # HAL9000
-The world's most complete oracle feeder
+
 ```bash
 GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@<tag>
 ```

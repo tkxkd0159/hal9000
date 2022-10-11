@@ -21,12 +21,11 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 	LOOP1:
 		for {
 			var done bool
-			txok := base.GenTxByBot(b, SeqRecoverDelay, msgs...)
-			switch txok {
+			switch base.GenTxByBot(b, msgs...) {
 			case base.NEXT:
 				break LOOP1
 			case base.NONE:
-				time.Sleep(time.Second * IBCDelay)
+				time.Sleep(IBCDelay)
 				done = isIBCDone(ibc.seq, FetchBotSeq(ibc.nq, ibc.action, host.Name))
 			case base.CRITICAL:
 				done = false
@@ -40,8 +39,7 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 	LOOP2:
 		for {
 			var done bool
-			txok := base.GenTxByBot(b, SeqRecoverDelay, msgs...)
-			switch txok {
+			switch base.GenTxByBot(b, msgs...) {
 			case base.NEXT:
 				break LOOP2
 			case base.NONE:
@@ -155,9 +153,8 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClien
 			}()
 
 			wg.Wait()
-			b.APIch <- time.Now().UTC()
 		}
-
+		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++
 	}

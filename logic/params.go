@@ -5,9 +5,8 @@ import (
 )
 
 const (
-	ReQueryDelay    = time.Duration(1)
-	SeqRecoverDelay = time.Duration(4)
-	IBCDelay        = time.Duration(30)
+	ReQueryDelay = time.Second * 1
+	IBCDelay     = time.Second * 30
 )
 
 const (

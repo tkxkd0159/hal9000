@@ -117,7 +117,7 @@ LOOP:
 				utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 			}
 		case config.ActUndelegate:
-			res, err := nq.CurrentWithdrawVersion(zoneid)
+			res, err := nq.CurrentUndelegateVersion(zoneid)
 			if err == nil {
 				seq = res.GetVersion()
 				break LOOP
@@ -125,7 +125,7 @@ LOOP:
 				utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 			}
 		case config.ActWithdraw:
-			res, err := nq.CurrentUndelegateVersion(zoneid)
+			res, err := nq.CurrentWithdrawVersion(zoneid)
 			if err == nil {
 				seq = res.GetVersion()
 				break LOOP

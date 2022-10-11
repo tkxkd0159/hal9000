@@ -25,6 +25,11 @@ const (
 	CRITICAL
 )
 
+const (
+	SeqRecoverDelay    = time.Second * 4
+	NormalTxRetryDelay = time.Second
+)
+
 var (
 	wm sync.Mutex
 )
@@ -34,11 +39,11 @@ var (
 // -> If the transaction creation fails due to sequence mismatch, the transaction is regenerated again after the set recovery time.
 // 2. Sign the generated transaction with the keyring's account
 // 3. Broadcast the tx to the Tendermint node using gPRC
-func GenTxByBot(b *basetypes.Bot, recyIntv time.Duration, msgs ...sdktypes.Msg) (ok TxErr) {
+func GenTxByBot(b *basetypes.Bot, msgs ...sdktypes.Msg) (e TxErr) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println(" ☠️ Get panic while generating tx ->", err)
-			ok = CRITICAL
+			e = CRITICAL
 		}
 	}()
 
@@ -57,8 +62,9 @@ TXLOOP:
 		case NEXT:
 			return NEXT
 		case NORMAL:
+			time.Sleep(NormalTxRetryDelay)
 		case SEQMISMATCH:
-			time.Sleep(time.Second * recyIntv)
+			time.Sleep(SeqRecoverDelay)
 		}
 	}
 

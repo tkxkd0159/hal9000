@@ -4,7 +4,7 @@
 
 <!-- TOC -->
 * [HAL9000](#hal9000)
-  * [Bot types](#bot-types)
+  * [Bot types](#bot-action-types)
   * [Event](#event)
 * [Run the HAL9000](#run-the-hal9000)
 <!-- TOC -->
@@ -45,21 +45,24 @@ curl "localhost:26657/tx_search?query=\"message.sender='cosmos1...'\"&prove=true
 
 
 # Run the HAL9000
-```bash
-# Set keyring if you need
+## 1. Set keyring if you need
+```shell
 make run FLAGS="-display -new -name=<keyname>"
-
-# Build all bots
+```
+## 2. Make `.secret.yml` to pipe keyring password
+```yaml
+pw: <your_keyring_password>
+```
+## 3. Build all bots & Run
+```shell
 make all [ARCH=<arm64|amd64>] # if you don't set ARCH, it follows GOARCH
-
-# Run bot without build (test)
+./out/hal <action> [flags]  # use --help to show usages
+                            # e.g. ./out/hal oracle -display -host=gaia -interval=60 -api=127.0.0.1:3334 -logloc=logs/oracle
+```
+## Extra) Run bot without build (Do not use for prod)
+```shell
 make run ACTION=oracle FLAGS="-name=<keyname> -host=gaia -interval=900 -api=127.0.0.1:3334 -logloc=logs/oracle -display"
 make run ACTION=stake FLAGS="-name=<keyname> -host=gaia -interval=600 -api=127.0.0.1:3335 -logloc=logs/stake -display"
 make run ACTION=restake FLAGS="-name=<keyname> -host=gaia -interval=21600 -api=127.0.0.1:3336 -logloc=logs/restake -display"
 make run ACTION=withdraw FLAGS="-name=<keyname> -host=gaia -ch=<ch_id> -interval=1814400 -api=127.0.0.1:3337 -logloc=logs/withdraw -display"
-
-# Run bot (prod)
-./out/hal <action> [flags]  # use --help to show usages
-                            # e.g. ./out/hal oracle -display -host=gaia -interval=60 -api=127.0.0.1:3334 -logloc=logs/oracle
-
 ```

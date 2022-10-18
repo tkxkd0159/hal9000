@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/Carina-labs/nova v0.6.3
 	github.com/cosmos/cosmos-sdk v0.45.8
-	github.com/cosmos/ibc-go/v3 v3.3.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/prometheus/client_golang v1.13.0
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
@@ -36,6 +36,7 @@ require (
 	github.com/cosmos/gogoproto v1.4.1 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.1 // indirect
+	github.com/cosmos/ibc-go/v3 v3.3.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/cosmos/ledger-go v0.9.2 // indirect
 	github.com/creachadair/taskgroup v0.3.2 // indirect
@@ -93,7 +94,6 @@ require (
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.13.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect

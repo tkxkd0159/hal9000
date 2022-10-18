@@ -9,13 +9,13 @@ import (
 	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
-type chkHandler struct{}
+type ChkHandler struct{}
 
-func NewChkHandler() *chkHandler {
-	return &chkHandler{}
+func NewChkHandler() *ChkHandler {
+	return &ChkHandler{}
 }
 
-func (ch *chkHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (ch *ChkHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/check/" {
 		log.Println("You can check commit time")
 	} else if req.URL.Path == "/check/commit" {

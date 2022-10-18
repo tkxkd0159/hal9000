@@ -2,11 +2,14 @@ package logic
 
 import (
 	"fmt"
+
 	"log"
 	"time"
 
 	tmtypes "github.com/Carina-labs/nova/api/tendermint/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	nquery "github.com/Carina-labs/HAL9000/client/nova/query"
@@ -48,7 +51,15 @@ func OracleInfo(cq *query.CosmosQueryClient, validatorAddr, delegatorAddr string
 			delegatedToken = res.GetDelegationResponse().GetBalance().GetAmount()
 			break
 		} else {
-			utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
+			if err.Error() == status.Errorf(
+				codes.NotFound,
+				"delegation with delegator %s not found for validator %s",
+				delegatorAddr, validatorAddr).Error() {
+				delegatedToken = "0"
+				break
+			} else {
+				utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
+			}
 		}
 		time.Sleep(ReQueryDelay)
 	}

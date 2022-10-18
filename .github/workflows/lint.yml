@@ -15,18 +15,14 @@ env:
 jobs:
   golangci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [ amd64 ]
-        os: [ darwin, linux, windows ]
-    name: ${{ matrix.arch }} for ${{ matrix.os }}
+    name: golangci-lint start
     steps:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
         env:
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }}
+          GOOS: linux
+          GOARCH: amd64
           GOPRIVATE: github.com/Carina-labs
       - uses: actions/checkout@v3
       - name: Set git config to pull private repo
@@ -42,5 +38,5 @@ jobs:
       - uses: golangci/golangci-lint-action@v3
         with:
           version: v1.46.2
-          args: --timeout=3m --issues-exit-code=0 ./...
+          args: --timeout=5m ./...
         if: env.GIT_DIFF

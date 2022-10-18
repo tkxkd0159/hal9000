@@ -59,10 +59,19 @@ make all [ARCH=<arm64|amd64>] # if you don't set ARCH, it follows GOARCH
 ./out/hal <action> [flags]  # use --help to show usages
                             # e.g. ./out/hal oracle -display -host=gaia -interval=60 -api=127.0.0.1:3334 -logloc=logs/oracle
 ```
-## Extra) Run bot without build (Do not use for prod)
+## Appx. 1) Run bot without build (Do not use for prod)
 ```shell
 make run ACTION=oracle FLAGS="-name=<keyname> -host=gaia -interval=900 -api=127.0.0.1:3334 -logloc=logs/oracle -display"
 make run ACTION=stake FLAGS="-name=<keyname> -host=gaia -interval=600 -api=127.0.0.1:3335 -logloc=logs/stake -display"
 make run ACTION=restake FLAGS="-name=<keyname> -host=gaia -interval=21600 -api=127.0.0.1:3336 -logloc=logs/restake -display"
 make run ACTION=withdraw FLAGS="-name=<keyname> -host=gaia -ch=<ch_id> -interval=1814400 -api=127.0.0.1:3337 -logloc=logs/withdraw -display"
+```
+
+## Appx. 2) Run as container
+```shell
+# Set keyring (only need when start first)
+docker run --rm -it -v halscrt:/workspace/keyring a41ventures/hal:0.1.1 <action> -display -new
+
+# Run HAL9000
+docker run --rm -it -v halscrt:/workspace/keyring a41ventures/hal:0.1.1 <action> [flags]
 ```

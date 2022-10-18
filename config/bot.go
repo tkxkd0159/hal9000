@@ -20,11 +20,11 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
-func SetInitialDir(krDir string, logDir string) (string, string) {
+func SetInitialDir(keyname string, logSubdir string) (string, string) {
 	cwd, err := os.Getwd()
 	utils.CheckErr(err, "cannot get working directory", 0)
 
-	krDir = path.Join(cwd, "/keyring", krDir)
+	krDir := path.Join(cwd, "/keyring", keyname)
 	err = os.MkdirAll(krDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** bot directory already exist **")
@@ -32,7 +32,7 @@ func SetInitialDir(krDir string, logDir string) (string, string) {
 		log.Fatal(err)
 	}
 
-	logDir = path.Join(cwd, logDir)
+	logDir := path.Join(cwd, logSubdir)
 	err = os.MkdirAll(logDir, 0740)
 	if os.IsExist(err) {
 		log.Println("** log directory already exist **")

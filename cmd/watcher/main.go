@@ -21,6 +21,7 @@ const (
 	NumWorker = 2
 )
 
+// Deprecated: This bot does not use anymore because of the change of nova implementation
 func main() {
 	isTest := flag.Bool("test", false, "Decide whether it's test with localnet")
 	cfg.LoadChainInfo(*isTest)

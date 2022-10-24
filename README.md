@@ -69,6 +69,9 @@ make run ACTION=withdraw FLAGS="-name=<keyname> -host=gaia -ch=<ch_id> -interval
 
 ## Appx. 2) Run as container
 ```shell
+# Build docker image locally (optional)
+docker build --build-arg arch=<os_arch> --build-arg GHTOKEN=<SCRT> -t a41ventures/hal:<tags> . 
+
 # Set keyring (only need when start first)
 docker run --rm -it -v halscrt:/workspace/keyring a41ventures/hal:0.1.1 <action> -display -new
 

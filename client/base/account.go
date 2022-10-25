@@ -26,7 +26,7 @@ func MakeClientWithNewAcc(ctx client.Context, keyname string, mnemonic string, b
 
 func createAcc(ctx client.Context, keyname string, mnemonic string, bip44path string, algo keyring.SignatureAlgo) keyring.Info {
 	info, err := ctx.Keyring.NewAccount(keyname, mnemonic, "", bip44path, algo)
-	utils.CheckErr(err, "Cannot create account with those arguments. Check it!", ut.EXIT)
+	utils.CheckErr(err, " * cannot create account with those arguments. Check it!", ut.EXIT)
 	return info
 }
 

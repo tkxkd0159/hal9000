@@ -23,8 +23,11 @@ func main() {
 	bf := flags.GetBase()
 	krDir, logDir := cfg.SetInitialDir(bf.Kn, bf.LogLocation)
 	fdLog, fdErr, fdErrExt := cfg.SetAllLogger(logDir, cfg.StdLogFile, cfg.LocalErrlogFile, cfg.ExtRedirectErrlogFile, bf.Disp)
-	defer utils.CloseFds(fdLog, fdErr, fdErrExt)
-	botctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, "bot_addr")
+	if !bf.Disp {
+		defer utils.CloseFds(fdLog, fdErr, fdErrExt)
+	}
+
+	botctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, cfg.NovaBotAddrKey)
 	log.SetOutput(botctx.Output)
 
 	wg := new(sync.WaitGroup)

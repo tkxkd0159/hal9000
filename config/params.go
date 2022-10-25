@@ -24,3 +24,8 @@ const (
 	LocalErrlogFile       = "nova_err.txt"
 	ExtRedirectErrlogFile = "other_err.txt"
 )
+
+// related to Viper
+const (
+	NovaBotAddrKey = "bot_addr"
+)

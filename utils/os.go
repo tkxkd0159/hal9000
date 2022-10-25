@@ -25,8 +25,7 @@ func CheckErr(err error, moreMsg string, action types.Code) {
 	switch action {
 	case types.EXIT:
 		if err != nil {
-			panic(fmt.Sprintf("%s: \n %+v", moreMsg, err))
-
+			panic(fmt.Sprintf("%s: \n %+v\n", moreMsg, err))
 		}
 	case types.KEEP:
 		if err != nil {
@@ -39,7 +38,8 @@ func LogErrWithFd(fd *os.File, err error, msg string, action types.Code) {
 	switch action {
 	case types.EXIT:
 		if err != nil {
-			panic(fmt.Sprintf("\n %s: \n %v", msg, err))
+			fmt.Fprintf(fd, "\n %s: \n %v", msg, err)
+			panic(err)
 		}
 	case types.KEEP:
 		if err != nil {

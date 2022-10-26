@@ -15,12 +15,12 @@ RUN cp /lib/libwasmvm_muslc.${arch}.a /lib/libwasmvm_muslc.a
 RUN LINK_STATICALLY=true make build
 
 FROM alpine:3.16
-RUN apk add --update --no-cache  ca-certificates libstdc++
+RUN apk add --update --no-cache  ca-certificates libstdc++ yq
 
 ENV TARGET=hal
 ENV PATH="${PATH}:/workspace"
 WORKDIR /workspace
 COPY --from=builder /workspace/build/$TARGET ./$TARGET
-COPY .chaininfo.yml .secret.yml ./
-ENTRYPOINT ["hal"]
-CMD ["--help"]
+# comment out below if you need config dynamic linking
+COPY .chaininfo.yml .secret.yml ./config/
+CMD ["hal", "--help"]

@@ -73,8 +73,8 @@ make run ACTION=withdraw FLAGS="-name=<keyname> -host=gaia -ch=<ch_id> -interval
 docker build --build-arg arch=<os_arch> --build-arg GHTOKEN=<SCRT> -t a41ventures/hal:<tags> . 
 
 # Set keyring (only need when start first)
-docker run --rm -it -v halscrt:/workspace/keyring a41ventures/hal:0.1.1 <action> -display -new
+docker run --rm -it -v halscrt:/workspace/keyring a41ventures/hal:<tags> sh -c "hal <action> -display -new"
 
 # Run HAL9000
-docker run --rm -d -p <host_port>:<bot_monitoring_port> -v halscrt:/workspace/keyring -v hallog:/workspace/logs a41ventures/hal:0.1.1 <action> [flags]
+docker run --rm -d -p <host_port>:<bot_monitoring_port> -v halscrt:/workspace/keyring -v hallog:/workspace/logs a41ventures/hal:<tags> sh -c "hal <action> [flags]"
 ```

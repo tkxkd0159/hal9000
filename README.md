@@ -12,7 +12,7 @@
 # HAL9000
 
 ```bash
-GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@<tag>
+GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@<tag> # or get env -w GOPRIVATE=github.com/Carina-labs
 ```
 
 ## Bot action types

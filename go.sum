@@ -70,8 +70,8 @@ github.com/BurntSushi/toml v0.4.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/Carina-labs/ibc-go/v3 v3.0.0-nova-alpha h1:aFAE7VqenIU/pXpq4SkLeKEIuPmseVFHuiTEI0iX7w8=
 github.com/Carina-labs/ibc-go/v3 v3.0.0-nova-alpha/go.mod h1:Mb+1NXiPOLd+CPFlOC6BKeAUaxXlhuWenMmRiUiSmwY=
-github.com/Carina-labs/nova v0.6.5-rc1 h1:K7Y+LDfy/TpudPkjNWp7FYUpdI68x+c7aBqwKeyUEyc=
-github.com/Carina-labs/nova v0.6.5-rc1/go.mod h1:D1dSCxQ0W9JaszpciN1yuu0tQIWm7FE0xw0X/u9yDaU=
+github.com/Carina-labs/nova v0.6.5 h1:spkjyiSJhktZAX8N4dvgTONrfqSZc107faprIX9hFRo=
+github.com/Carina-labs/nova v0.6.5/go.mod h1:qidhS21WMCtfn8cp6hauhENng4/9FH4gYkXQO/8RQTM=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d h1:nalkkPQcITbvhmL4+C4cKA87NW0tfm3Kl9VXRoPywFg=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d/go.mod h1:URdX5+vg25ts3aCh8H5IFZybJYKWhJHYMTnf+ULtoC4=
 github.com/CosmWasm/wasmd v0.29.0-rc1 h1:5lvbzKkstmYFVBv1NomQqUAkun7iz6M4sE3AUBHC9Iw=

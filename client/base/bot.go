@@ -23,6 +23,7 @@ const (
 	NORMAL
 	SEQMISMATCH
 	CRITICAL
+	REPEAT
 )
 
 const (
@@ -55,7 +56,7 @@ func GenTxByBot(b *basetypes.Bot, msgs ...sdktypes.Msg) (e TxErr) {
 TXLOOP:
 	for {
 		txbytes, err = GenerateTx(b.Ctx, b.Txf, msgs...)
-		status := handleSeqErr(b.ErrLogger, err)
+		status := handleTxErr(b.ErrLogger, err)
 		switch status {
 		case NONE:
 			break TXLOOP
@@ -65,6 +66,8 @@ TXLOOP:
 			time.Sleep(NormalTxRetryDelay)
 		case SEQMISMATCH:
 			time.Sleep(SeqRecoverDelay)
+		case REPEAT:
+			return REPEAT
 		}
 	}
 
@@ -82,7 +85,7 @@ TXLOOP:
 	return NONE
 }
 
-func handleSeqErr(f *os.File, e error) TxErr {
+func handleTxErr(f *os.File, e error) TxErr {
 	if e != nil {
 		if strings.Contains(e.Error(), "account sequence mismatch") {
 			utils.LogErrWithFd(f, e, " ❌ ", ut.KEEP)
@@ -99,6 +102,9 @@ func handleSeqErr(f *os.File, e error) TxErr {
 		} else if strings.Contains(e.Error(), "cannot withdraw funds") {
 			utils.LogErrWithFd(f, e, " ❌ There is no asset to withdraw on this host zone  ➡️ go to next batch\n", ut.KEEP)
 			return NEXT
+		} else if strings.Contains(e.Error(), "current block height must be higher than the previous block height") {
+			utils.LogErrWithFd(f, e, " ❌ oracle info was outdated due to the oracle bot's update. It will regenerate tx\n", ut.KEEP)
+			return REPEAT
 		}
 
 		utils.LogErrWithFd(f, e, " ❌ something went wrong while generate tx", ut.KEEP)

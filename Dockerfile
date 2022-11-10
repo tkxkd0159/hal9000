@@ -1,10 +1,16 @@
 FROM golang:1.19-alpine AS builder
+
+FROM builder AS builder-amd64
 ARG arch=x86_64
+
+FROM builder AS builder-arm64
+ARG arch=aarch64
+
+FROM builder-$TARGETARCH AS release
 RUN set -eux; apk add --no-cache ca-certificates build-base;
 RUN apk add git
 ARG GHTOKEN
 RUN git config --global url."https://$GHTOKEN@github.com/".insteadOf "https://github.com/" && go env -w GOPRIVATE=github.com/Carina-labs
-
 WORKDIR /workspace
 COPY . .
 ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.1.1/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
@@ -16,11 +22,10 @@ RUN LINK_STATICALLY=true make build
 
 FROM alpine:3.16
 RUN apk add --update --no-cache  ca-certificates libstdc++ yq
-
 ENV TARGET=hal
 ENV PATH="${PATH}:/workspace"
 WORKDIR /workspace
-COPY --from=builder /workspace/build/$TARGET ./$TARGET
+COPY --from=release /workspace/build/$TARGET ./$TARGET
 # comment out below if you need config dynamic linking
 COPY .chaininfo.yml .secret.yml ./config/
 CMD ["hal", "--help"]

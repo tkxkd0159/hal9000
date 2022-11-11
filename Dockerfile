@@ -27,5 +27,5 @@ ENV PATH="${PATH}:/workspace"
 WORKDIR /workspace
 COPY --from=release /workspace/build/$TARGET ./$TARGET
 # comment out below if you need config dynamic linking
-COPY .chaininfo.yml .secret.yml ./config/
+COPY .chaininfo.yaml .secret.yaml ./config/
 CMD ["hal", "--help"]

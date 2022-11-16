@@ -105,6 +105,9 @@ func handleTxErr(f *os.File, e error) TxErr {
 		} else if strings.Contains(e.Error(), "current block height must be higher than the previous block height") {
 			utils.LogErrWithFd(f, e, " ❌ oracle info was outdated due to the oracle bot's update. It will regenerate tx\n", ut.KEEP)
 			return REPEAT
+		} else if strings.Contains(e.Error(), "invalid ica version") {
+			utils.LogErrWithFd(f, e, " ❌ ica sequence was not updated yet when the bot queried\n", ut.KEEP)
+			return REPEAT
 		}
 
 		utils.LogErrWithFd(f, e, " ❌ something went wrong while generate tx", ut.KEEP)

@@ -51,7 +51,11 @@ func (s Server) On(addr string) {
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/check/", NewChkHandler())
-	err := http.ListenAndServe(addr, nil)
+	srv := &http.Server{
+		Addr:              addr,
+		ReadHeaderTimeout: time.Second * 3,
+	}
+	err := srv.ListenAndServe()
 	utils.CheckErr(err, "cannot open http server", ut.EXIT)
 }
 

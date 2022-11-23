@@ -44,7 +44,7 @@ func (s *NovaTestSuite) TestCheckAccAddr() {
 		got, err := base.CheckAccAddr(tc.input)
 		assert.Equal(s.T(), tc.expected, got)
 		if got == nil {
-			assert.Errorf(s.T(), err, "cannot covert target to AccAddress")
+			assert.Errorf(s.T(), err, "cannot convert target to AccAddress")
 		} else {
 			assert.NoError(s.T(), err)
 		}

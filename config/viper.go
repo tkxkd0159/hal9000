@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 
@@ -18,7 +20,8 @@ const (
 )
 
 func setDefaultCfgPath(v ...*viper.Viper) {
-	pl := [2]string{"/workspace/config", "."}
+	home := os.Getenv("HOME")
+	pl := [3]string{filepath.Join(home, "config"), "/workspace/config", "."}
 	for _, p := range pl {
 		if v == nil {
 			viper.AddConfigPath(p)

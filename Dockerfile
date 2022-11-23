@@ -32,8 +32,7 @@ WORKDIR $HOME
 
 RUN sudo apk add --update --no-cache  ca-certificates libstdc++ yq
 ENV TARGET=$USER
-ENV PATH="${PATH}:/workspace"
-WORKDIR /workspace
+ENV PATH="${PATH}:$HOME"
 COPY --from=release /workspace/build/$TARGET ./$TARGET
 # comment out below if you need config dynamic linking
 COPY .chaininfo.yaml .secret.yaml ./config/

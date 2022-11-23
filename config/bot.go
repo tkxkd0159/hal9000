@@ -60,7 +60,7 @@ func SetAllLogger(logDir, stdLogName, errLogName, errRedirectLogName string, isD
 		fdErr, err = os.OpenFile(path.Join(logDir, errLogName), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		utils.CheckErr(err, "cannot open novaerr", 0)
 
-		// 외부 라이브러리에서 fmt.Fprintf(os.stderr)로 처리하는 애들 핸들링
+		// 외부 라이브러리에서 fmt.Fprintf(os.stderr)로 처리하는 애들 핸들링 (redirect stderr)
 		fdErrExt, err = os.OpenFile(path.Join(logDir, errRedirectLogName), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		utils.CheckErr(err, "cannot open otherErr", 0)
 

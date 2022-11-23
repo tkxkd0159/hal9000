@@ -10,23 +10,31 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Carina-labs/HAL9000/client/base"
+	basem "github.com/Carina-labs/HAL9000/client/base/msgs"
 	"github.com/Carina-labs/HAL9000/client/base/query"
 	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
 	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
 	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
 	"github.com/Carina-labs/HAL9000/config"
+	"github.com/Carina-labs/HAL9000/utils"
+	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
 func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Msg, opts ...IBCConfirm) bool {
+	if err := basem.Validate(msgs...); err != nil {
+		utils.LogErrWithFd(b.ErrLogger, err, "[msg]", ut.KEEP)
+		return false
+	}
+
 	if opts != nil {
 		ibc := opts[0]
-	LOOP1:
+	IBCTX:
 		for {
 			var done bool
 			txErr := base.GenTxByBot(b, msgs...)
 			switch txErr {
 			case base.NEXT:
-				break LOOP1
+				break IBCTX
 			case base.NONE:
 				time.Sleep(IBCDelay)
 				done = isIBCDone(ibc.seq, FetchBotSeq(ibc.nq, ibc.action, host.Name))
@@ -46,12 +54,12 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 			}
 		}
 	} else {
-	LOOP2:
+	NORMTX:
 		for {
 			var done bool
 			switch base.GenTxByBot(b, msgs...) {
 			case base.NEXT:
-				break LOOP2
+				break NORMTX
 			case base.NONE:
 				done = true
 			case base.CRITICAL:
@@ -74,11 +82,13 @@ func UpdateChainState(cq *query.CosmosQueryClient, b *novatypes.Bot, host *confi
 	intv := time.Duration(b.Interval)
 	for {
 		botTickLog("Oracle", int(intv)*i, b.Interval)
-
+	ORACLE:
 		delegatedToken, height, apphash := OracleInfo(cq, host.Validator, host.HostAccount)
 		msg1 := novaTx.MakeMsgUpdateChainState(b.KrInfo.GetAddress(), host.Name, host.Denom, delegatedToken, height, apphash)
 		msgs := []sdktypes.Msg{msg1}
-		_ = mustExecTx(b, host, msgs)
+		if ok := mustExecTx(b, host, msgs); !ok {
+			goto ORACLE
+		}
 		b.APIch <- time.Now().UTC()
 		time.Sleep(intv * time.Second)
 		i++

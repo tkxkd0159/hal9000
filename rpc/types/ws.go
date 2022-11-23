@@ -2,10 +2,11 @@ package types
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
-	mrand "math/rand"
+	"math/big"
 	"net"
 	"net/http"
 	"sync"
@@ -268,14 +269,17 @@ func (c *WSClient) reconnect() error {
 	}()
 
 	for {
-		// nolint:gosec // G404: Use of weak random number generator
-		jitter := time.Duration(mrand.Float64() * float64(time.Second)) // 1s == (1e9 ns)
+		randNum, err := rand.Int(rand.Reader, big.NewInt(1<<52))
+		if err != nil {
+			panic(err)
+		}
+		jitter := time.Duration((float64(randNum.Int64()) / (1 << 52)) * float64(time.Second)) // 1s == (1e9 ns)
 		backoffDuration := jitter + ((1 << attempt) * time.Second)
 
 		c.Logger.Info("reconnecting", "attempt", attempt+1, "backoff_duration", backoffDuration)
 		time.Sleep(backoffDuration)
 
-		err := c.dial()
+		err = c.dial()
 		if err != nil {
 			c.Logger.Error("failed to redial", "err", err)
 		} else {

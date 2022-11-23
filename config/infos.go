@@ -67,24 +67,3 @@ func NewChainNetInfo(zone string) (ni *ChainNetInfo) {
 		TmWsRPC: &url.URL{Scheme: "ws", Host: ip + ":" + viper.GetString("net.port.tmrpc"), Path: "/websocket"},
 	}
 }
-
-type BotScrt struct {
-	addr       string
-	passphrase string
-}
-
-func NewBotScrt(zone string, addrTarget string, keyname ...string) (bi BotScrt) {
-	if len(keyname) == 1 {
-		bi.passphrase = GetPassphrase(Sviper)
-	}
-	bi.addr = viper.GetString(fmt.Sprintf("%s.%s", zone, addrTarget))
-	return
-}
-
-func (b BotScrt) Address() string {
-	return b.addr
-}
-
-func (b BotScrt) Passphrase() string {
-	return b.passphrase
-}

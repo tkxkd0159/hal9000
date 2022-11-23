@@ -3,20 +3,10 @@ package config
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path"
 
-	novaapp "github.com/Carina-labs/nova/app"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/spf13/viper"
-
-	"github.com/Carina-labs/HAL9000/client/base"
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
@@ -41,12 +31,6 @@ func SetInitialDir(keyname string, logSubdir string) (string, string) {
 	}
 
 	return krDir, logDir
-}
-
-func GetPassphrase(vp *viper.Viper) string {
-	pw := vp.GetString("pw")
-	pp := fmt.Sprintf("%s\n%s\n", pw, pw)
-	return pp
 }
 
 func SetAllLogger(logDir, stdLogName, errLogName, errRedirectLogName string, isDisp bool) (*os.File, *os.File, *os.File) {
@@ -113,63 +97,4 @@ func CheckTesterType(botType string) string {
 		os.Exit(1)
 	}
 	return ""
-}
-
-func SetupBotBase(f BotCommon, krDir string, ctxOut io.Writer, zone string, target string) (ctx client.Context, botInfo keyring.Info, txf tx.Factory, cni *ChainNetInfo) {
-	flags := f.GetBase()
-	base.SetBechPrefix()
-	LoadChainInfo(flags.IsTest)
-	cni = NewChainNetInfo(zone)
-	BotScrt := NewBotScrt(cni.ChainID, target, flags.Kn)
-
-	if flags.New {
-		SetupBotKey(flags.Kn, krDir, cni, BotScrt)
-		log.Println("🎉 Your keyring has been successfully set.")
-		os.Exit(0)
-	}
-
-	rpipe, wpipe, err := os.Pipe()
-	utils.CheckErr(err, "", 0)
-	os.Stdin = rpipe
-	_, err = wpipe.Write([]byte(BotScrt.Passphrase()))
-	utils.CheckErr(err, "", 0)
-
-	ctx = base.MakeContext(
-		novaapp.ModuleBasics,
-		BotScrt.Address(),
-		cni.TmRPC.String(),
-		cni.ChainID,
-		krDir,
-		keyring.BackendFile,
-		rpipe,
-		ctxOut,
-		false,
-	)
-
-	botInfo = base.LoadClientPubInfo(ctx, flags.Kn)
-	ctx = base.AddMoreFromInfo(ctx)
-	txf = base.MakeTxFactory(ctx, Gas, NovaGasPrice, "", GasWeight)
-	return
-}
-
-func SetupBotKey(keyname, keyloc string, info *ChainNetInfo, bot BotScrt) {
-	ctx := base.MakeContext(
-		novaapp.ModuleBasics,
-		bot.Address(),
-		info.TmRPC.String(),
-		info.ChainID,
-		keyloc,
-		keyring.BackendFile,
-		os.Stdin,
-		os.Stdout,
-		false,
-	)
-
-	_ = base.MakeClientWithNewAcc(
-		ctx,
-		keyname,
-		InputMnemonic(),
-		sdktypes.FullFundraiserPath,
-		hd.Secp256k1,
-	)
 }

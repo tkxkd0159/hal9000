@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Carina-labs/HAL9000/api"
+	"github.com/Carina-labs/HAL9000/client"
 	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
 	cfg "github.com/Carina-labs/HAL9000/config"
 	"github.com/Carina-labs/HAL9000/logic"
@@ -27,7 +28,7 @@ func main() {
 		defer utils.CloseFds(fdLog, fdErr, fdErrExt)
 	}
 
-	botctx, krInfo, txf, cni := cfg.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, cfg.NovaBotAddrKey)
+	botctx, krInfo, txf, cni := client.SetupBotBase(flags, krDir, fdLog, cfg.ControlChain, cfg.NovaBotAddrKey)
 	log.SetOutput(botctx.Output)
 
 	wg := new(sync.WaitGroup)

@@ -21,8 +21,17 @@ RUN cp /lib/libwasmvm_muslc.${arch}.a /lib/libwasmvm_muslc.a
 RUN LINK_STATICALLY=true make build
 
 FROM alpine:3.16
-RUN apk add --update --no-cache  ca-certificates libstdc++ yq
-ENV TARGET=hal
+ARG USER=hal
+ENV HOME /home/$USER
+RUN apk add --update sudo
+RUN adduser -D $USER \
+        && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
+        && chmod 0440 /etc/sudoers.d/$USER
+USER $USER
+WORKDIR $HOME
+
+RUN sudo apk add --update --no-cache  ca-certificates libstdc++ yq
+ENV TARGET=$USER
 ENV PATH="${PATH}:/workspace"
 WORKDIR /workspace
 COPY --from=release /workspace/build/$TARGET ./$TARGET

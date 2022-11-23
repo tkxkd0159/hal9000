@@ -12,6 +12,7 @@ import (
 type HostTransferChanID = string
 
 type Bot struct {
+	Type      string
 	Ctx       client.Context
 	Txf       tx.Factory
 	KrInfo    keyring.Info
@@ -20,6 +21,6 @@ type Bot struct {
 	APIch     chan time.Time
 }
 
-func NewBot(ctx client.Context, txf tx.Factory, kr keyring.Info, interval int, errLogger *os.File, botch chan time.Time) *Bot {
-	return &Bot{ctx, txf, kr, interval, errLogger, botch}
+func NewBot(bottype string, ctx client.Context, txf tx.Factory, kr keyring.Info, interval int, errLogger *os.File, botch chan time.Time) *Bot {
+	return &Bot{bottype, ctx, txf, kr, interval, errLogger, botch}
 }

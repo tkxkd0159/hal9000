@@ -3,8 +3,6 @@ package base
 import (
 	"fmt"
 	"log"
-	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -56,7 +54,7 @@ func GenTxByBot(b *basetypes.Bot, msgs ...sdktypes.Msg) (e TxErr) {
 TXLOOP:
 	for {
 		txbytes, err = GenerateTx(b.Ctx, b.Txf, msgs...)
-		status := handleTxErr(b.ErrLogger, err)
+		status := handleTxErr(b.ErrLogger, err, b.Type)
 		switch status {
 		case NONE:
 			break TXLOOP
@@ -82,36 +80,5 @@ TXLOOP:
 
 	_, err = b.Ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n\n", time.Now())))
 	utils.CheckErr(err, " ❌ cannot write log on output", ut.KEEP)
-	return NONE
-}
-
-func handleTxErr(f *os.File, e error) TxErr {
-	if e != nil {
-		if strings.Contains(e.Error(), "account sequence mismatch") {
-			utils.LogErrWithFd(f, e, " ❌ ", ut.KEEP)
-			return SEQMISMATCH
-		} else if strings.Contains(e.Error(), "cannot change state") {
-			utils.LogErrWithFd(f, e, " ❌ There is no asset to delegate on this host zone  ➡️ go to next batch\n", ut.KEEP)
-			return NEXT
-		} else if strings.Contains(e.Error(), "invalid coins") {
-			utils.LogErrWithFd(f, e, " ❌ There is no reward to autostake on this host zone  ➡️ go to next batch\n", ut.KEEP)
-			return NEXT
-		} else if strings.Contains(e.Error(), "no coins to undelegate") {
-			utils.LogErrWithFd(f, e, " ❌ There is no asset to undelegate on this host zone  ➡️ go to next batch\n", ut.KEEP)
-			return NEXT
-		} else if strings.Contains(e.Error(), "cannot withdraw funds") {
-			utils.LogErrWithFd(f, e, " ❌ There is no asset to withdraw on this host zone  ➡️ go to next batch\n", ut.KEEP)
-			return NEXT
-		} else if strings.Contains(e.Error(), "current block height must be higher than the previous block height") {
-			utils.LogErrWithFd(f, e, " ❌ oracle info was outdated due to the oracle bot's update. It will regenerate tx\n", ut.KEEP)
-			return REPEAT
-		} else if strings.Contains(e.Error(), "invalid ica version") {
-			utils.LogErrWithFd(f, e, " ❌ ica sequence was not updated yet when the bot queried\n", ut.KEEP)
-			return REPEAT
-		}
-
-		utils.LogErrWithFd(f, e, " ❌ something went wrong while generate tx", ut.KEEP)
-		return NORMAL
-	}
 	return NONE
 }

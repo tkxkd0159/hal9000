@@ -8,9 +8,9 @@ import (
 	"github.com/Carina-labs/HAL9000/utils"
 )
 
-func RouteBotAction(botType string, b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.HostChainInfo) {
-	initialBanner(botType)
-	switch botType {
+func RouteBotAction(b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.HostChainInfo) {
+	initialBanner(b.Type)
+	switch b.Type {
 	case config.ActOracle:
 		cq := query.NewCosmosQueryClient(hci.GrpcAddr)
 		defer utils.CloseGrpc(cq.ClientConn)

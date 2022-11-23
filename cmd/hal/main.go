@@ -34,13 +34,13 @@ func main() {
 	wg.Add(NumWorker)
 	botch := make(chan time.Time)
 	go api.OpenMonitoringSrv(wg, botch, flags)
-	bot := basetypes.NewBot(botctx, txf, krInfo, bf.Period, fdErr, botch)
+	bot := basetypes.NewBot(botType, botctx, txf, krInfo, bf.Period, fdErr, botch)
 	hostZone := cfg.NewHostChainInfo(bf.HostChain)
 	hostZone.Set()
-	hostZone.WithIBCInfo(flags, botType)
+	hostZone.WithIBCInfo(flags, bot.Type)
 	go func() {
 		defer wg.Done()
-		logic.RouteBotAction(botType, bot, cni, hostZone)
+		logic.RouteBotAction(bot, cni, hostZone)
 	}()
 
 	wg.Wait()

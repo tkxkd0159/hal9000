@@ -105,4 +105,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-/.secret.yml
+/.secret.y*ml

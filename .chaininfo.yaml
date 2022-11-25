@@ -11,6 +11,8 @@ gaia:
   host_addr: "cosmos1mn52fx79ckzam60qa4ctgt5meyrk09xc6y6j8adqz3wynww7mczqhj6wur"
   client_addr: "cosmos1ma2378jplsnj3chlcgwqfx8p8g92z7dztqzacq"
 net:
+  connection:
+    secure: false  # SSL/TLS on/off
   ip:
     nova: "3.38.200.6"
     gaia: "3.36.104.92"

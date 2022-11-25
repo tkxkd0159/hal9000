@@ -40,7 +40,7 @@ func main() {
 	hostZone.Set()
 	hostZone.WithIBCInfo(flags, botType)
 
-	nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
+	nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)
 	defer utils.CloseGrpc(nq.ClientConn)
 	tmpseq := logic.FetchBotSeq(nq, cfg.ActWithdraw, "gaia")
 	fmt.Println(tmpseq)

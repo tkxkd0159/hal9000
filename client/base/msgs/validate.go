@@ -10,6 +10,6 @@ func Validate(msgs ...sdktypes.Msg) error {
 			return err
 		}
 	}
-	
+
 	return nil
 }

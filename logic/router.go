@@ -10,24 +10,25 @@ import (
 
 func RouteBotAction(b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.HostChainInfo) {
 	initialBanner(b.Type)
+
 	switch b.Type {
 	case config.ActOracle:
-		cq := query.NewCosmosQueryClient(hci.GrpcAddr)
+		cq := query.NewCosmosQueryClient(hci.GrpcAddr, cni.Secure)
 		defer utils.CloseGrpc(cq.ClientConn)
 		UpdateChainState(cq, b, hci)
 	case config.ActStake:
-		nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
+		nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)
 		defer utils.CloseGrpc(nq.ClientConn)
 		IcaStake(nq, b, hci)
 	case config.ActAutoStake:
-		cq := query.NewCosmosQueryClient(hci.GrpcAddr)
-		nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
+		cq := query.NewCosmosQueryClient(hci.GrpcAddr, cni.Secure)
+		nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)
 		defer utils.CloseGrpc(cq.ClientConn)
 		defer utils.CloseGrpc(nq.ClientConn)
 		IcaAutoStake(cq, nq, b, hci)
 	case config.ActWithdraw:
-		cq := query.NewCosmosQueryClient(hci.GrpcAddr)
-		nq := novaq.NewNovaQueryClient(cni.GRPC.Host)
+		cq := query.NewCosmosQueryClient(hci.GrpcAddr, cni.Secure)
+		nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)
 		defer utils.CloseGrpc(cq.ClientConn)
 		defer utils.CloseGrpc(nq.ClientConn)
 		UndelegateAndWithdraw(cq, nq, b, hci)

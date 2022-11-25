@@ -11,6 +11,7 @@ import (
 	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"google.golang.org/grpc"
 
+	"github.com/Carina-labs/HAL9000/client"
 	"github.com/Carina-labs/HAL9000/client/base/types"
 	"github.com/Carina-labs/HAL9000/utils"
 	utiltypes "github.com/Carina-labs/HAL9000/utils/types"
@@ -28,11 +29,8 @@ type CosmosQueryClient struct {
 	*grpc.ClientConn
 }
 
-func NewCosmosQueryClient(grpcAddr string) *CosmosQueryClient {
-	conn, err := grpc.Dial(
-		grpcAddr,
-		grpc.WithInsecure(),
-	)
+func NewCosmosQueryClient(grpcAddr string, secure bool) *CosmosQueryClient {
+	conn, err := client.OpengRPCConn(grpcAddr, secure)
 	utils.CheckErr(err, "cannot create gRPC connection", utiltypes.EXIT)
 	return &CosmosQueryClient{conn}
 }

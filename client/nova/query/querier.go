@@ -8,6 +8,7 @@ import (
 	icatypes "github.com/Carina-labs/nova/x/icacontrol/types"
 	"google.golang.org/grpc"
 
+	"github.com/Carina-labs/HAL9000/client"
 	"github.com/Carina-labs/HAL9000/client/nova/types"
 	"github.com/Carina-labs/HAL9000/utils"
 )
@@ -24,11 +25,8 @@ type NovaQueryClient struct {
 	*grpc.ClientConn
 }
 
-func NewNovaQueryClient(grpcAddr string) *NovaQueryClient {
-	conn, err := grpc.Dial(
-		grpcAddr,
-		grpc.WithInsecure(),
-	)
+func NewNovaQueryClient(grpcAddr string, secure bool) *NovaQueryClient {
+	conn, err := client.OpengRPCConn(grpcAddr, secure)
 	utils.CheckErr(err, "cannot create gRPC connection", 0)
 	return &NovaQueryClient{conn}
 }

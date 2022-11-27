@@ -36,7 +36,7 @@ func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Ms
 			case base.NEXT:
 				break IBCTX
 			case base.NONE:
-				time.Sleep(IBCDelay)
+				time.Sleep(time.Duration(host.IBCTimeout) * time.Minute)
 				done = isIBCDone(ibc.seq, FetchBotSeq(ibc.nq, ibc.action, host.Name))
 			case base.CRITICAL:
 				done = false
@@ -109,7 +109,7 @@ func IcaAutoStake(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClient, b *nov
 		}
 
 		targetSeq := FetchBotSeq(nq, config.ActAutoStake, host.Name)
-		msg1 := novaTx.MakeMsgIcaAutoStaking(host.Name, b.KrInfo.GetAddress(), hostReward, targetSeq)
+		msg1 := novaTx.MakeMsgIcaAutoStaking(host.Name, b.KrInfo.GetAddress(), hostReward, targetSeq, host.IBCTimeout)
 		msgs := []sdktypes.Msg{msg1}
 		if ok := mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActAutoStake, targetSeq}); !ok {
 			goto RESTAKE
@@ -127,7 +127,7 @@ func IcaStake(nq *novaq.NovaQueryClient, b *novatypes.Bot, host *config.HostChai
 		botTickLog("ICA-Staking", int(intv)*i, b.Interval)
 	STAKE:
 		targetSeq := FetchBotSeq(nq, config.ActStake, host.Name)
-		msg1 := novaTx.MakeMsgDelegate(host.Name, b.KrInfo.GetAddress(), targetSeq)
+		msg1 := novaTx.MakeMsgDelegate(host.Name, b.KrInfo.GetAddress(), targetSeq, host.IBCTimeout)
 		msgs := []sdktypes.Msg{msg1}
 		if ok := mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActStake, targetSeq}); !ok {
 			goto STAKE
@@ -153,7 +153,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClien
 			delegatedToken, height, apphash := OracleInfo(cq, host.Validator, host.HostAccount)
 			undelSeq := FetchBotSeq(nq, config.ActUndelegate, host.Name)
 			msg1 := novaTx.MakeMsgUpdateChainState(b.KrInfo.GetAddress(), host.Name, host.Denom, delegatedToken, height, apphash)
-			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq)
+			msg2 := novaTx.MakeMsgUndelegate(host.Name, b.KrInfo.GetAddress(), undelSeq, host.IBCTimeout)
 			msgs := []sdktypes.Msg{msg1, msg2}
 			if ok := mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActUndelegate, undelSeq}); !ok {
 				goto UNDEL
@@ -166,7 +166,7 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClien
 		WD:
 			wdSeq := FetchBotSeq(nq, config.ActWithdraw, host.Name)
 			blkTS := LatestBlockTS(cq)
-			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, wdSeq)
+			msg3 := novaTx.MakeMsgIcaWithdraw(host.Name, b.KrInfo.GetAddress(), "transfer", host.IBCInfo.Transfer, blkTS, wdSeq, host.IBCTimeout)
 			msgs := []sdktypes.Msg{msg3}
 			if ok := mustExecTx(b, host, msgs, IBCConfirm{nq, config.ActWithdraw, wdSeq}); !ok {
 				goto WD

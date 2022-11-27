@@ -7,16 +7,16 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 )
 
-func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, seq uint64) *types.MsgDelegate {
-	return types.NewMsgDelegate(chainID, seq, operator)
+func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, seq uint64, ibctimeout uint64) *types.MsgDelegate {
+	return types.NewMsgDelegate(chainID, seq, operator, ibctimeout)
 }
 
-func MakeMsgIcaWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTs time.Time, seq uint64) *types.MsgIcaWithdraw {
-	return types.NewMsgIcaWithdraw(chainID, operator, portID, chanID, blockTs, seq)
+func MakeMsgIcaWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTs time.Time, seq uint64, ibctimeout uint64) *types.MsgIcaWithdraw {
+	return types.NewMsgIcaWithdraw(chainID, operator, portID, chanID, blockTs, seq, ibctimeout)
 }
 
-func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress, seq uint64) *types.MsgUndelegate {
-	return types.NewMsgUndelegate(chainID, seq, operator)
+func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress, seq uint64, ibctimeout uint64) *types.MsgUndelegate {
+	return types.NewMsgUndelegate(chainID, seq, operator, ibctimeout)
 }
 
 func MakeMsgDeposit(from, claimer sdktypes.AccAddress, zoneID, denom string, amount int64) *types.MsgDeposit {

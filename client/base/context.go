@@ -43,7 +43,7 @@ func MakeContext(mb module.BasicManager, from string, tmRPC string, chainID stri
 }
 
 func AddMoreFromInfo(ctx client.Context) client.Context {
-	fromAddr, fromName, _, err := client.GetFromFields(ctx.Keyring, ctx.From, ctx.GenerateOnly)
+	fromAddr, fromName, _, err := client.GetFromFields(ctx, ctx.Keyring, ctx.From)
 	utils.CheckErr(err, "cannot get info from keyring", 0)
 	ctx = ctx.WithFromAddress(fromAddr).WithFromName(fromName)
 	return ctx

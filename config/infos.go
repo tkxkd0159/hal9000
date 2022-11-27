@@ -22,7 +22,8 @@ type HostChainInfo struct {
 	Denom       string
 	Decimal     uint32
 	IBCInfo
-	mu sync.RWMutex
+	IBCTimeout uint64
+	mu         sync.RWMutex
 }
 
 func NewHostChainInfo(zone string) *HostChainInfo {
@@ -43,9 +44,20 @@ func (hci *HostChainInfo) Set() {
 }
 
 func (hci *HostChainInfo) WithIBCInfo(bc BotCommon, botTypes string) {
+	hci.mu.Lock()
+	defer hci.mu.Unlock()
+
 	switch botTypes {
+	case ActStake:
+		sf := bc.(StakeFlags)
+		hci.IBCTimeout = sf.IBCTimeout()
+	case ActAutoStake:
+		rf := bc.(RestakeFlags)
+		hci.IBCTimeout = rf.IBCTimeout()
 	case ActWithdraw:
-		hci.IBCInfo = bc.(WithdrawFlags).HostIBC
+		wf := bc.(WithdrawFlags)
+		hci.IBCTimeout = wf.IBCTimeout()
+		hci.IBCInfo = wf.HostIBC
 	}
 }
 

@@ -22,11 +22,19 @@ var (
 	_ BotCommon = RestakeFlags{}
 	_ BotCommon = StakeFlags{}
 	_ BotCommon = WithdrawFlags{}
+
+	_ IBCAble = RestakeFlags{}
+	_ IBCAble = StakeFlags{}
+	_ IBCAble = WithdrawFlags{}
 )
 
 type BotCommon interface {
 	GetBase() BaseFlags
 	Observable
+}
+
+type IBCAble interface {
+	IBCTimeout() uint64
 }
 
 type Observable interface {
@@ -58,27 +66,42 @@ func (of OracleFlags) GetBase() BaseFlags {
 
 type RestakeFlags struct {
 	BaseFlags
+	ibct uint64
 }
 
 func (rf RestakeFlags) GetBase() BaseFlags {
 	return rf.BaseFlags
 }
 
+func (rf RestakeFlags) IBCTimeout() uint64 {
+	return rf.ibct
+}
+
 type StakeFlags struct {
 	BaseFlags
+	ibct uint64
 }
 
 func (sf StakeFlags) GetBase() BaseFlags {
 	return sf.BaseFlags
 }
 
+func (sf StakeFlags) IBCTimeout() uint64 {
+	return sf.ibct
+}
+
 type WithdrawFlags struct {
 	BaseFlags
 	HostIBC IBCInfo
+	ibct    uint64
 }
 
 func (wf WithdrawFlags) GetBase() BaseFlags {
 	return wf.BaseFlags
+}
+
+func (wf WithdrawFlags) IBCTimeout() uint64 {
+	return wf.ibct
 }
 
 func addBaseFlags(cmd *flag.FlagSet) {
@@ -113,6 +136,7 @@ func SetOracleFlags(cmd *flag.FlagSet) OracleFlags {
 }
 
 func SetRestakeFlags(cmd *flag.FlagSet) RestakeFlags {
+	t := cmd.Uint64("ibc-timeout", 10, "IBC Packet Timeout for Nova (min.)")
 	err := cmd.Parse(os.Args[2:])
 	if err != nil {
 		panic("Something went wrong while parse flags")
@@ -129,10 +153,12 @@ func SetRestakeFlags(cmd *flag.FlagSet) RestakeFlags {
 			Period:      intv,
 			LogLocation: logloc,
 		},
+		*t,
 	}
 }
 
 func SetStakeFlags(cmd *flag.FlagSet) StakeFlags {
+	t := cmd.Uint64("ibc-timeout", 10, "IBC Packet Timeout for Nova (min.)")
 	err := cmd.Parse(os.Args[2:])
 	if err != nil {
 		panic("Something went wrong while parse flags")
@@ -149,11 +175,13 @@ func SetStakeFlags(cmd *flag.FlagSet) StakeFlags {
 			Period:      intv,
 			LogLocation: logloc,
 		},
+		*t,
 	}
 }
 
 func SetWithdrawFlags(cmd *flag.FlagSet) WithdrawFlags {
 	chanID := cmd.String("ch", "channel-225", "Host Transfer Channel ID")
+	t := cmd.Uint64("ibc-timeout", 10, "IBC Packet Timeout for Nova (min.)")
 	err := cmd.Parse(os.Args[2:])
 	if err != nil {
 		panic("Something went wrong while parse flags")
@@ -171,6 +199,7 @@ func SetWithdrawFlags(cmd *flag.FlagSet) WithdrawFlags {
 			LogLocation: logloc,
 		},
 		IBCInfo{Transfer: *chanID},
+		*t,
 	}
 }
 

@@ -49,7 +49,7 @@ curl "localhost:26657/tx_search?query=\"message.sender='cosmos1...'\"&prove=true
 ```shell
 make run FLAGS="-display -new -name=<keyname>"
 ```
-## 2. Make `.secret.yml` to pipe keyring password
+## 2. Make `.secret.yaml` to pipe keyring password
 ```yaml
 pw: <your_keyring_password>
 ```

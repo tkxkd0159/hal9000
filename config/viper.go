@@ -14,9 +14,8 @@ import (
 var Sviper *viper.Viper
 
 const (
-	ScrtFileName          = ".secret"
-	ChainInfoFileName     = ".chaininfo"
-	ChainInfoTestFileName = ChainInfoFileName + ".test"
+	ScrtFileName      = ".secret"
+	ChainInfoFileName = ".chaininfo"
 )
 
 func setDefaultCfgPath(v ...*viper.Viper) {
@@ -31,31 +30,25 @@ func setDefaultCfgPath(v ...*viper.Viper) {
 	}
 }
 
-func init() {
-	Sviper = setScrt()
-}
-
-func setScrt() *viper.Viper {
-	sViper := viper.New()
-	sViper.SetConfigName(ScrtFileName)
-	sViper.SetConfigType("yaml")
-	setDefaultCfgPath(sViper)
-	err := sViper.ReadInConfig()
+func SetScrt(isTest bool) {
+	if isTest {
+		return
+	}
+	Sviper = viper.New()
+	Sviper.SetConfigName(ScrtFileName)
+	Sviper.SetConfigType("yaml")
+	setDefaultCfgPath(Sviper)
+	err := Sviper.ReadInConfig()
 	utils.CheckErr(err, fmt.Sprintf("Can't read %s.yaml", ScrtFileName), types.EXIT)
-
-	return sViper
 }
 
 func LoadChainInfo(isTest bool) {
 	setDefaultCfgPath()
 	viper.SetConfigType("yaml")
 	if isTest {
-		viper.SetConfigName(ChainInfoTestFileName)
-		err := viper.ReadInConfig()
-		utils.CheckErr(err, fmt.Sprintf("Can't read %s.yaml", ChainInfoTestFileName), types.EXIT)
-	} else {
-		viper.SetConfigName(ChainInfoFileName)
-		err := viper.ReadInConfig()
-		utils.CheckErr(err, fmt.Sprintf("Can't read %s.yaml", ChainInfoFileName), types.EXIT)
+		return
 	}
+	viper.SetConfigName(ChainInfoFileName)
+	err := viper.ReadInConfig()
+	utils.CheckErr(err, fmt.Sprintf("Can't read %s.yaml", ChainInfoFileName), types.EXIT)
 }

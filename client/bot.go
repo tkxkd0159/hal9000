@@ -22,6 +22,7 @@ import (
 func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer, zone string, target string) (ctx client.Context, botInfo keyring.Info, txf tx.Factory, cni *cfg.ChainNetInfo) {
 	flags := f.GetBase()
 	base.SetBechPrefix()
+	cfg.SetScrt(flags.IsTest)
 	cfg.LoadChainInfo(flags.IsTest)
 	cni = cfg.NewChainNetInfo(zone)
 	BotScrt := NewBotScrt(cni.ChainID, target, flags.Kn)

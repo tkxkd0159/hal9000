@@ -23,17 +23,17 @@ RUN LINK_STATICALLY=true make build
 FROM alpine:3.16
 ARG USER=hal
 ENV HOME /home/$USER
-RUN apk add --update sudo
+RUN apk add --update sudo ca-certificates libstdc++ yq
 RUN adduser -D $USER \
         && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
         && chmod 0440 /etc/sudoers.d/$USER
 USER $USER
 WORKDIR $HOME
 
-RUN sudo apk add --update --no-cache  ca-certificates libstdc++ yq
 ENV TARGET=$USER
 ENV PATH="${PATH}:$HOME"
 COPY --from=release /workspace/build/$TARGET ./$TARGET
 # comment out below if you need config dynamic linking
 COPY .chaininfo.yaml .secret.yaml ./config/
+RUN mkdir /home/hal/keyring && chown hal:hal /home/hal/keyring
 CMD ["hal", "--help"]

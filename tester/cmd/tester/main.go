@@ -37,7 +37,7 @@ func main() {
 
 	_ = basetypes.NewBot(botType, ctx, txf, krInfo, bf.Period, fdErr, botch)
 	hostZone := cfg.NewHostChainInfo(bf.HostChain)
-	hostZone.Set()
+	hostZone.SetDetailInfos()
 	hostZone.WithIBCInfo(flags, botType)
 
 	nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)

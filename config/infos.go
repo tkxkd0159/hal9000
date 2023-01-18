@@ -30,7 +30,7 @@ func NewHostChainInfo(zone string) *HostChainInfo {
 	return &HostChainInfo{Name: zone}
 }
 
-func (hci *HostChainInfo) Set() {
+func (hci *HostChainInfo) SetDetailInfos() {
 	hci.mu.Lock()
 	host := hci.Name
 	defer hci.mu.Unlock()
@@ -59,6 +59,19 @@ func (hci *HostChainInfo) WithIBCInfo(bc BotCommon, botTypes string) {
 		hci.IBCTimeout = wf.IBCTimeout()
 		hci.IBCInfo = wf.HostIBC
 	}
+}
+
+func SetHostChainInfo(flags BotCommon, btype string) *HostChainInfo {
+	info := NewHostChainInfo(flags.GetBase().HostChain)
+	switch btype {
+	case ActOracle, ActStake, ActAutoStake, ActWithdraw:
+		info.SetDetailInfos()
+	default:
+		return info
+	}
+	info.WithIBCInfo(flags, btype)
+
+	return info
 }
 
 type ChainNetInfo struct {

@@ -19,7 +19,7 @@ func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amou
 	for {
 		log.Printf("Pusher is ongoing for %d secs\n", int(intv)*i)
 
-		msg1 := novam.MakeMsgDeposit(b.KrInfo.GetAddress(), b.KrInfo.GetAddress(), host.Name, denom, amount)
+		msg1 := novam.MakeMsgDeposit(b.KrInfo.GetAddress(), b.KrInfo.GetAddress(), host.Name, denom, amount, 10)
 		msgs := []sdktype.Msg{msg1}
 		base.GenTxByBot(b, msgs...)
 		time.Sleep(intv * time.Second)

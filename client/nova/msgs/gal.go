@@ -19,7 +19,7 @@ func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress, seq uint64,
 	return types.NewMsgUndelegate(chainID, seq, operator, ibctimeout)
 }
 
-func MakeMsgDeposit(from, claimer sdktypes.AccAddress, zoneID, denom string, amount int64) *types.MsgDeposit {
+func MakeMsgDeposit(from, claimer sdktypes.AccAddress, zoneID, denom string, amount int64, ibctimeout uint64) *types.MsgDeposit {
 	coin := sdktypes.Coin{Denom: denom, Amount: sdktypes.NewInt(amount)}
-	return types.NewMsgDeposit(zoneID, from, claimer, coin)
+	return types.NewMsgDeposit(zoneID, from, claimer, coin, ibctimeout)
 }

@@ -15,7 +15,7 @@ ifeq ($(LINK_STATICALLY),true)
 endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
-BUILD_FLAGS := -tags '$(build_tags)' -ldflags '$(ldflags)'
+BUILD_FLAGS := -trimpath -tags '$(build_tags)' -ldflags '$(ldflags)'
 
 build: BUILD_ARGS=-o $(BUILD_DIR)/
 

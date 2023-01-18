@@ -36,9 +36,9 @@ func main() {
 	go api.OpenMonitoringSrv(wg, botch, flags)
 
 	_ = basetypes.NewBot(botType, ctx, txf, krInfo, bf.Period, fdErr, botch)
-	hostZone := cfg.NewHostChainInfo(bf.HostChain)
-	hostZone.SetDetailInfos()
-	hostZone.WithIBCInfo(flags, botType)
+	hzInfo := cfg.NewHostChainInfo(bf.HostChain)
+	hzInfo.SetDetailInfos()
+	hzInfo.WithIBCInfo(flags, botType)
 
 	nq := novaq.NewNovaQueryClient(cni.GRPC.Host, cni.Secure)
 	defer utils.CloseGrpc(nq.ClientConn)

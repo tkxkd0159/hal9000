@@ -72,6 +72,8 @@ github.com/Carina-labs/ibc-go/v3 v3.0.0-nova-alpha h1:aFAE7VqenIU/pXpq4SkLeKEIuP
 github.com/Carina-labs/ibc-go/v3 v3.0.0-nova-alpha/go.mod h1:Mb+1NXiPOLd+CPFlOC6BKeAUaxXlhuWenMmRiUiSmwY=
 github.com/Carina-labs/nova v0.6.7 h1:Hctc0RIfH5bW5MePlU3AK6HTVufwY62gK4Nzxelc/uM=
 github.com/Carina-labs/nova v0.6.7/go.mod h1:TDaO/q3FAV1/MIpI5MfuWeDtnjQkFUGlx2mvCUcsXCM=
+github.com/Carina-labs/nova v0.6.8-0.20230113064528-f75de89d13ce h1:v+fRH8c4XDOmKe/YCC2Hl9P74kcpAPJsGvrD9MkEDzo=
+github.com/Carina-labs/nova v0.6.8-0.20230113064528-f75de89d13ce/go.mod h1:TDaO/q3FAV1/MIpI5MfuWeDtnjQkFUGlx2mvCUcsXCM=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d h1:nalkkPQcITbvhmL4+C4cKA87NW0tfm3Kl9VXRoPywFg=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d/go.mod h1:URdX5+vg25ts3aCh8H5IFZybJYKWhJHYMTnf+ULtoC4=
 github.com/CosmWasm/wasmd v0.29.2 h1:xYZpQjoCixaebMeZs2WGAbBQ8N9PUHVZieuNWy+avI8=

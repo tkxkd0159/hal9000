@@ -1,6 +1,7 @@
 package base
 
 import (
+	"errors"
 	"os"
 	"strings"
 
@@ -13,8 +14,15 @@ import (
 	ut "github.com/Carina-labs/HAL9000/utils/types"
 )
 
+var ErrMustPanic = errors.New(" ❌ cannot recoverable. chain internal logic error")
+
 func handleTxErr(f *os.File, e error, bottype string) TxErr {
 	if e != nil {
+		if strings.Contains(e.Error(), "connect: connection refused") {
+			utils.LogErrWithFd(f, e, " ❌ ", ut.KEEP)
+			return NORMAL
+		}
+
 		if strings.Contains(e.Error(), sdkerr.ErrWrongSequence.Error()) {
 			utils.LogErrWithFd(f, e, " ❌ ", ut.KEEP)
 			return SEQMISMATCH
@@ -43,6 +51,17 @@ func handleTxErr(f *os.File, e error, bottype string) TxErr {
 			} else if strings.Contains(e.Error(), galtypes.ErrCanNotWithdrawAsset.Error()) {
 				utils.LogErrWithFd(f, e, " ❌ There is no asset to withdraw on this host zone  ➡️ go to next batch\n", ut.KEEP)
 				return NEXT
+			}
+		case config.ActAutoClaim:
+			if strings.Contains(e.Error(), "claimable amount is zero") {
+				utils.LogErrWithFd(f, e, " ❌ There is no sn-asset to claim for this host zone  ➡️ go to next batch\n", ut.KEEP)
+				return NEXT
+			} else if strings.Contains(e.Error(), "cannot find zone id") {
+				utils.LogErrWithFd(f, e, " ❌ unexpected host zone\n", ut.KEEP)
+				panic(ErrMustPanic)
+			} else {
+				utils.LogErrWithFd(f, e, "", ut.KEEP)
+				panic(ErrMustPanic)
 			}
 		}
 

@@ -6,6 +6,7 @@ const (
 	ActAutoStake  = "restake"
 	ActWithdraw   = "withdraw"
 	ActUndelegate = "undelegate"
+	ActAutoClaim  = "autoclaim"
 
 	ActPusher = "push"
 	ActMinter = "mint"

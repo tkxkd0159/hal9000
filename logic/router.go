@@ -32,6 +32,8 @@ func RouteBotAction(b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.Host
 		defer utils.CloseGrpc(cq.ClientConn)
 		defer utils.CloseGrpc(nq.ClientConn)
 		UndelegateAndWithdraw(cq, nq, b, hci)
+	case config.ActAutoClaim:
+		ClaimAllSnAsset(b, hci)
 	default:
 		panic("This type cannot handle at this action router")
 	}

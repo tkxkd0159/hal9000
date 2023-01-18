@@ -23,3 +23,7 @@ func MakeMsgDeposit(from, claimer sdktypes.AccAddress, zoneID, denom string, amo
 	coin := sdktypes.Coin{Denom: denom, Amount: sdktypes.NewInt(amount)}
 	return types.NewMsgDeposit(zoneID, from, claimer, coin, ibctimeout)
 }
+
+func MakeMsgClaimAllSnAsset(zoneID string, from sdktypes.AccAddress) *types.MsgClaimAllSnAsset {
+	return types.NewMsgClaimAllSnAsset(zoneID, from)
+}

@@ -71,13 +71,13 @@ func InputMnemonic() (mnemonic string) {
 
 func CheckBotType(botType string) string {
 	switch botType {
-	case ActOracle, ActStake, ActAutoStake, ActWithdraw:
+	case ActOracle, ActStake, ActAutoStake, ActWithdraw, ActAutoClaim:
 		return botType
 	default:
 		fmt.Printf(" 🤮 This bot type is not supported. \n\n")
 		fmt.Println("Command:")
 		fmt.Printf("  hal [action] [flags]\n\n")
-		fmt.Println(" [action] : oracle / stake / restake / withdraw")
+		fmt.Println(" [action] : oracle / stake / restake / withdraw / autoclaim")
 		fmt.Println(" Use (-h|--help) if you want to see flag usage after set action")
 		os.Exit(1)
 	}

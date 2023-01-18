@@ -181,5 +181,22 @@ func UndelegateAndWithdraw(cq *query.CosmosQueryClient, nq *novaq.NovaQueryClien
 		time.Sleep(intv * time.Second)
 		i++
 	}
+}
 
+func ClaimAllSnAsset(b *novatypes.Bot, host *config.HostChainInfo) {
+	i := 0
+	intv := time.Duration(b.Interval)
+	for {
+		botTickLog("Auto-Claim", int(intv)*i, b.Interval)
+	CLAIM:
+		msg1 := novaTx.MakeMsgClaimAllSnAsset(host.Name, b.KrInfo.GetAddress())
+		msgs := []sdktypes.Msg{msg1}
+		if ok := mustExecTx(b, host, msgs); !ok {
+			goto CLAIM
+		}
+
+		b.APIch <- time.Now().UTC()
+		time.Sleep(intv * time.Second)
+		i++
+	}
 }

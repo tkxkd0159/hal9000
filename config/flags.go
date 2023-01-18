@@ -22,6 +22,7 @@ var (
 	_ BotCommon = RestakeFlags{}
 	_ BotCommon = StakeFlags{}
 	_ BotCommon = WithdrawFlags{}
+	_ BotCommon = AutoClaimFlags{}
 
 	_ IBCAble = RestakeFlags{}
 	_ IBCAble = StakeFlags{}
@@ -104,6 +105,14 @@ func (wf WithdrawFlags) IBCTimeout() uint64 {
 	return wf.ibct
 }
 
+type AutoClaimFlags struct {
+	BaseFlags
+}
+
+func (wf AutoClaimFlags) GetBase() BaseFlags {
+	return wf.BaseFlags
+}
+
 func addBaseFlags(cmd *flag.FlagSet) {
 	cmd.BoolVar(&isTest, "test", false, "Decide whether it's test with localnet")
 	cmd.BoolVar(&isNew, "new", false, "Start client with making new account")
@@ -111,7 +120,7 @@ func addBaseFlags(cmd *flag.FlagSet) {
 	cmd.StringVar(&apiAddr, "api", "127.0.0.1:3334", "Set bot api address")
 	cmd.StringVar(&keyname, "name", "nova_bot", "Set unique key name (uid)")
 	cmd.StringVar(&hostchainName, "host", "gaia", "Name of the host chain from which to obtain oracle info")
-	cmd.IntVar(&intv, "interval", 15*60, "Oracle update interval (sec)")
+	cmd.IntVar(&intv, "interval", 15*60, "bot logic interval (sec)")
 	cmd.StringVar(&logloc, "logloc", "logs", "Where All Logs Are Stored from project root")
 }
 
@@ -203,6 +212,26 @@ func SetWithdrawFlags(cmd *flag.FlagSet) WithdrawFlags {
 	}
 }
 
+func SetAutoClaimFlags(cmd *flag.FlagSet) AutoClaimFlags {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		panic("Something went wrong while parse flags")
+	}
+
+	return AutoClaimFlags{
+		BaseFlags{
+			IsTest:      isTest,
+			New:         isNew,
+			Disp:        disp,
+			ExtIP:       apiAddr,
+			Kn:          keyname,
+			HostChain:   hostchainName,
+			Period:      intv,
+			LogLocation: logloc,
+		},
+	}
+}
+
 func SetFlags(action string) (bf BotCommon) {
 	actCmd := flag.NewFlagSet(fmt.Sprintf("%s bot", action), flag.ExitOnError)
 	actCmd.Usage = func() {
@@ -222,6 +251,8 @@ func SetFlags(action string) (bf BotCommon) {
 		bf = SetRestakeFlags(actCmd)
 	case ActWithdraw:
 		bf = SetWithdrawFlags(actCmd)
+	case ActAutoClaim:
+		bf = SetAutoClaimFlags(actCmd)
 	}
 
 	return

@@ -1,6 +1,7 @@
 package base
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"sync"
@@ -41,6 +42,12 @@ var (
 func GenTxByBot(b *basetypes.Bot, msgs ...sdktypes.Msg) (e TxErr) {
 	defer func() {
 		if err := recover(); err != nil {
+			if realerr, ok := err.(error); ok {
+				if errors.Is(realerr, ErrMustPanic) {
+					panic(time.Now())
+				}
+			}
+
 			log.Println(" ☠️ Get panic while generating tx ->", err)
 			e = CRITICAL
 		}

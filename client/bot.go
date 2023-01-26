@@ -25,7 +25,7 @@ func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer, zone string, 
 	cfg.SetScrt(flags.IsTest)
 	cfg.LoadChainInfo(flags.IsTest)
 	cni = cfg.NewChainNetInfo(zone)
-	BotScrt := NewBotScrt(cni.ChainID, target, flags.Kn)
+	BotScrt := NewBotScrt(zone, target, flags.Kn)
 
 	if flags.New {
 		SetupBotKey(flags.Kn, krDir, cni, BotScrt)
@@ -38,7 +38,6 @@ func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer, zone string, 
 	os.Stdin = rpipe
 	_, err = wpipe.Write([]byte(BotScrt.Passphrase()))
 	utils.CheckErr(err, "", 0)
-
 	ctx = base.MakeContext(
 		novaapp.ModuleBasics,
 		BotScrt.Address(),

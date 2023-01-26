@@ -85,8 +85,9 @@ type ChainNetInfo struct {
 
 func NewChainNetInfo(zone string) (ni *ChainNetInfo) {
 	ip := viper.GetString(fmt.Sprintf("net.ip.%s", zone))
+	chainId := viper.GetString(fmt.Sprintf("%s.chain_id", zone))
 	return &ChainNetInfo{
-		ChainID: zone,
+		ChainID: chainId,
 		IP:      ip,
 		Secure:  viper.GetBool("net.connection.secure"),
 		GRPC:    &url.URL{Scheme: "tcp", Host: ip + ":" + viper.GetString("net.port.grpc")},

@@ -1,21 +1,35 @@
 nova:
-  chain_id: "nova"
+  chain_id: "champagne"
   val_addr: "novavaloper18hcuafd3849v4deyyazn6k32ze9msyqs2xgvjh"
-  bot_addr: "nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf"
+  bot_addr: "nova14qehls0kenjad2lth33ry7aed8nyk0tkagu7jl"
   client_addr: "nova1ma2378jplsnj3chlcgwqfx8p8g92z7dzxdvxmd"
 gaia:
   chain_id: "gaia"
   denom: "uatom"
   decimal: 6
-  val_addr: "cosmosvaloper1ma2378jplsnj3chlcgwqfx8p8g92z7dzw5kg5n"
-  host_addr: "cosmos1mn52fx79ckzam60qa4ctgt5meyrk09xc6y6j8adqz3wynww7mczqhj6wur"
+  val_addr: "cosmosvaloper1zkarsurgym3hnm06qupyt96pu0k24k4fq9la7n"
+  host_addr: "cosmos1tur97kug0h2dpucphdcdd68why3sznrs49vps7gsp7c0vh2ztjpqzu0fdk"
   client_addr: "cosmos1ma2378jplsnj3chlcgwqfx8p8g92z7dztqzacq"
+osmosis:
+  chain_id: "osmosis"
+  denom: "uosmo"
+  decimal: 6
+  val_addr: "osmovaloper1zkarsurgym3hnm06qupyt96pu0k24k4fhasmn4"
+  host_addr: "osmo1ukmm2spxmjmnm5ptq455zeejud93v6yeczvf0mgfl30sqfh2gdjsp7x5zc"
+  client_addr: "osmo1zkarsurgym3hnm06qupyt96pu0k24k4fd2ccyj"
+juno:
+  chain_id: "juno"
+  denom: "ujuno"
+  decimal: 6
+  val_addr: "junovaloper1zkarsurgym3hnm06qupyt96pu0k24k4fv77uw9"
+  host_addr: "juno1pfjh0tsznyqc8v8gtf0nr9whqkf40vklyc3s75pwneltcj3nlmhqu8x07f"
+  client_addr: "juno1zkarsurgym3hnm06qupyt96pu0k24k4fnrgn4u"
 net:
-  connection:
-    secure: false  # SSL/TLS on/off
   ip:
-    nova: "3.38.200.6"
-    gaia: "3.36.104.92"
+    nova: "champagne.dev-supernova.xyz"
+    gaia: "champagne-cosmos.dev-supernova.xyz"
+    osmosis: "champagne-osmosis.dev-supernova.xyz"
+    juno: "champagne-juno.dev-supernova.xyz"
   port:
     grpc: 9090
     rest: 1317

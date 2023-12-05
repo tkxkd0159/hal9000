@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -14,9 +13,11 @@ import (
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/viper"
 
-	"github.com/Carina-labs/HAL9000/client/base"
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
+	novaapp "github.com/Carina-labs/nova/app"
+
+	"github.com/tkxkd0159/HAL9000/client/base"
+	cfg "github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 func SetupBotBase(f cfg.BotCommon, krDir string, ctxOut io.Writer, zone string, target string) (ctx client.Context, botInfo keyring.Info, txf tx.Factory, cni *cfg.ChainNetInfo) {

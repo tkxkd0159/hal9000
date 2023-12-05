@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Carina-labs/HAL9000/utils"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 func TestCheckErr(t *testing.T) {

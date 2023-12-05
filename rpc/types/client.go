@@ -6,7 +6,6 @@ import (
 
 // Client describes the interface of Tendermint RPC client implementations.
 type Client interface {
-
 	// Start the client. Start must report an error if the client is running.
 	Start() error
 

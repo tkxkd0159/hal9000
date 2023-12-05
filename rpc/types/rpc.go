@@ -97,7 +97,7 @@ func (req *RPCRequest) String() string {
 }
 
 func MapToRequest(id jsonrpcid, method string, params map[string]interface{}) (RPCRequest, error) {
-	var paramsMap = make(map[string]json.RawMessage, len(params))
+	paramsMap := make(map[string]json.RawMessage, len(params))
 	for name, value := range params {
 		valueJSON, err := tmjson.Marshal(value)
 		if err != nil {
@@ -115,7 +115,7 @@ func MapToRequest(id jsonrpcid, method string, params map[string]interface{}) (R
 }
 
 func ArrayToRequest(id jsonrpcid, method string, params []interface{}) (RPCRequest, error) {
-	var paramsMap = make([]json.RawMessage, len(params))
+	paramsMap := make([]json.RawMessage, len(params))
 	for i, value := range params {
 		valueJSON, err := tmjson.Marshal(value)
 		if err != nil {
@@ -318,7 +318,7 @@ func makeHTTPDialer(remoteAddr string) (func(string, string) (net.Conn, error), 
 	}
 
 	dialFn := func(proto, addr string) (net.Conn, error) {
-		var timeout = 10 * time.Second
+		timeout := 10 * time.Second
 		if !u.isUnixSocket && strings.LastIndex(u.Host, ":") == -1 {
 			u.Host = fmt.Sprintf("%s:%s", u.Host, padding)
 			return net.DialTimeout(protocol, u.GetDialAddress(), timeout)

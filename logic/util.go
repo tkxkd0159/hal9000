@@ -6,7 +6,7 @@ import (
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/config"
 )
 
 func botTickLog(botType string, elapsedSecs int, period int) {

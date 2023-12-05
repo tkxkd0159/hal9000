@@ -6,14 +6,13 @@ import (
 
 	sdktype "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/client/base"
-	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
-	novam "github.com/Carina-labs/HAL9000/client/nova/msgs"
-	"github.com/Carina-labs/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/client/base"
+	novatypes "github.com/tkxkd0159/HAL9000/client/base/types"
+	novam "github.com/tkxkd0159/HAL9000/client/nova/msgs"
+	"github.com/tkxkd0159/HAL9000/config"
 )
 
 func DepositGal(b *novatypes.Bot, host *config.HostChainInfo, denom string, amount int64) {
-
 	i := 0
 	intv := time.Duration(b.Interval)
 	for {

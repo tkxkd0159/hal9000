@@ -7,12 +7,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils/types"
 )
 
-var (
-	ToB64Str = base64.StdEncoding.EncodeToString
-)
+var ToB64Str = base64.StdEncoding.EncodeToString
 
 func CloseFds(fds ...*os.File) {
 	for _, fd := range fds {

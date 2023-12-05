@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 
-	"github.com/Carina-labs/HAL9000/client/base/types"
+	"github.com/tkxkd0159/HAL9000/client/base/types"
 )
 
 type EncodingConfig struct {

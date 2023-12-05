@@ -5,8 +5,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils"
+	"github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 // MakeKeyring returns keystore from cosmos-sdk/crypto/keyring

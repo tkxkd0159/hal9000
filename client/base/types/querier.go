@@ -1,12 +1,12 @@
 package types
 
 import (
-	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
-	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
+	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
 	bankv1beta1 "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distv1beta1 "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	txv1beta1 "github.com/cosmos/cosmos-sdk/types/tx"
+	tendermintv1beta1 "github.com/Carina-labs/nova/api/cosmos/base/tendermint/v1beta1"
+	stakingv1beta1 "github.com/Carina-labs/nova/api/cosmos/staking/v1beta1"
 )
 
 type BaseQuerier interface {

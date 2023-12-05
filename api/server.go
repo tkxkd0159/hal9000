@@ -9,13 +9,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	cfg "github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
-type Server struct {
-}
+type Server struct{}
 
 type TxCheckPoint struct {
 	LastCommit time.Time
@@ -48,7 +47,6 @@ func Tracker(ch <-chan bool) {
 }
 
 func (s Server) On(addr string) {
-
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/check/", NewChkHandler())
 	srv := &http.Server{

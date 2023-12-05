@@ -1,5 +1,5 @@
-![cross compile](https://github.com/Carina-labs/HAL9000/actions/workflows/build.yml/badge.svg)
-![golangci-lint](https://github.com/Carina-labs/HAL9000/actions/workflows/lint.yml/badge.svg)
+![cross compile](https://github.com/tkxkd0159/HAL9000/actions/workflows/build.yml/badge.svg)
+![golangci-lint](https://github.com/tkxkd0159/HAL9000/actions/workflows/lint.yml/badge.svg)
 ![LoC](https://img.shields.io/badge/line%20of%20codes-4062-informational)
 
 <!-- TOC -->
@@ -12,7 +12,7 @@
 # HAL9000
 
 ```bash
-GOPRIVATE=github.com/Carina-labs go get -u github.com/Carina-labs/nova@<tag> # or get env -w GOPRIVATE=github.com/Carina-labs
+go get -u github.com/Carina-labs/nova@<tag>
 ```
 
 ## Bot action types

@@ -9,15 +9,15 @@ import (
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/client/base"
-	basem "github.com/Carina-labs/HAL9000/client/base/msgs"
-	"github.com/Carina-labs/HAL9000/client/base/query"
-	novatypes "github.com/Carina-labs/HAL9000/client/base/types"
-	novaTx "github.com/Carina-labs/HAL9000/client/nova/msgs"
-	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
-	"github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/client/base"
+	basem "github.com/tkxkd0159/HAL9000/client/base/msgs"
+	"github.com/tkxkd0159/HAL9000/client/base/query"
+	novatypes "github.com/tkxkd0159/HAL9000/client/base/types"
+	novaTx "github.com/tkxkd0159/HAL9000/client/nova/msgs"
+	novaq "github.com/tkxkd0159/HAL9000/client/nova/query"
+	"github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 func mustExecTx(b *novatypes.Bot, host *config.HostChainInfo, msgs []sdktypes.Msg, opts ...IBCConfirm) bool {

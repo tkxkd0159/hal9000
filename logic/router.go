@@ -1,11 +1,11 @@
 package logic
 
 import (
-	"github.com/Carina-labs/HAL9000/client/base/query"
-	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
-	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
-	"github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
+	"github.com/tkxkd0159/HAL9000/client/base/query"
+	basetypes "github.com/tkxkd0159/HAL9000/client/base/types"
+	novaq "github.com/tkxkd0159/HAL9000/client/nova/query"
+	"github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 func RouteBotAction(b *basetypes.Bot, cni *config.ChainNetInfo, hci *config.HostChainInfo) {

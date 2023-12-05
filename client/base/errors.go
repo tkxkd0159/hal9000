@@ -5,13 +5,14 @@ import (
 	"os"
 	"strings"
 
-	galtypes "github.com/Carina-labs/nova/x/gal/types"
-	oracletypes "github.com/Carina-labs/nova/x/oracle/types"
 	sdkerr "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	galtypes "github.com/Carina-labs/nova/x/gal/types"
+	oracletypes "github.com/Carina-labs/nova/x/oracle/types"
+
+	"github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 var ErrMustPanic = errors.New(" ❌ cannot recoverable. chain internal logic error")
@@ -23,13 +24,14 @@ func handleTxErr(f *os.File, e error, bottype string) TxErr {
 			return NORMAL
 		}
 
-		if strings.Contains(e.Error(), sdkerr.ErrWrongSequence.Error()) {
+		switch {
+		case strings.Contains(e.Error(), sdkerr.ErrWrongSequence.Error()):
 			utils.LogErrWithFd(f, e, " ❌ ", ut.KEEP)
 			return SEQMISMATCH
-		} else if strings.Contains(e.Error(), galtypes.ErrInvalidIcaVersion.Error()) {
+		case strings.Contains(e.Error(), galtypes.ErrInvalidIcaVersion.Error()):
 			utils.LogErrWithFd(f, e, " ❌ ica sequence was not updated yet when the bot queried\n", ut.KEEP)
 			return REPEAT
-		} else if strings.Contains(e.Error(), sdkerr.ErrInvalidAddress.Error()) {
+		case strings.Contains(e.Error(), sdkerr.ErrInvalidAddress.Error()):
 			panic(sdkerr.Wrap(e, "please check your controller address in the keyring"))
 		}
 
@@ -53,13 +55,14 @@ func handleTxErr(f *os.File, e error, bottype string) TxErr {
 				return NEXT
 			}
 		case config.ActAutoClaim:
-			if strings.Contains(e.Error(), "claimable amount is zero") {
+			switch {
+			case strings.Contains(e.Error(), "claimable amount is zero"):
 				utils.LogErrWithFd(f, e, " ❌ There is no sn-asset to claim for this host zone  ➡️ go to next batch\n", ut.KEEP)
 				return NEXT
-			} else if strings.Contains(e.Error(), "cannot find zone id") {
+			case strings.Contains(e.Error(), "cannot find zone id"):
 				utils.LogErrWithFd(f, e, " ❌ unexpected host zone\n", ut.KEEP)
 				panic(ErrMustPanic)
-			} else {
+			default:
 				utils.LogErrWithFd(f, e, "", ut.KEEP)
 				panic(ErrMustPanic)
 			}

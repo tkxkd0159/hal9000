@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/Carina-labs/HAL9000/utils"
-	"github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils"
+	"github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 var Sviper *viper.Viper

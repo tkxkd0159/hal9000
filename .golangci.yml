@@ -6,19 +6,25 @@ linters:
   disable-all: true
   enable:
     - errcheck
+    - dogsled
+    - exportloopref
+    - goconst
+    - gocritic
+    - gci
+    - gofumpt
+    - gosec
     - gosimple
     - govet
     - ineffassign
+    - misspell
+    - nolintlint
     - staticcheck
-    - typecheck
-    - unused
-    - gofmt
-    - unconvert
-    - gosec
-    - depguard
-    - dogsled
     - revive
-    - goimports
+    - stylecheck
+    - typecheck
+    - thelper
+    - unconvert
+    - unused
 
 issues:
   max-issues-per-linter: 10000
@@ -27,5 +33,12 @@ issues:
 linters-settings:
   dogsled:
     max-blank-identifiers: 3
-  goimports:
-    local-prefixes: github.com/Carina-labs/HAL9000
+  gci:
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - prefix(github.com/Carina-labs/nova) # Custom section: groups all imports with the specified Prefix.
+      - prefix(github.com/tkxkd0159/HAL9000) # Custom section: groups all imports with the specified Prefix.
+      - blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
+      - dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
+    custom-order: true

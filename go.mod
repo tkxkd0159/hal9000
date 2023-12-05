@@ -1,6 +1,6 @@
-module github.com/Carina-labs/HAL9000
+module github.com/tkxkd0159/HAL9000
 
-go 1.18
+go 1.21
 
 require (
 	github.com/Carina-labs/nova v0.6.8-0.20230113064528-f75de89d13ce

@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"testing"
 
-	novaapp "github.com/Carina-labs/nova/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Carina-labs/HAL9000/client/base"
+	novaapp "github.com/Carina-labs/nova/app"
+
+	"github.com/tkxkd0159/HAL9000/client/base"
 )
 
 type mockio struct{}
@@ -69,8 +70,6 @@ func TestMakeContext(t *testing.T) {
 		assert.NotEqual(t, tc.TxConfig, got.TxConfig)
 		gotcli, _ := got.GetNode()
 		assert.NotEqual(t, tc.Client, gotcli)
-
-		//assert.Equal(t, tc.LegacyAmino, got.LegacyAmino)
 		assert.Equal(t, tc.HomeDir, got.HomeDir)
 		assert.Equal(t, tc.Keyring, got.Keyring)
 		assert.Equal(t, tc.KeyringDir, got.KeyringDir)

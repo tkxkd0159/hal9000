@@ -7,13 +7,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Carina-labs/HAL9000/api"
-	"github.com/Carina-labs/HAL9000/client"
-	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
-	novaq "github.com/Carina-labs/HAL9000/client/nova/query"
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/logic"
-	"github.com/Carina-labs/HAL9000/utils"
+	"github.com/tkxkd0159/HAL9000/api"
+	"github.com/tkxkd0159/HAL9000/client"
+	basetypes "github.com/tkxkd0159/HAL9000/client/base/types"
+	novaq "github.com/tkxkd0159/HAL9000/client/nova/query"
+	cfg "github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/logic"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 const (
@@ -44,16 +44,16 @@ func main() {
 	defer utils.CloseGrpc(nq.ClientConn)
 	tmpseq := logic.FetchBotSeq(nq, cfg.ActWithdraw, "gaia")
 	fmt.Println(tmpseq)
+	/*
+		cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
+		defer utils.CloseGrpc(cq.ClientConn)
+		delegatedToken, height, apphash := logic.OracleInfo(cq, hostZone.Validator)
 
-	//cq := query.NewCosmosQueryClient(hostZone.GrpcAddr)
-	//defer utils.CloseGrpc(cq.ClientConn)
-	//delegatedToken, height, apphash := logic.OracleInfo(cq, hostZone.Validator)
-	//
-	//bot.Txf = bot.Txf.WithSequence(320)
-	//msg1 := novaTx.MakeMsgUpdateChainState(bot.KrInfo.GetAddress(), hostZone.Name, hostZone.Denom, delegatedToken, height, apphash)
-	//msgs := []sdktypes.Msg{msg1}
-	//_ = base.GenTxByBot(bot, false, msgs...)
-	//_ = cni
-
+		bot.Txf = bot.Txf.WithSequence(320)
+		msg1 := novaTx.MakeMsgUpdateChainState(bot.KrInfo.GetAddress(), hostZone.Name, hostZone.Denom, delegatedToken, height, apphash)
+		msgs := []sdktypes.Msg{msg1}
+		_ = base.GenTxByBot(bot, false, msgs...)
+		_ = cni
+	*/
 	wg.Wait()
 }

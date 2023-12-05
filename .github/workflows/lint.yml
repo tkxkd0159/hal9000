@@ -19,15 +19,11 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.21
         env:
           GOOS: linux
           GOARCH: amd64
-          GOPRIVATE: github.com/Carina-labs
       - uses: actions/checkout@v3
-      - name: Set git config to pull private repo
-        run: |
-          git config --global url."https://${{ env.USER_NAME }}:${{ secrets.HAL_ACT }}@github.com".insteadOf "https://github.com"
       - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
@@ -37,6 +33,6 @@ jobs:
             go.sum
       - uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.46.2
+          version: v1.55.2
           args: --timeout=5m ./...
         if: env.GIT_DIFF

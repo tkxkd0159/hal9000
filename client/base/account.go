@@ -9,8 +9,8 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 func LoadClientPubInfo(ctx client.Context, keyname string) keyring.Info {

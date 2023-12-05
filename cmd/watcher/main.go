@@ -11,10 +11,10 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	cfg "github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/rpc"
-	rpctype "github.com/Carina-labs/HAL9000/rpc/types"
-	"github.com/Carina-labs/HAL9000/utils"
+	cfg "github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/rpc"
+	rpctype "github.com/tkxkd0159/HAL9000/rpc/types"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 const (
@@ -36,16 +36,16 @@ func main() {
 		wsc, _, err := websocket.DefaultDialer.Dial(Nova.TmWsRPC.String(), nil)
 		if err != nil {
 			log.Fatal("dial:", err)
-		} else {
-			log.Printf("connecting to %s", Nova.TmWsRPC.String())
 		}
+		log.Printf("connecting to %s", Nova.TmWsRPC.String())
+
 		defer func(c *websocket.Conn) {
 			err := wsc.Close()
 			if err != nil {
 				utils.CheckErr(err, "", 1)
 			}
 		}(wsc)
-		//myp := map[string]any{"query": "tm.event='Tx' And transfer.sender='nova1lds58drg8lvnaprcue2sqgfvjnz5ljlkq9lsyf'"}
+
 		paramSet := map[string]any{"query": "tm.event='Tx'"}
 		tmSubReq := &rpctype.RPCReq{JSONRPC: "2.0", Method: "subscribe", ID: "0", Params: paramSet}
 		utils.CheckErr(err, "cannot marshal", 0)
@@ -57,7 +57,6 @@ func main() {
 			err = wsc.ReadJSON(&reply)
 			evts := reply.Result.Events
 			utils.CheckErr(err, "no reply from subscription", 1)
-			//fmt.Println(evts)
 
 			evt10, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.chain_id"])
 			evt11, _ := rpc.CheckEvt(evts["nova.oracle.v1.ChainInfo.operator_address"])
@@ -80,7 +79,7 @@ func main() {
 		wsErr := novaWsc.Start()
 		utils.CheckErr(wsErr, "", 0)
 		query1 := fmt.Sprintf("tm.event='Tx' AND message.action='%s'", "/nova.oracle.v1.MsgUpdateChainState")
-		//query1 := fmt.Sprintf("tm.event='Tx'")
+
 		subsErr := novaWsc.Subscribe(watchCtx, query1)
 		utils.CheckErr(subsErr, "", 0)
 
@@ -99,7 +98,6 @@ func main() {
 			fmt.Printf("%s\n", parser.EventWithFieldName("decimal"))
 			fmt.Printf("%s\n", parser.EventWithFieldName("operator_address"))
 		}
-
 	}()
 
 	wg.Wait()

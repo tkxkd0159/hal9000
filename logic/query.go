@@ -2,20 +2,20 @@ package logic
 
 import (
 	"fmt"
-
 	"log"
 	"time"
 
-	tmtypes "github.com/Carina-labs/nova/api/tendermint/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/Carina-labs/HAL9000/client/base/query"
-	nquery "github.com/Carina-labs/HAL9000/client/nova/query"
-	"github.com/Carina-labs/HAL9000/config"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	tmtypes "github.com/Carina-labs/nova/api/tendermint/types"
+
+	"github.com/tkxkd0159/HAL9000/client/base/query"
+	nquery "github.com/tkxkd0159/HAL9000/client/nova/query"
+	"github.com/tkxkd0159/HAL9000/config"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 func OracleInfo(cq *query.CosmosQueryClient, validatorAddr, delegatorAddr string) (string, int64, []byte) {
@@ -28,9 +28,9 @@ func OracleInfo(cq *query.CosmosQueryClient, validatorAddr, delegatorAddr string
 		if err == nil {
 			bh = res.GetBlock().GetHeader().GetHeight()
 			break
-		} else {
-			utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		}
+
+		utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		time.Sleep(ReQueryDelay)
 	}
 
@@ -39,9 +39,9 @@ func OracleInfo(cq *query.CosmosQueryClient, validatorAddr, delegatorAddr string
 		if err == nil {
 			apphash = res.GetHist().GetHeader().GetAppHash()
 			break
-		} else {
-			utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		}
+
+		utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		time.Sleep(ReQueryDelay)
 	}
 
@@ -50,17 +50,17 @@ func OracleInfo(cq *query.CosmosQueryClient, validatorAddr, delegatorAddr string
 		if err == nil {
 			delegatedToken = res.GetDelegationResponse().GetBalance().GetAmount()
 			break
-		} else {
-			if err.Error() == status.Errorf(
-				codes.NotFound,
-				"delegation with delegator %s not found for validator %s",
-				delegatorAddr, validatorAddr).Error() {
-				delegatedToken = "0"
-				break
-			} else {
-				utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
-			}
 		}
+
+		if err.Error() == status.Errorf(
+			codes.NotFound,
+			"delegation with delegator %s not found for validator %s",
+			delegatorAddr, validatorAddr).Error() {
+			delegatedToken = "0"
+			break
+		}
+
+		utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		time.Sleep(ReQueryDelay)
 	}
 
@@ -76,15 +76,15 @@ func LatestBlockTS(cq *query.CosmosQueryClient) (ts time.Time) {
 		if err == nil {
 			blk = res.GetBlock()
 			break
-		} else {
-			utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		}
+
+		utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		time.Sleep(ReQueryDelay)
 	}
 	secs := blk.GetHeader().GetTime().GetSeconds()
 	nanos := blk.GetHeader().GetTime().GetNanos()
-	currentTs := time.Unix(secs, int64(nanos)).UTC()
-	return currentTs
+	currentTS := time.Unix(secs, int64(nanos)).UTC()
+	return currentTS
 }
 
 func RewardsWithAddr(cq *query.CosmosQueryClient, delegator string, validator string) (reward sdktypes.DecCoin) {
@@ -99,9 +99,9 @@ func RewardsWithAddr(cq *query.CosmosQueryClient, delegator string, validator st
 		if err == nil {
 			reward = res.GetRewards()[0]
 			break
-		} else {
-			utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		}
+
+		utils.CheckErr(err, QueryErrPrefix, ut.KEEP)
 		time.Sleep(ReQueryDelay)
 	}
 	return

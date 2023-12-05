@@ -10,7 +10,7 @@ FROM builder-$TARGETARCH AS release
 RUN set -eux; apk add --no-cache ca-certificates build-base;
 RUN apk add git
 ARG GHTOKEN
-RUN git config --global url."https://$GHTOKEN@github.com/".insteadOf "https://github.com/" && go env -w GOPRIVATE=github.com/Carina-labs
+RUN git config --global url."https://$GHTOKEN@github.com/".insteadOf "https://github.com/"
 WORKDIR /workspace
 COPY . .
 ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.1.1/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a

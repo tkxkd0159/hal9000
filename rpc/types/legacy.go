@@ -24,5 +24,7 @@ type ResultRes struct {
 	Data   map[string]any      `json:"data"`
 }
 
-type Event = sdktypes.Event
-type EvtAttr = []abcitypes.EventAttribute
+type (
+	Event   = sdktypes.Event
+	EvtAttr = []abcitypes.EventAttribute
+)

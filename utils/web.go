@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 func SetJSONHeader(w http.ResponseWriter) {

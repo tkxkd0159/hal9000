@@ -32,8 +32,8 @@ $(BUILD_DIR)/:
 
 go.sum: go.mod
 	@echo "Ensure dependencies have not been modified" >&2
-	GOPRIVATE=github.com/Carina-labs go mod verify
-	GOPRIVATE=github.com/Carina-labs go mod tidy
+	go mod verify
+	go mod tidy
 
 tester: go.sum $(BUILD_DIR)/
 	@echo "--> Generate tester for test"
@@ -47,7 +47,7 @@ tester: go.sum $(BUILD_DIR)/
 
 lint:
 	@echo " 👻 Running linter"
-	golangci-lint run --out-format=tab
+	@golangci-lint run --out-format=tab
 
 loc:
 	@tokei .

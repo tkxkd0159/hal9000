@@ -8,21 +8,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
-	"github.com/cosmos/cosmos-sdk/client/tx"
+	txcore "github.com/cosmos/cosmos-sdk/client/tx"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-
-	txcore "github.com/cosmos/cosmos-sdk/client/tx"
 )
 
 type (
 	AccAddr = sdktypes.AccAddress
 )
 
-func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string, gasWeight float64) tx.Factory {
+func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string, gasWeight float64) txcore.Factory {
 	gasSetting, _ := flags.ParseGasSetting(gas)
 
-	initFac := tx.Factory{}.
+	initFac := txcore.Factory{}.
 		WithAccountNumber(0).
 		WithSequence(0).
 		WithTimeoutHeight(0).
@@ -38,7 +36,6 @@ func MakeTxFactory(ctx client.Context, gas string, gasPrice string, memo string,
 	return initFac.
 		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithMemo(memo)
-
 }
 
 // BroadcastTx broadcast to a Tendermint node
@@ -104,7 +101,6 @@ func GenerateTx(ctx client.Context, txf txcore.Factory, msgs ...sdktypes.Msg) ([
 		return nil, err
 	}
 	return txBytes, nil
-
 }
 
 func prepareFactory(clientCtx client.Context, txf txcore.Factory) (txcore.Factory, error) {

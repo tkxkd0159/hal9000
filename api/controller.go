@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 type ChkHandler struct{}
@@ -20,6 +20,6 @@ func (ch *ChkHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Println("You can check commit time")
 	} else if req.URL.Path == "/check/commit" {
 		_, err := io.WriteString(w, BotStatus.LastCommit.String())
-		utils.CheckErr(err, "error occured while write response", ut.KEEP)
+		utils.CheckErr(err, "error occurred while write response", ut.KEEP)
 	}
 }

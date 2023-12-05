@@ -45,7 +45,6 @@ func (p *TypedEventParser) EventWithFieldName(protoFieldName string) string {
 func NewTypedEventParser(pkgName, msgName string, fieldName ...string) *TypedEventParser {
 	if len(fieldName) > 1 {
 		panic("You should assign only one field")
-
 	}
 	if fieldName == nil {
 		return &TypedEventParser{protoPkg: pkgName, protoMsg: msgName}

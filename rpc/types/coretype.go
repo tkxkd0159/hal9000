@@ -257,5 +257,7 @@ type ResultEvent struct {
 	Events TmEvents           `json:"events"`
 }
 
-type TmEvents map[EventName][]string
-type EventName = string
+type (
+	TmEvents  map[EventName][]string
+	EventName = string
+)

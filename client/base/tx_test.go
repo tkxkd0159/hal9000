@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Carina-labs/HAL9000/client/base"
+	"github.com/tkxkd0159/HAL9000/client/base"
 )
 
 type NovaTestSuite struct {

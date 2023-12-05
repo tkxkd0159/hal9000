@@ -4,22 +4,21 @@ import (
 	"context"
 	"time"
 
-	galtypes "github.com/Carina-labs/nova/x/gal/types"
-	icatypes "github.com/Carina-labs/nova/x/icacontrol/types"
 	"google.golang.org/grpc"
 
-	"github.com/Carina-labs/HAL9000/client"
-	"github.com/Carina-labs/HAL9000/client/nova/types"
-	"github.com/Carina-labs/HAL9000/utils"
+	galtypes "github.com/Carina-labs/nova/x/gal/types"
+	icatypes "github.com/Carina-labs/nova/x/icacontrol/types"
+
+	"github.com/tkxkd0159/HAL9000/client"
+	"github.com/tkxkd0159/HAL9000/client/nova/types"
+	"github.com/tkxkd0159/HAL9000/utils"
 )
 
 const (
 	ctxTimeout = time.Second * 10
 )
 
-var (
-	_ types.NovaQuerier = &NovaQueryClient{}
-)
+var _ types.NovaQuerier = &NovaQueryClient{}
 
 type NovaQueryClient struct {
 	*grpc.ClientConn

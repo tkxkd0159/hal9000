@@ -9,9 +9,9 @@ import (
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 
-	basetypes "github.com/Carina-labs/HAL9000/client/base/types"
-	"github.com/Carina-labs/HAL9000/utils"
-	ut "github.com/Carina-labs/HAL9000/utils/types"
+	basetypes "github.com/tkxkd0159/HAL9000/client/base/types"
+	"github.com/tkxkd0159/HAL9000/utils"
+	ut "github.com/tkxkd0159/HAL9000/utils/types"
 )
 
 type TxErr int
@@ -30,9 +30,7 @@ const (
 	NormalTxRetryDelay = time.Second
 )
 
-var (
-	wm sync.Mutex
-)
+var wm sync.Mutex
 
 // GenTxByBot
 // 1. Generate a TX with Msg (TxBuilder). If you set --generate-only, it makes unsigned tx and never broadcast
@@ -80,9 +78,9 @@ TXLOOP:
 		err = BroadcastTx(b.Ctx, txbytes)
 		if err == nil {
 			break
-		} else {
-			utils.CheckErr(err, " ❌ something went wrong while broadcast tx", ut.KEEP)
 		}
+
+		utils.CheckErr(err, " ❌ something went wrong while broadcast tx", ut.KEEP)
 	}
 
 	_, err = b.Ctx.Output.Write([]byte(fmt.Sprintf("%v: Tx was generated\n\n", time.Now())))

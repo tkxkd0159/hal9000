@@ -16,9 +16,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
-var (
-	_ Client = &WSClient{}
-)
+var _ Client = &WSClient{}
 
 // WSOptions for WSClient.
 type WSOptions struct {
@@ -42,7 +40,7 @@ func DefaultWSOptions() WSOptions {
 // the remote server.
 //
 // WSClient is safe for concurrent use by multiple goroutines.
-type WSClient struct { // nolint: maligned
+type WSClient struct { //nolint: maligned
 	*RunState
 	conn *websocket.Conn
 

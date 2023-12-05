@@ -3,16 +3,17 @@ package msgs
 import (
 	"time"
 
-	"github.com/Carina-labs/nova/x/gal/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Carina-labs/nova/x/gal/types"
 )
 
 func MakeMsgDelegate(chainID string, operator sdktypes.AccAddress, seq uint64, ibctimeout uint64) *types.MsgDelegate {
 	return types.NewMsgDelegate(chainID, seq, operator, ibctimeout)
 }
 
-func MakeMsgIcaWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTs time.Time, seq uint64, ibctimeout uint64) *types.MsgIcaWithdraw {
-	return types.NewMsgIcaWithdraw(chainID, operator, portID, chanID, blockTs, seq, ibctimeout)
+func MakeMsgIcaWithdraw(chainID string, operator sdktypes.AccAddress, portID string, chanID string, blockTS time.Time, seq uint64, ibctimeout uint64) *types.MsgIcaWithdraw {
+	return types.NewMsgIcaWithdraw(chainID, operator, portID, chanID, blockTS, seq, ibctimeout)
 }
 
 func MakeMsgUndelegate(chainID string, operator sdktypes.AccAddress, seq uint64, ibctimeout uint64) *types.MsgUndelegate {

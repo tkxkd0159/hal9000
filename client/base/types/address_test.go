@@ -5,16 +5,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Carina-labs/HAL9000/client/base/types"
+	"github.com/tkxkd0159/HAL9000/client/base/types"
 )
 
 func TestConvertMainPrefix(t *testing.T) {
 	old := "nova"
-	new := "newprefix"
-	got := types.ConvertMainPrefix(types.Bech32MainPrefix, old, new)
-	got2 := types.ConvertMainPrefix(types.Bech32PrefixAccAddr, old, new)
-	got3 := types.ConvertMainPrefix(types.Bech32PrefixValAddr, old, new)
-	got4 := types.ConvertMainPrefix(types.Bech32PrefixConsAddr, old, new)
+	_new := "newprefix"
+	got := types.ConvertMainPrefix(types.Bech32MainPrefix, old, _new)
+	got2 := types.ConvertMainPrefix(types.Bech32PrefixAccAddr, old, _new)
+	got3 := types.ConvertMainPrefix(types.Bech32PrefixValAddr, old, _new)
+	got4 := types.ConvertMainPrefix(types.Bech32PrefixConsAddr, old, _new)
 	require.Equal(t, "newprefix", got, "")
 	require.Equal(t, "newprefix", got2, "")
 	require.Equal(t, "newprefixvaloper", got3, "")
